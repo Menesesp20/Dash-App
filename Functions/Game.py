@@ -71,6 +71,11 @@ sys.path.append('Functions/visualization')
 from Functions.utils import read_json
 from Functions.visualization.passing_network import draw_pitch, draw_pass_map
 
+from plottable import ColumnDefinition, ColumnType, Table
+from plottable.cmap import normed_cmap
+from plottable.formatters import decimal_to_percent
+from plottable.plots import circled_image, image, progress_donut
+
 clubColors = {'Brazil' : ['#fadb04', '#1c3474'],
               'Portugal' : ['#e1231b', '#004595'],
               'Argentina' : ['#52a9dc', '#dbe4ea'],
@@ -106,6 +111,146 @@ df["matchTimestamp"] = pd.to_timedelta(df["matchTimestamp"], unit='s')
 df.drop_duplicates(subset=['name', 'matchTimestamp', 'team', 'typedisplayName', 'x', 'y'], keep='first', inplace=True)
 df.sort_values(by=['Match_ID', 'matchTimestamp'], inplace=True, ascending=[True, True])
 df.reset_index(drop=True, inplace=True)
+
+tier0 = ['La Liga', 'Premier League', 'Serie A', 'Ligue 1', 'Bundesliga']
+
+tier1 = ['Liga Bwin', 'Brasileirao', 'Eredivisie', 'Super Liga Turkey', 'Liga Mexico', 'First Divison Belgium', 'First Division Belgium',
+'Championship', 'Liga Profesional Argentina']
+
+tier2= ['MLS', 'Austrian Bundesliga', 'NHL', 'Super League Greece', 'Swiss Super League', 'Serie B',
+'Ligue 2', 'Super Liga Denamark', 'J1 League', 'K League 1', 'Smart Bank', 'J1 League', 'Ukraine League',
+'Russia League', 'Scottish Premiership', 'HNL', 'Bundesliga 2', 'Serie B Italy', 'Arabia Saudi Pro League', 'UAE Pro League']
+
+tier3 = ['1 RFEF',
+'Allsvenskan',
+'Liga 3 Portugal',
+'Brasileirao B',
+'Fortuna Liga',
+'Campeonato Peruano',
+'Super Liga Serbia',
+'First Division Andorra',
+'Superlig Albania',
+'Liga SABSEG',
+'Belgium Divison B',
+'Liga BetPlay Colombia',
+'Venezuela League', 'Ecuador Liga Pro',
+'Hungarian SuperLiga', 'Romania SuperLiga',
+'Poland League', 'Denamark 1st Division', 'Liga Profesional Argentina 2',
+'Cyprus League', 'Uruguay Primera División', 'Chile Primera División', 'Bosnia League', 'Slovenia League',
+'Moldavia League',
+'Slovakia League', 'India Super League', 'Finland League', 'Lituania League', 'Scotland Championship']
+
+tier4 = ['2 RFEF', 'Canadian Premier League', 'MLS PRO', 'USL Championship', 'USL League 1', 'Brasileirao C',
+'Turkey League 2',
+'Bolivia League',
+'Bulgaria League',
+'Israel League',
+'Letonia League',
+'Uruguai Segunda Divisón',
+'Bundesliga 3',
+'Armenia Premier League',
+'Scotland League One',
+'Denmark Division 3',
+'Persha Liga Ukraine',
+'Brazil Serie C',
+'Romania Division 2',
+'Hungarian Division 2',
+'Pvra Liga',
+'India Divison 2',
+'Israel Divison 2',
+'England League Two',
+'FNL',
+'Norway Division 2',
+'Poland Fortuna 1 Liga',
+'Peru Division 2',
+'England League One',
+'Italy Serie C',
+'Italy Serie D',
+'Italy Seriea D',
+'Guatemala League',
+'Montenegro League',
+'Estonia League',
+'Malta League',
+'North Ireland Premiership',
+'Azerbeijan League',
+'Costa Rica Primera Divisón',
+'Chile Primera B',
+'Austria 2',
+'France National 1',
+'Swiss 2',
+'Eredivisie 2',
+'K2 League',
+'J2 League',
+'Luxembourg League',
+'New Zealand League',
+'Singapore League',
+'Panama League',
+'kyrgyzstan Premier League',
+'Hong Kong League',
+'El Salvador Primera Divisón',
+'Vietnam League',
+'North Macedonia First League',
+'Malaysia Super Liga',
+'Indonesia Liga 1',
+'Georgia League',
+'Belarus Premier League',
+'Thai League',
+'Uzbekistan League',
+'Kazaskitao League',
+'Algeria Ligue 1',
+'A-League',
+'Iran Super League',
+'China Super League',
+'South Africa League',
+'Regionalliga Bayern',
+'Regionalliga Nordost',
+'Regionalliga Nord',
+'Regionalliga West',
+'Regionalliga SudWest',
+'Finland Division 2']
+
+center_Back = ['Non-penalty goals/90', 'Offensive duels %', 'Progressive runs/90',
+                'Passes %', 'Forward passes %', 'Forward passes/90', 'Progressive passes/90',
+               'PAdj Interceptions', 'PAdj Sliding tackles', 'Defensive duels/90', 'Defensive duels %',
+               'Aerial duels/90', 'Aerial duels %', 'Shots blocked/90']
+
+center_Back_bs = ['Progressive runs/90', 'Forward passes %', 'Progressive passes/90',
+               'PAdj Interceptions', 'PAdj Sliding tackles', 'Aerial duels %']
+
+full_Back = ['Successful dribbles %', 'Touches in box/90', 'Offensive duels %', 'Progressive runs/90', 'Crosses/90', 'Deep completed crosses/90',
+            'Passes %', 'Deep completions/90', 'Progressive passes/90', 'Key passes/90', 'Third assists/90',
+             'PAdj Interceptions', 'Defensive duels %', 'Aerial duels/90', 'Aerial duels %']
+
+defensive_Midfield  = ['xG/90', 'Shots/90', 'Progressive runs/90', 'Successful dribbles %',
+                       'Passes %', 'Forward passes %', 'Forward passes/90', 'Progressive passes/90','PAdj Sliding tackles',
+                       'PAdj Interceptions', 'Aerial duels %', 'Defensive duels %', 'Offensive duels %']
+
+Midfield  = ['xG/90', 'Shots', 'Progressive runs/90', 'Successful dribbles %',
+             'Passes %', 'Forward passes %', 'Forward passes/90', 'Progressive passes/90',
+             'Key passes/90', 'Second assists/90', 'Assists', 'xA',
+             'PAdj Interceptions', 'Aerial duels %', 'Defensive duels %']
+
+offensive_Midfield = ['xG/90', 'Goals/90', 'Progressive runs/90', 'Successful dribbles %',
+                      'xA/90', 'Deep completions/90', 'Passes to penalty area/90',
+                      'Touches in box/90', 'Key passes/90', 'Passes final 1/3 %',
+                      'Passes penalty area %', 'Progressive passes/90',
+                      'Succ defensive actions/90', 'PAdj Interceptions', 'Aerial duels %', 'Defensive duels %']
+
+offensive_Midfield_BS = ['Successful dribbles %', 'xA/90', 'Deep completions/90', 'Passes to penalty area/90',
+                      'Key passes/90', 'Passes final 1/3 %']
+
+Winger = ['Successful dribbles %', 'Goals', 'xG/90',
+          'xA/90', 'Touches in box/90', 'Dribbles/90', 'Passes to penalty area/90', 'Key passes/90',
+          'Progressive runs/90', 'Crosses/90', 'Deep completed crosses/90',
+          'Offensive duels/90', 'PAdj Interceptions']
+
+Forward = ['Non-penalty goals', 'xG', 'Shots on target, %', 'Goal conversion, %',
+           'Dribbles/90', 'Deep completions/90', 'Passes penalty area %', 
+           'Aerial duels %', 'Aerial duels/90', 'Touches in box/90']
+
+################################################################################################################################################
+#--------------------------------------------------- PERFORMANCE --------------------------------------------------------------------------------
+################################################################################################################################################
 
 def buildUpPasses(club, data):
     from datetime import timedelta
@@ -5431,58 +5576,5084 @@ def possessionGained(team, eventType):
 
     return app.get_asset_url('possessionGained' + team + '.png')
 
+################################################################################################################################################
+#--------------------------------------------------- SCOUTING --------------------------------------------------------------------------------
+################################################################################################################################################
+
+def playerAbility(df):
+
+  def rank(df):
+    for col in df.columns:
+      df['rank_' + col] = df[col].rank(pct=True)
+
+  rank(df)
+
+  df['Pass Ability'] = ((df['rank_Passes/90'] * 65) + (df['rank_Accurate short / medium passes, %'] * 35))
+
+  ##########################################################################################################################################################################
+
+  df['KeyPass Ability'] = ((df['rank_Key passes/90'] * 65) + (df['rank_Smart passes/90'] * 35))
+
+  ##########################################################################################################################################################################
+
+  df['SetPieces Ability'] = ((df['rank_Corners/90']  * 60) + (df['rank_Direct free kicks on target, %'] * 40))
+
+  ##########################################################################################################################################################################
+
+  df['Dribbling Ability'] = ((df['rank_Dribbles/90']* 50) + (df['rank_Successful dribbles %'] * 50))
+
+  ##########################################################################################################################################################################
+
+  df['Create Chances Ability'] = ((df['rank_Shot assists/90'] * 10) + (df['rank_Second assists/90'] * 30) + (df['rank_Third assists/90'] * 15) +
+                                      (df['rank_xA'] * 25) + (df['rank_Assists'] * 20))
+
+  ##########################################################################################################################################################################
+
+  df['Sight play'] = ((df['rank_Passes to penalty area/90'] * 20) + (df['rank_Key passes/90'] * 30) +
+                            (df['rank_Passes final 1/3 %'] * 20) + (df['rank_Smart passes/90'] * 30))
+
+  ##########################################################################################################################################################################
+
+  df['Concentration Ability'] = ((df['rank_PAdj Sliding tackles'] * 50) + (df['rank_PAdj Interceptions'] * 50))
+
+  ##########################################################################################################################################################################
+
+  df['Finishing Ability'] = ((df['rank_Shots on target, %'] * 15) + (df['rank_Goals'] * 60) + (df['rank_xG'] * 25))
+
+  ##########################################################################################################################################################################
+
+  df['Heading Ability'] = ((df['rank_Head goals'] * 50) + (df['rank_Head goals/90'] * 50))
+
+  ##########################################################################################################################################################################
+
+  df['Interception Ability'] = ((df['rank_PAdj Interceptions'] * 65) + (df['Interceptions/90'] * 35))
+
+  ##########################################################################################################################################################################
+
+  df['Tackle Ability'] = ((df['rank_Sliding tackles/90'] * 35) + (df['rank_PAdj Sliding tackles'] * 65))
+
+  ##########################################################################################################################################################################
+
+  df['Aerial Ability'] = ((df['rank_Aerial duels %'] * 50) + (df['rank_Aerial duels/90'] * 50))
+
+################################################################################################################################################
+
+def radar_chart_compare(df, player, player2, cols):
+
+  from soccerplots.radar_chart import Radar
+
+  #Obtenção dos dois jogadores que pretendemos
+  pl1 = df[(df['Player'] == player)]
+
+  position = pl1['Position'].unique()
+  position = position.tolist()
+  position = position[0]
+  if ', ' in position:
+      position = position.split(', ')[0]
+
+  val1 = pl1[cols].values[0]
+
+  club = pl1['Team'].values[0]
+  league = pl1['Comp'].values[0]
+
+  #Obtenção dos dois jogadores que pretendemos
+  pl2 = df[(df['Player'] == player2)]
+  val2 = pl2[cols].values[0]
+
+  position2 = pl2['Position'].unique()
+  position2 = position2.tolist()
+  position2 = position2[0]
+  if ', ' in position2:
+      position2 = position2.split(', ')[0]
+
+  club2 = pl2['Team'].values[0]
+  league2 = pl2['Comp'].values[0]
+
+  #Obtenção dos valores das colunas que pretendemos colocar no radar chart, não precisamos aceder ao index porque só iriamos aceder aos valores de um dos jogadores
+  values = [val1, val2]
+
+  rango = df.loc[(df['Comp'] == league) & (df.Position.str.contains(position))].reset_index(drop=True)
+
+  #Obtençaõ dos valores min e max das colunas selecionadas
+  ranges = [(rango[col].min(), rango[col].max()) for col in cols] 
+
+  #Atribuição dos valores aos titulos e respetivos tamanhos e cores
+  title = dict(
+      #Jogador 1
+      title_name = player,
+      title_color = '#548135',
+      
+      #Jogador 2
+      title_name_2 = player2,
+      title_color_2 = '#fb8c04',
+
+      #Tamnhos gerais do radar chart
+      title_fontsize = 20,
+      subtitle_fontsize = 15,
+    
+      subtitle_name=club,
+      subtitle_color='#181818',
+      subtitle_name_2=club2
+
+  )
+
+  #team_player = df[col_name_team].to_list()
+
+  #dict_team ={'Dortmund':['#ffe011', '#000000'],
+              #'Nice':['#cc0000', '#000000'],
+              #'Nice':['#cc0000', '#000000']}
+
+  #color = dict_team.get(team_player[0])
+
+  ## endnote 
+  endnote = "Visualization made by: Pedro Meneses(@menesesp20)"
+
+  #Criação do radar chart
+  fig, ax = plt.subplots(figsize=(18,15), dpi=500)
+  radar = Radar(background_color="#E8E8E8", patch_color="#181818", range_color="#181818", label_color="#181818", label_fontsize=10, range_fontsize=11)
+  fig, ax = radar.plot_radar(ranges=ranges, 
+                             params=cols, 
+                             values=values, 
+                             radar_color=['#548135','#fb8c04'], 
+                             figax=(fig, ax),
+                             title=title,
+                             endnote=endnote, end_size=0, end_color="#1b1b1b",
+                             compare=True)
+  
+  fig.set_facecolor('#E8E8E8')
+
+################################################################################################################################################
+
+def radar_chart(df, league, player, cols, player2=None):
+
+  from soccerplots.radar_chart import Radar
+
+  leagueDF = df.loc[df.Comp == league].reset_index(drop=True)
+
+  tier = leagueDF.Tier.unique()
+  tier = tier.tolist()
+  tier = tier[0]
+
+  if player2 == None:
+    #Atribuição do jogador a colocar no gráfico
+    players = df.loc[(df['Player'] == player) & (df['Season'] == '2021/22')].reset_index(drop=True)
+
+    club = players.Team.unique()
+    club = club.tolist()
+    club = club[0]
+
+    tierPlayer = players.Tier.unique()
+    tierPlayer = tierPlayer.tolist()
+    tierPlayer = tierPlayer[0]
+
+    position = players['Position'].unique()
+    position = position.tolist()
+    position = position[0]
+    if ', ' in position:
+        position = position.split(', ')[0]
+
+    """
+    playersDF = []
+
+    if (tier == 2) & (tierPlayer == 1):
+      for i, row in players[Forward].iterrows():
+          playersDF.append(row.values * 1.1)
+
+      players = pd.DataFrame(playersDF)
+
+      players.rename(columns={0: cols[0], 1: cols[1], 2: cols[2], 3: cols[3],
+                                4: cols[4], 5: cols[5], 6: cols[6],
+                                7: cols[7], 8: cols[8], 9: cols[9]}, inplace=True)
+
+    #####################################################################################################################
+    #####################################################################################################################
+
+    elif (tier == 3) & (tierPlayer == 1):
+      for i, row in players[Forward].iterrows():
+          playersDF.append(row.values * 1.3)
+
+      players = pd.DataFrame(playersDF)
+
+      players.rename(columns={0: cols[0], 1: cols[1], 2: cols[2], 3: cols[3],
+                                4: cols[4], 5: cols[5], 6: cols[6],
+                                7: cols[7], 8: cols[8], 9: cols[9]}, inplace=True)
+
+    elif (tier == 3) & (tierPlayer == 2):
+      for i, row in players[Forward].iterrows():
+          playersDF.append(row.values * 1.1)
+
+      players = pd.DataFrame(playersDF)
+
+      players.rename(columns={0: cols[0], 1: cols[1], 2: cols[2], 3: cols[3],
+                                4: cols[4], 5: cols[5], 6: cols[6],
+                                7: cols[7], 8: cols[8], 9: cols[9]}, inplace=True)
+
+    #####################################################################################################################
+    #####################################################################################################################
+
+    elif (tier == 4) & (tierPlayer == 1):
+      for i, row in players[Forward].iterrows():
+          playersDF.append(row.values * 1.35)
+
+      players = pd.DataFrame(playersDF)
+
+      players.rename(columns={0: cols[0], 1: cols[1], 2: cols[2], 3: cols[3],
+                                4: cols[4], 5: cols[5], 6: cols[6],
+                                7: cols[7], 8: cols[8], 9: cols[9]}, inplace=True)
+
+    elif (tier == 4) & (tierPlayer == 2):
+      for i, row in players[Forward].iterrows():
+          playersDF.append(row.values * 1.25)
+
+      players = pd.DataFrame(playersDF)
+
+      players.rename(columns={0: cols[0], 1: cols[1], 2: cols[2], 3: cols[3],
+                                4: cols[4], 5: cols[5], 6: cols[6],
+                                7: cols[7], 8: cols[8], 9: cols[9]}, inplace=True)
+
+    elif (tier == 4) & (tierPlayer == 3):
+      for i, row in players[Forward].iterrows():
+          playersDF.append(row.values * 1.15)
+
+      players = pd.DataFrame(playersDF)
+
+      players.rename(columns={0: cols[0], 1: cols[1], 2: cols[2], 3: cols[3],
+                                4: cols[4], 5: cols[5], 6: cols[6],
+                                7: cols[7], 8: cols[8], 9: cols[9]}, inplace=True)
+    """
+      
+
+    #####################################################################################################################
+    #####################################################################################################################
+
+    #Valores que pretendemos visualizar no radar chart, acedemos ao index 0 para obtermos os valores dentro da lista correta
+    values = players[cols].values[0]
+    #Obtenção do alcance minimo e máximo dos valores
+
+    rango = df.loc[(df['Comp'] == league) & (df.Position.str.contains(position)) | (df.Player == player)].reset_index(drop=True)
+
+    ranges = [(rango[col].min(), rango[col].max()) for col in cols]
+
+    color = ['#548135','#fb8c04']
+    #Atribuição dos valores aos titulos e respetivos tamanhos e cores
+    title = dict(
+      title_name = player,
+      title_color = color[0],
+      title_fontsize = 25,
+      subtitle_fontsize = 15,
+    
+      subtitle_name=club,
+      subtitle_color='#181818',
+    )
+
+    #team_player = df[col_name_team].to_list()
+
+    #dict_team ={'Dortmund':['#ffe011', '#000000'],
+              #'Nice':['#cc0000', '#000000'],}
+
+    #color = dict_team.get(team_player[0])
+
+    ## endnote 
+    endnote = "Visualization made by: Pedro Meneses(@menesesp20)"
+
+    #Criação do radar chart
+    fig, ax = plt.subplots(figsize=(18,15))
+    radar = Radar(background_color="#E8E8E8", patch_color="#181818", range_color="#181818", label_color="#181818", label_fontsize=10, range_fontsize=11)
+    fig, ax = radar.plot_radar(ranges=ranges, 
+                               params=cols, 
+                               values=values, 
+                               radar_color=color,
+                               figax=(fig, ax),
+                               image_coord=[0.464, 0.81, 0.1, 0.075],
+                               title=title,
+                               endnote=endnote)
+
+    fig.set_facecolor('#E8E8E8')
+
+  else:
+    radar_chart_compare(df, player, player2, 'Player', 'Team', cols, league)
+
+################################################################################################################################################
+
+def PCA5(df, age, end_Value, minutes, playerName, role, contract, Tier, tierSec=None):
+
+    if (age == 'All Data') & (Tier == 'All Data') & (contract == 'No'):
+        # Age and League == All Data - DONE - 8
+        df = df.loc[(df['Minutes played'] >= minutes) & (df['Market value'] >= 0) & (df['Market value'] <= end_Value)].reset_index(drop=True)
+
+    elif (age == 'All Data') & (Tier == 'All Data') & (contract == 'Yes'):
+        # Age and League == All Data - DONE - 8
+        df = df.loc[(df['Minutes played'] >= minutes) & (df['Market value'] >= 0) & (df['Market value'] <= end_Value) &
+                    (df['Contract expires'] == str(date.today().year) + '-06' + '-30')].reset_index(drop=True)
+
+####################################################################################################################################################################
+####################################################################################################################################################################
 
 
+    elif (age != 'All Data') & (Tier != 'All Data') & (contract == 'No') & (tierSec == None):
+        # Age and Leagues != All Data and Leagues by Tier - DONE - 8
+        df = df.loc[(df.Age <= age) & (df.Tier == Tier) & (df['Minutes played'] >= minutes) &
+                    (df['Market value'] >= 0) & (df['Market value'] <= end_Value) | (df.Player == playerName)].reset_index(drop=True)
+
+    elif (age != 'All Data') & (Tier != 'All Data') & (contract == 'Yes') & (tierSec == None):
+        # Age and Leagues != All Data and Leagues by Tier - DONE - 8
+        df = df.loc[(df.Age <= age) & (df.Tier == Tier) & (df['Minutes played'] >= minutes) &
+                    (df['Contract expires'] == str(date.today().year) + '-06' + '-30') &
+                    (df['Market value'] >= 0) & (df['Market value'] <= end_Value) | (df.Player == playerName)].reset_index(drop=True)
+
+    elif (age != 'All Data') & (Tier != 'All Data') & (tierSec != None) & (contract == 'No'):
+        # Age and Leagues != All Data and Leagues by Tier - DONE - 8
+        df = df.loc[(df.Age <= age) & (df['Minutes played'] >= minutes) &
+                    (df['Market value'] >= 0) & (df['Market value'] <= end_Value) &
+                    ((df.Tier == Tier) | (df.Tier == tierSec)) | (df.Player == playerName)].reset_index(drop=True)
+
+    elif (age != 'All Data') & (Tier != 'All Data') & (tierSec != None) & (contract == 'Yes'):
+        # Age and Leagues != All Data and Leagues by Tier - DONE - 8
+        df = df.loc[(df.Age <= age) & (df['Minutes played'] >= minutes) &
+                    (df['Contract expires'] == str(date.today().year) + '-06' + '-30') &
+                    (df['Market value'] >= 0) & (df['Market value'] <= end_Value) &
+                    ((df.Tier == Tier) | (df.Tier == tierSec)) | (df.Player == playerName)].reset_index(drop=True)
+
+####################################################################################################################################################################
+####################################################################################################################################################################
+
+    elif (age != 'All Data') & (Tier == 'All Data') & (contract == 'No'):
+        # League == All Data - DONE - 8
+        df = df.loc[(df.Age <= age) & (df['Minutes played'] >= minutes) &
+                        (df['Market value'] >= 0) & (df['Market value'] <= end_Value) |
+                        (df.Player == playerName)].reset_index(drop=True)
+
+    elif (age != 'All Data') & (Tier == 'All Data') & (contract == 'Yes'):
+        # League == All Data - DONE - 8
+        df = df.loc[(df.Age <= age) & (df['Minutes played'] >= minutes) &
+                    (df['Contract expires'] == str(date.today().year) + '-06' + '-30') &
+                    (df['Market value'] >= 0) & (df['Market value'] <= end_Value) |
+                    (df.Player == playerName)].reset_index(drop=True)
+
+####################################################################################################################################################################
+####################################################################################################################################################################
+
+    elif (age == 'All Data') & (Tier != 'All Data') & (contract == 'No'):
+        # Age == All Data - DONE - 4
+        df = df.loc[(df['Minutes played'] >= minutes) & (df['Market value'] >= 0) & (df['Market value'] <= end_Value) &
+                    ((df.Tier == Tier) | (df.Tier == tierSec)) | (df.Player == playerName)].reset_index(drop=True)
+
+    elif (age == 'All Data') & (Tier != 'All Data') & (contract == 'Yes'):
+        # Age == All Data - DONE - 4
+        df = df.loc[(df['Minutes played'] >= minutes) & (df['Market value'] >= 0) & (df['Contract expires'] == str(date.today().year) + '-06' + '-30') &
+                    (df['Market value'] <= end_Value) & ((df.Tier == Tier) | (df.Tier == tierSec)) | (df.Player == playerName)].reset_index(drop=True)
+                        
+#######################################################################################################################################################################################
+#######################################################################################################################################################################################
+
+    if role == center_Back:
+        df = df.loc[(df.Position.str.contains('CB'))][['Player', 'Non-penalty goals/90', 'Offensive duels %', 'Progressive runs/90',
+                'Passes %', 'Forward passes %', 'Forward passes/90', 'Progressive passes/90',
+                'PAdj Interceptions', 'PAdj Sliding tackles', 'Defensive duels/90', 'Defensive duels %',
+                'Aerial duels/90', 'Aerial duels %', 'Shots blocked/90']]
+
+    elif role == full_Back:
+        df = df.loc[(df.Position.str.contains('RB')) | (df.Position.str.contains('LB'))][['Player', 'Successful dribbles %', 'Touches in box/90', 'Offensive duels %', 'Progressive runs/90', 'Crosses/90', 'Deep completed crosses/90',
+            'Passes %', 'Deep completions/90', 'Progressive passes/90', 'Key passes/90', 'Third assists/90',
+                'PAdj Interceptions', 'Defensive duels %', 'Aerial duels/90', 'Aerial duels %']]
+
+    elif role == defensive_Midfield:
+
+        df = df.loc[(df.Position.str.contains('RCMF')) | (df.Position.str.contains('LCMF')) | (df.Position.str.contains('LDMF')) | (df.Position.str.contains('RDMF')) |
+                    (df.Position.str.contains('AMF')) | (df.Position.str.contains('DMF'))][['Player', 'xG/90', 'Shots', 'Progressive runs/90', 'Successful dribbles %',
+                        'Passes %', 'Forward passes %', 'Forward passes/90', 'Progressive passes/90','PAdj Sliding tackles',
+                        'PAdj Interceptions', 'Aerial duels %', 'Defensive duels %', 'Offensive duels %']]
+
+    elif role == Midfield:
+
+        df = df.loc[(df.Position.str.contains('RCMF')) | (df.Position.str.contains('LCMF')) | (df.Position.str.contains('LDMF')) | (df.Position.str.contains('RDMF')) |
+                    (df.Position.str.contains('AMF')) | (df.Position.str.contains('DMF'))][['Player', 'xG/90', 'Shots', 'Progressive runs/90', 'Successful dribbles %',
+                'Passes %', 'Forward passes %', 'Forward passes/90', 'Progressive passes/90',
+                'Key passes/90', 'Second assists/90', 'Assists', 'xA',
+                'PAdj Interceptions', 'Aerial duels %', 'Defensive duels %']]
+
+    elif role == offensive_Midfield:
+
+        df = df.loc[(df.Position.str.contains('RCMF')) | (df.Position.str.contains('LCMF')) | (df.Position.str.contains('LDMF')) | (df.Position.str.contains('RDMF')) |
+                    (df.Position.str.contains('AMF')) | (df.Position.str.contains('DMF'))][['Player', 'xG/90', 'Goals/90', 'Progressive runs/90', 'Successful dribbles %',
+                        'xA/90', 'Deep completions/90', 'Passes to penalty area/90',
+                        'Touches in box/90', 'Key passes/90', 'Passes final 1/3 %',
+                        'Passes penalty area %', 'Progressive passes/90',
+                        'Succ defensive actions/90', 'PAdj Interceptions', 'Aerial duels %', 'Defensive duels %']]
+
+    elif role == Winger:
+
+        df = df.loc[(df.Position.str.contains('LW')) | (df.Position.str.contains('RW')) | (df.Position.str.contains('LAMF')) |
+                     (df.Position.str.contains('RAMF')) | (df.Position.str.contains('LWF')) | (df.Position.str.contains('RWF'))][['Player', 'Successful dribbles %', 'Goals', 'xG/90',
+            'xA/90', 'Touches in box/90', 'Dribbles/90', 'Passes to penalty area/90', 'Key passes/90',
+            'Progressive runs/90', 'Crosses/90', 'Deep completed crosses/90',
+            'Offensive duels/90', 'PAdj Interceptions']]
+
+    elif role == Forward:
+
+        df = df.loc[(df.Position.str.contains('CF'))][['Player', 'Goals', 'xG/90', 'Shots on target, %', 'Goal conversion, %',
+            'Successful dribbles %', 'xA/90', 'Touches in box/90', 'Dribbles/90',
+            'Offensive duels/90', 'PAdj Interceptions', 'Aerial duels/90', 'Aerial duels %']]
+
+    else:
+
+        df = df
+
+    #Guardar como matriz na variavél X todas as métricas e na variavél y todos os nomes dos jogadores
+    X, y = df.iloc[:, 1:len(df.columns)].values, df.iloc[:, 0].values
+
+    #Escalar os dados, passo muito importante em Machine Learning
+    X_std = StandardScaler().fit_transform(X)
+
+    #Aplicar o método PCA, ou seja reduzir o dataframe até à quantidade necessária de dados, sem perdermos informação essencial
+    if (age == 'All Data') & (Tier != 'All Data'):
+        pca = PCA(n_components = 10)
+        pca.fit(X_std)
+        X_pca = pca.transform(X_std)
+        #Visualização de quantas dimensões nos interessam
+        #print("Shape x_PCA: ", X_pca.shape)
+        #expl = pca.explained_variance_ratio_
+
+        #for x in range(0, len(df.columns), 2):
+        #    print("Explained Variance: " + str(x) + " components:", sum(expl[0:x]))
+
+        #plt.plot(np.cumsum(pca.explained_variance_ratio_))
+        #plt.xlabel('Dimensions')
+        #plt.ylabel('Explained Variance')
+
+        #Utilizar n dimensões que nos indicar o Elbow
+        N_COMP = 4
+
+    elif len(df) < 10:
+
+        pca = PCA(n_components = len(df))
+        pca.fit(X_std)
+        X_pca = pca.transform(X_std)
+        #Visualização de quantas dimensões nos interessam
+        #print("Shape x_PCA: ", X_pca.shape)
+        #expl = pca.explained_variance_ratio_
+
+        #for x in range(0, len(df.columns), 2):
+        #    print("Explained Variance: " + str(x) + " components:", sum(expl[0:x]))
+
+        #plt.plot(np.cumsum(pca.explained_variance_ratio_))
+        #plt.xlabel('Dimensions')
+        #plt.ylabel('Explained Variance')
+
+        #Utilizar n dimensões que nos indicar o Elbow
+        N_COMP = 4
+        
+    else:
+
+        pca = PCA(n_components = len(df.columns)-1)
+        pca.fit(X_std)
+        X_pca = pca.transform(X_std)
+        #Visualização de quantas dimensões nos interessam
+        #print("Shape x_PCA: ", X_pca.shape)
+        #expl = pca.explained_variance_ratio_
+
+        #for x in range(0, len(df.columns), 2):
+        #    print("Explained Variance: " + str(x) + " components:", sum(expl[0:x]))
+
+        #plt.plot(np.cumsum(pca.explained_variance_ratio_))
+        #plt.xlabel('Dimensions')
+        #plt.ylabel('Explained Variance')
+
+        #Utilizar n dimensões que nos indicar o Elbow
+        N_COMP = 8
+
+    columns = []
+
+    for col in range(1, N_COMP+1):
+        columns.append("PCA" + str(col))
+
+    df_pca_resultado = pd.DataFrame(data=X_pca[:,:N_COMP], columns=columns, index = y)
+
+    #Mostrar a correlação numa matriz
+    corr_matrix = df_pca_resultado.T.corr(method='pearson')
+
+    #Função automatizada para encontrarmos o jogador que pretendemos e o jogadores mais similar a ele
+    def GetSimilarPlayers(playerName, numPlayers, corr_matrix):
+        
+        SimPlayers = pd.DataFrame(columns = ['PlayerName', 'Similar Player', 'Correlation Factor'])
+
+        i = 0
+        for i in range(0, numPlayers):
+            row = corr_matrix.loc[corr_matrix.index == playerName].squeeze()
+
+            SimPlayers.at[i, 'PlayerName'] = playerName
+            SimPlayers.at[i, 'Similar Player'] = row.nlargest(i+2).sort_values(ascending=True).index[0]
+            SimPlayers.at[i, 'Correlation Factor'] = row.nlargest(i+2).round(2).sort_values(ascending=True)[0]
+
+            i = i+1
+        
+        return SimPlayers
+    
+    PlayerName = playerName
+    NumPlayers = 5
+
+    df_correlatedPlayers = GetSimilarPlayers(playerName, NumPlayers, corr_matrix)
+
+    df_correlatedPlayers.drop_duplicates(inplace=True)
+
+    return df_correlatedPlayers
+
+################################################################################################################################################
+
+def similarityDashboard(df, age, end_Value, minutes, playerName, role, contract, Tier, tierSec=None):
+
+        from soccerplots.radar_chart import Radar
+
+        df1 = PCA5(df, age, end_Value, minutes, playerName, role, contract, Tier, tierSec)
+
+        #df1 = PCA5(wyscout, 25, 250000, 1000, 'Vinícius Júnior', Winger, 'No', 0, 3)
+
+        fig = plt.figure(figsize=(50, 45), dpi = 500, facecolor = '#E8E8E8')
+        gspec = gridspec.GridSpec(
+        ncols=7, nrows=2, wspace = 0.5
+        )
+
+        ########################################################################################################################################################
+
+        ax6 = plt.subplot(
+                        gspec[1, 0],
+                )
+
+        dfPlayer = df.loc[df.Player == playerName].reset_index(drop=True)
+
+        position = dfPlayer.Position.unique()
+        position = position.tolist()
+        position = position[0]
+        if ', ' in position:
+                position = position.split(', ')[0]
+
+        rows = 9
+        cols = 0
+
+        #Criação da lista de jogadores
+        Players = df1['PlayerName'].unique()
+
+        Players = Players.tolist()
+
+        #Criação da lista de jogadores similares
+        similarPlayers = df1['Similar Player'].unique()
+
+        similarPlayers = similarPlayers.tolist()
 
 
+        pl1 = df.loc[df['Player'] == df1['Similar Player'].iloc[0]]
+        pl2 = df.loc[df['Player'] == df1['Similar Player'].iloc[1]]
+        pl3 = df.loc[df['Player'] == df1['Similar Player'].iloc[2]]
+        pl4 = df.loc[df['Player'] == df1['Similar Player'].iloc[3]]
+        pl5 = df.loc[df['Player'] == df1['Similar Player'].iloc[4]]
+
+        team = []
+
+        team.append(pl1['Team'].values)
+        team.append(pl2['Team'].values)
+        team.append(pl3['Team'].values)
+        team.append(pl4['Team'].values)
+        team.append(pl5['Team'].values)
+
+        comp = []
+
+        comp.append(pl1['Comp'].values)
+        comp.append(pl2['Comp'].values)
+        comp.append(pl3['Comp'].values)
+        comp.append(pl4['Comp'].values)
+        comp.append(pl5['Comp'].values)
+
+        xG90 = []
+
+        xG90.append(pl1['xG/90'].values)
+        xG90.append(pl2['xG/90'].values)
+        xG90.append(pl3['xG/90'].values)
+        xG90.append(pl4['xG/90'].values)
+        xG90.append(pl5['xG/90'].values)
+
+        Goals90 = []
+
+        Goals90.append(pl1['Goals/90'].values)
+        Goals90.append(pl2['Goals/90'].values)
+        Goals90.append(pl3['Goals/90'].values)
+        Goals90.append(pl4['Goals/90'].values)
+        Goals90.append(pl5['Goals/90'].values)
+        
+        Progressive_runs90 = []
+
+        Progressive_runs90.append(pl1['Progressive runs/90'].values)
+        Progressive_runs90.append(pl2['Progressive runs/90'].values)
+        Progressive_runs90.append(pl3['Progressive runs/90'].values)
+        Progressive_runs90.append(pl4['Progressive runs/90'].values)
+        Progressive_runs90.append(pl5['Progressive runs/90'].values)
+        
+        dribbles = []
+
+        dribbles.append(pl1['Successful dribbles %'].values)
+        dribbles.append(pl2['Successful dribbles %'].values)
+        dribbles.append(pl3['Successful dribbles %'].values)
+        dribbles.append(pl4['Successful dribbles %'].values)
+        dribbles.append(pl5['Successful dribbles %'].values)
+        
+        xA = []
+
+        xA.append(pl1['xA/90'].values)
+        xA.append(pl2['xA/90'].values)
+        xA.append(pl3['xA/90'].values)
+        xA.append(pl4['xA/90'].values)
+        xA.append(pl5['xA/90'].values)
+        
+        Deepcompletions = []
+
+        Deepcompletions.append(pl1['Deep completions/90'].values)
+        Deepcompletions.append(pl2['Deep completions/90'].values)
+        Deepcompletions.append(pl3['Deep completions/90'].values)
+        Deepcompletions.append(pl4['Deep completions/90'].values)
+        Deepcompletions.append(pl5['Deep completions/90'].values)
+        
+        Penaltyarea90 = []
+
+        Penaltyarea90.append(pl1['Passes to penalty area/90'].values)
+        Penaltyarea90.append(pl2['Passes to penalty area/90'].values)
+        Penaltyarea90.append(pl3['Passes to penalty area/90'].values)
+        Penaltyarea90.append(pl4['Passes to penalty area/90'].values)
+        Penaltyarea90.append(pl5['Passes to penalty area/90'].values)
+
+        
+        Market_value = []
+
+        Market_value.append(pl1['Market value'].values)
+        Market_value.append(pl2['Market value'].values)
+        Market_value.append(pl3['Market value'].values)
+        Market_value.append(pl4['Market value'].values)
+        Market_value.append(pl5['Market value'].values)
+        
+        keyPasses = []
+
+        keyPasses.append(pl1['Key passes/90'].values)
+        keyPasses.append(pl2['Key passes/90'].values)
+        keyPasses.append(pl3['Key passes/90'].values)
+        keyPasses.append(pl4['Key passes/90'].values)
+        keyPasses.append(pl5['Key passes/90'].values)
+
+        passesFinaThird = []
+
+        passesFinaThird.append(pl1['Passes final 1/3 %'].values)
+        passesFinaThird.append(pl2['Passes final 1/3 %'].values)
+        passesFinaThird.append(pl3['Passes final 1/3 %'].values)
+        passesFinaThird.append(pl4['Passes final 1/3 %'].values)
+        passesFinaThird.append(pl5['Passes final 1/3 %'].values)
+
+        keyPenBox = []
+
+        keyPenBox.append(pl1['Passes penalty area %'].values)
+        keyPenBox.append(pl2['Passes penalty area %'].values)
+        keyPenBox.append(pl3['Passes penalty area %'].values)
+        keyPenBox.append(pl4['Passes penalty area %'].values)
+        keyPenBox.append(pl5['Passes penalty area %'].values)
+
+        progressivePasses = []
+
+        progressivePasses.append(pl1['Progressive passes/90'].values)
+        progressivePasses.append(pl2['Progressive passes/90'].values)
+        progressivePasses.append(pl3['Progressive passes/90'].values)
+        progressivePasses.append(pl4['Progressive passes/90'].values)
+        progressivePasses.append(pl5['Progressive passes/90'].values)
+
+        succDefensiveActions = []
+
+        succDefensiveActions.append(pl1['Succ defensive actions/90'].values)
+        succDefensiveActions.append(pl2['Succ defensive actions/90'].values)
+        succDefensiveActions.append(pl3['Succ defensive actions/90'].values)
+        succDefensiveActions.append(pl4['Succ defensive actions/90'].values)
+        succDefensiveActions.append(pl5['Succ defensive actions/90'].values)
+
+        PAdjInterceptions = []
+
+        PAdjInterceptions.append(pl1['PAdj Interceptions'].values)
+        PAdjInterceptions.append(pl2['PAdj Interceptions'].values)
+        PAdjInterceptions.append(pl3['PAdj Interceptions'].values)
+        PAdjInterceptions.append(pl4['PAdj Interceptions'].values)
+        PAdjInterceptions.append(pl5['PAdj Interceptions'].values)
+
+        aerialDuels = []
+
+        aerialDuels.append(pl1['Aerial duels %'].values)
+        aerialDuels.append(pl2['Aerial duels %'].values)
+        aerialDuels.append(pl3['Aerial duels %'].values)
+        aerialDuels.append(pl4['Aerial duels %'].values)
+        aerialDuels.append(pl5['Aerial duels %'].values)
+
+        defensiveDuels = []
+
+        defensiveDuels.append(pl1['Defensive duels %'].values)
+        defensiveDuels.append(pl2['Defensive duels %'].values)
+        defensiveDuels.append(pl3['Defensive duels %'].values)
+        defensiveDuels.append(pl4['Defensive duels %'].values)
+        defensiveDuels.append(pl5['Defensive duels %'].values)
+        #Valores de similariedade
+        valuePlayers = df1['Correlation Factor']
+        valuePlayers = valuePlayers.tolist()
+
+        data = {
+                'Players' : similarPlayers,
+                'Similarity' : valuePlayers,
+                'Market value' : Market_value,
+                'xG/90' : xG90,
+                'Goals/90' : Goals90,
+                'Progressive runs/90' : Progressive_runs90,
+                'Succ dribbles %' : dribbles,
+                'xA/90' : xA,
+                'Deep completions/90' : Deepcompletions,
+                'Passes to penalty area/90' : Penaltyarea90,
+                'Key passes/90' : keyPasses,
+                'Passes final 1/3 %' : passesFinaThird,
+                'Passes penalty area %' : keyPenBox,
+                'Progressive passes/90' : progressivePasses,
+                'Succ defensive actions/90' : succDefensiveActions,
+                'PAdj Interceptions' : PAdjInterceptions,
+                'Aerial duels %' : aerialDuels,
+                'Defensive duels %' : defensiveDuels
+
+        }
+
+        data = pd.DataFrame(data)
+
+        data.reset_index(drop=True, inplace=True)
+
+        data = data.T
+
+        data = data.to_dict('index')
+
+        for i in range(1):
+                for k, v in data.items():
+                        if k == 'Players':
+                                ax6.text(x=8, y=11, s=v[0], va='center', ha='center', weight='bold', size=48, color='#548135')
+                                ax6.text(x=11.5, y=11, s=v[1], va='center', ha='center', weight='bold', size=48, color='#548135')
+                                ax6.text(x=14.8, y=11, s=v[2], va='center', ha='center', weight='bold', size=48, color='#548135')
+                                ax6.text(x=17.5, y=11, s=v[3], va='center', ha='center', weight='bold', size=48, color='#548135')
+                                ax6.text(x=20.8, y=11, s=v[4], va='center', ha='center', weight='bold', size=48, color='#548135')
+                                # shots column - this is my "main" column, hence bold text
+
+                        if k == 'Similarity':
+                                ax6.text(x=8, y=10.3, s=v[0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=11.5, y=10.3, s=v[1], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=14.8, y=10.3, s=v[2], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=17.5, y=10.3, s=v[3], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=20.8, y=10.3, s=v[4], va='center', ha='right', size=48, color='#181818')
+
+                        if k == 'Market value':
+                                ax6.text(x=8, y=9.6, s=v[0][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=11.5, y=9.6, s=v[1][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=14.8, y=9.6, s=v[2][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=17.5, y=9.6, s=v[3][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=20.8, y=9.6, s=v[4][0], va='center', ha='right', size=48, color='#181818')
+
+                        if k == 'Progressive runs/90':
+                                ax6.text(x=8, y=8.9, s=v[0][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=11.5, y=8.9, s=v[1][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=14.8, y=8.9, s=v[2][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=17.5, y=8.9, s=v[3][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=20.8, y=8.9, s=v[4][0], va='center', ha='right', size=48, color='#181818')
+
+                        if k == 'Succ dribbles %':
+                                ax6.text(x=8, y=8.2, s=v[0][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=11.5, y=8.2, s=v[1][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=14.8, y=8.2, s=v[2][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=17.5, y=8.2, s=v[3][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=20.8, y=8.2, s=v[4][0], va='center', ha='right', size=48, color='#181818')
+
+                        if k == 'xA/90':
+                                ax6.text(x=8, y=7.5, s=v[0][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=11.5, y=7.5, s=v[1][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=14.8, y=7.5, s=v[2][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=17.5, y=7.5, s=v[3][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=20.8, y=7.5, s=v[4][0], va='center', ha='right', size=48, color='#181818')
+
+                        if k == 'Deep completions/90':
+                                ax6.text(x=8, y=6.8, s=v[0][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=11.5, y=6.8, s=v[1][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=14.8, y=6.8, s=v[2][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=17.5, y=6.8, s=v[3][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=20.8, y=6.8, s=v[4][0], va='center', ha='right', size=48, color='#181818')
+
+                        if k == 'Passes to penalty area/90':
+                                ax6.text(x=8, y=6.1, s=v[0][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=11.5, y=6.1, s=v[1][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=14.8, y=6.1, s=v[2][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=17.5, y=6.1, s=v[3][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=20.8, y=6.1, s=v[4][0], va='center', ha='right', size=48, color='#181818')
+
+                        if k == 'xG/90':
+                                ax6.text(x=8, y=5.4, s=v[0][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=11.5, y=5.4, s=v[1][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=14.8, y=5.4, s=v[2][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=17.5, y=5.4, s=v[3][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=20.8, y=5.4, s=v[4][0], va='center', ha='right', size=48, color='#181818')
+
+                        if k == 'Key passes/90':
+                                ax6.text(x=8, y=4.7, s=v[0][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=11.5, y=4.7, s=v[1][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=14.8, y=4.7, s=v[2][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=17.5, y=4.7, s=v[3][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=20.8, y=4.7, s=v[4][0], va='center', ha='right', size=48, color='#181818')
+
+                        if k == 'Passes final 1/3 %':
+                                ax6.text(x=8, y=4, s=v[0][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=11.5, y=4, s=v[1][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=14.8, y=4, s=v[2][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=17.5, y=4, s=v[3][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=20.8, y=4, s=v[4][0], va='center', ha='right', size=48, color='#181818')
+
+                        if k == 'Passes penalty area %':
+                                ax6.text(x=8, y=3.3, s=v[0][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=11.5, y=3.3, s=v[1][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=14.8, y=3.3, s=v[2][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=17.5, y=3.3, s=v[3][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=20.8, y=3.3, s=v[4][0], va='center', ha='right', size=48, color='#181818')
+
+                        if k == 'Progressive passes/90':
+                                ax6.text(x=8, y=2.6, s=v[0][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=11.5, y=2.6, s=v[1][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=14.8, y=2.6, s=v[2][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=17.5, y=2.6, s=v[3][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=20.8, y=2.6, s=v[4][0], va='center', ha='right', size=48, color='#181818')
+
+                        if k == 'Succ defensive actions/90':
+                                ax6.text(x=8, y=1.9, s=v[0][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=11.5, y=1.9, s=v[1][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=14.8, y=1.9, s=v[2][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=17.5, y=1.9, s=v[3][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=20.8, y=1.9, s=v[4][0], va='center', ha='right', size=48, color='#181818')
+
+                        if k == 'PAdj Interceptions':
+                                ax6.text(x=8, y=1.2, s=v[0][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=11.5, y=1.2, s=v[1][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=14.8, y=1.2, s=v[2][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=17.5, y=1.2, s=v[3][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=20.8, y=1.2, s=v[4][0], va='center', ha='right', size=48, color='#181818')
+
+                        if k == 'Aerial duels %':
+                                ax6.text(x=8, y=0.5, s=v[0][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=11.5, y=0.5, s=v[1][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=14.8, y=0.5, s=v[2][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=17.5, y=0.5, s=v[3][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=20.8, y=0.5, s=v[4][0], va='center', ha='right', size=48, color='#181818')
+
+                        if k == 'Defensive duels %':
+                                ax6.text(x=8, y=-0.2, s=v[0][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=11.5, y=-0.2, s=v[1][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=14.8, y=-0.2, s=v[2][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=17.5, y=-0.2, s=v[3][0], va='center', ha='right', size=48, color='#181818')
+                                ax6.text(x=20.8, y=-0.2, s=v[4][0], va='center', ha='right', size=48, color='#181818')
 
 
+        ax6.text(1, 11, 'Players', weight='bold', ha='left', size=50, color='#548135')
+
+        ax6.text(1, 10.3, 'Similarity', weight='bold', ha='left', size=50, color='#548135')
+
+        ax6.text(1, 9.6, 'Market value', weight='bold', ha='left', size=50, color='#548135')
+
+        ax6.text(1, 8.9, 'Progressive runs/90', weight='bold', ha='left', size=50, color='#548135')
+
+        ax6.text(1, 8.2, 'Succ Dribbles %', weight='bold', ha='left', size=50, color='#548135')
+
+        ax6.text(1, 7.5, 'xA/90', weight='bold', ha='left', size=50, color='#548135')
+
+        ax6.text(1, 6.8, 'Deep Completions/90', weight='bold', ha='left', size=50, color='#548135')
+
+        ax6.text(1, 6.1, 'Passes penalty area/90', weight='bold', ha='left', size=50, color='#548135')
+
+        ax6.text(1, 5.4, 'xG/90', weight='bold', ha='left', size=50, color='#548135')
+
+        ax6.text(1, 4.7, 'Key passes/90', weight='bold', ha='left', size=50, color='#548135')
+
+        ax6.text(1, 4, 'Passes final 1/3 %', weight='bold', ha='left', size=50, color='#548135')
+
+        ax6.text(1, 3.3, 'Passes penalty area %', weight='bold', ha='left', size=50, color='#548135')
+
+        ax6.text(1, 2.6, 'Progressive passes/90', weight='bold', ha='left', size=50, color='#548135')
+
+        ax6.text(1, 1.9, 'Succ defensive actions/90', weight='bold', ha='left', size=50, color='#548135')
+
+        ax6.text(1, 1.2, 'PAdj Interceptions', weight='bold', ha='left', size=50, color='#548135')
+
+        ax6.text(1, 0.5, 'Aerial duels %', weight='bold', ha='left', size=50, color='#548135')
+
+        ax6.text(1, -0.2, 'Defensive duels %', weight='bold', ha='left', size=50, color='#548135')
+
+        for row in range(rows):
+                ax6.plot(
+                [0, cols + 2],
+                [row -.5, row - .5],
+                ls=':',
+                lw='.5',
+                c='#e8e8e8'
+                )
+
+        ax6.axis('off')
+
+        """
+        for i in range(len(data)):
+
+                ax6_image = add_image(image='C:/Users/menes/Documents/Data Hub/Images/Players/' + 'Premier League' + '/' + data[0].get('Players') + '.png', fig=fig, left=0.09, bottom=0.16, width=0.1, height=0.058)
+
+                ax6_image = add_image(image='C:/Users/menes/Documents/Data Hub/Images/Players/' + 'Premier League' + '/' + data[1].get('Players') + '.png', fig=fig, left=0.09, bottom=0.242, width=0.1, height=0.058)
+
+                ax6_image = add_image(image='C:/Users/menes/Documents/Data Hub/Images/Players/' + 'Premier League' + '/' + data[2].get('Players') + '.png', fig=fig, left=0.09, bottom=0.322, width=0.1, height=0.058)
+
+                ax6_image = add_image(image='C:/Users/menes/Documents/Data Hub/Images/Players/' + 'Premier League' + '/' + data[3].get('Players')+ '.png', fig=fig, left=0.09, bottom=0.398, width=0.1, height=0.058)
+
+                ax6_image = add_image(image='C:/Users/menes/Documents/Data Hub/Images/Players/' + 'Premier League' + '/' + data[4].get('Players') + '.png', fig=fig, left=0.09, bottom=0.47, width=0.1, height=0.058)
+
+                ax6_image = add_image(image='C:/Users/menes/Documents/Data Hub/Images/Players/' + 'Premier League' + '/' + data[5].get('Players') + '.png', fig=fig, left=0.09, bottom=0.55, width=0.1, height=0.058)
+
+                ax6_image = add_image(image='C:/Users/menes/Documents/Data Hub/Images/Players/' + 'Premier League' + '/' + data[6].get('Players') + '.png', fig=fig, left=0.09, bottom=0.624, width=0.1, height=0.058)
+
+                ax6_image = add_image(image='C:/Users/menes/Documents/Data Hub/Images/Players/' + 'Premier League' + '/' + data[7].get('Players') + '.png', fig=fig, left=0.09, bottom=0.70, width=0.1, height=0.058)
+
+                ax6_image = add_image(image='C:/Users/menes/Documents/Data Hub/Images/Players/' + 'Premier League' + '/' + data[8].get('Players') + '.png', fig=fig, left=0.09, bottom=0.773, width=0.1, height=0.058)
+
+                ax6_image = add_image(image='C:/Users/menes/Documents/Data Hub/Images/Players/' + 'Premier League' + '/' + data[9].get('Players') + '.png', fig=fig, left=0.09, bottom=0.85, width=0.1, height=0.058)
+        """
+
+        ax1 = plt.subplot(
+                        gspec[0, 1],
+                )
+
+        cols = role
+
+        #PLAYER 1
+        pl1 = df.loc[df['Player'] == playerName]
+        values = pl1[cols].values[0]
+
+        #Obtenção do alcance minimo e máximo dos valores
+        ranges = [(df[col].min(), df[col].max()) for col in cols]
+
+        #Criação do radar chart
+        radar = Radar(background_color="#181818", patch_color='#181818', range_color="#181818", label_color="#181818", label_fontsize=0, range_fontsize=0)
+        fig, ax1 = radar.plot_radar(ranges=ranges, 
+                                params=cols, 
+                                values=values, 
+                                radar_color=['#548135', '#548135'],
+                                figax=(fig, ax1),
+                                end_size=0, end_color="#1b1b1b")
+
+        age = pl1['Age'].unique()
+        age = age.tolist()
+        age = age[0]
+
+        tier = pl1['Tier'].unique()
+        tier = tier.tolist()
+        tier = tier[0]
+ 
+        ax_text(x = -20, y = -25,
+                s=playerName,
+                size=48,
+                color='#181818',
+                ax=ax1)
+
+        ax_text(x = -16, y = -32,
+                s='(' + str(age) + ')',
+                size=40,
+                color='#181818',
+                ax=ax1)
 
 
+        team = pl1['Team'].unique()
+        team = team.tolist()
+        team = team[0]
+
+        ax_text(x = -5, y = -19,
+                s=team + ' ' + '(' + str(tier) + ')',
+                size=35,
+                color='#181818',
+                ax=ax1)
+
+        ########################################################################################################################################################
+
+        ax2 = plt.subplot(
+                        gspec[0, 2],
+                )
+
+        cols = role
+
+        #PLAYER 1
+        pl1 = df.loc[df['Player'] == data.get('Players')[0]]
+        val1 = pl1[cols].values[0]
+
+        # PLAYER 2
+        pl2 = df.loc[df['Player'] == playerName]
+        val2 = pl2[cols].values[0]
+
+        values = [val1, val2]
+
+        #Obtenção do alcance minimo e máximo dos valores
+        ranges = [(df[col].min(), df[col].max()) for col in cols]
+
+        #Criação do radar chart
+        radar = Radar(background_color="#181818", patch_color='#181818', range_color="#181818", label_color="#181818", label_fontsize=0, range_fontsize=0)
+        fig, ax2 = radar.plot_radar(ranges=ranges, 
+                                params=cols, 
+                                values=values, 
+                                radar_color=['#2d92df', '#548135'],
+                                figax=(fig, ax2),
+                                end_size=0, end_color="#1b1b1b",
+                                compare=True)
+
+        age = pl1['Age'].unique()
+        age = age.tolist()
+        age = age[0]
+
+        tier = pl1['Tier'].unique()
+        tier = tier.tolist()
+        tier = tier[0]
+
+        ax_text(x = -8, y = -27,
+                s=data.get('Players')[0],
+                size=48,
+                color='#181818',
+                ax=ax2)
+
+        ax_text(x = -4, y = -34,
+                s='(' + str(age) + ')',
+                size=40,
+                color='#181818',
+                ax=ax2)
+
+        team = pl1['Team'].unique()
+        team = team.tolist()
+        team = team[0]
+
+        ax_text(x = -5, y = -19,
+                s=team + ' ' + '(' + str(tier) + ')',
+                size=35,
+                color='#181818',
+                ax=ax2)
+
+        ########################################################################################################################################################    
+
+        ax3 = plt.subplot(
+                        gspec[0, 3],
+                )
+
+        cols = role
+
+        #PLAYER 1
+        pl1 = df.loc[df['Player'] == data.get('Players')[1]]
+        val1 = pl1[cols].values[0]
+
+        # PLAYER 2
+        pl2 = df.loc[df['Player'] == playerName]
+        val2 = pl2[cols].values[0]
+
+        values = [val1, val2]
+        #Obtenção do alcance minimo e máximo dos valores
+        ranges = [(df[col].min(), df[col].max()) for col in cols]
+
+        #Criação do radar chart
+        radar = Radar(background_color="#181818", patch_color='#181818', range_color="#181818", label_color="#181818", label_fontsize=0, range_fontsize=0)
+        fig, ax3 = radar.plot_radar(ranges=ranges, 
+                                params=cols, 
+                                values=values, 
+                                radar_color=['#2d92df', '#548135'],
+                                figax=(fig, ax3),
+                                end_size=0, end_color="#1b1b1b",
+                                compare=True)
+
+        age = pl1['Age'].unique()
+        age = age.tolist()
+        age = age[0]
+
+        tier = pl1['Tier'].unique()
+        tier = tier.tolist()
+        tier = tier[0]
+
+        ax_text(x = -8, y = -27,
+                s=data.get('Players')[1],
+                size=48,
+                color='#181818',
+                ax=ax3)
+
+        ax_text(x = -4, y = -34,
+                s='(' + str(age) + ')',
+                size=40,
+                color='#181818',
+                ax=ax3)
+
+        team = pl1['Team'].unique()
+        team = team.tolist()
+        team = team[0]
+
+        ax_text(x = -5, y = -19,
+                s=team + ' ' + '(' + str(tier) + ')',
+                size=35,
+                color='#181818',
+                ax=ax3)
+
+        ########################################################################################################################################################
+
+        ax4 = plt.subplot(
+                        gspec[0, 4],
+                )
+
+        cols = role
+
+        #PLAYER 1
+        pl1 = df.loc[df['Player'] == data.get('Players')[2]]
+        val1 = pl1[cols].values[0]
+
+        # PLAYER 2
+        pl2 = df.loc[df['Player'] == playerName]
+        val2 = pl2[cols].values[0]
+
+        values = [val1, val2]
+        #Obtenção do alcance minimo e máximo dos valores
+        ranges = [(df[col].min(), df[col].max()) for col in cols]
+
+        #Criação do radar chart
+        radar = Radar(background_color="#181818", patch_color='#181818', range_color="#181818", label_color="#181818", label_fontsize=0, range_fontsize=0)
+        fig, ax4 = radar.plot_radar(ranges=ranges, 
+                                params=cols, 
+                                values=values, 
+                                radar_color=['#2d92df', '#548135'],
+                                figax=(fig, ax4),
+                                end_size=0, end_color="#181818",
+                                compare=True)
+
+        age = pl1['Age'].unique()
+        age = age.tolist()
+        age = age[0]
+
+        tier = pl1['Tier'].unique()
+        tier = tier.tolist()
+        tier = tier[0]
+
+        ax_text(x = -8, y = -27,
+                s=data.get('Players')[2],
+                size=48,
+                color='#181818',
+                ax=ax4)
+
+        ax_text(x = -4, y = -34,
+                s='(' + str(age) + ')',
+                size=40,
+                color='#181818',
+                ax=ax4)
+
+        team = pl1['Team'].unique()
+        team = team.tolist()
+        team = team[0]
+
+        ax_text(x = -5, y = -19,
+                s=team + ' ' + '(' + str(tier) + ')',
+                size=35,
+                color='#181818',
+                ax=ax4)
+
+        ########################################################################################################################################################
+
+        ax5 = plt.subplot(
+                        gspec[0, 5],
+                )
+
+        cols = role
+
+        #PLAYER 1
+        pl1 = df.loc[df['Player'] == data.get('Players')[3]]
+        val1 = pl1[cols].values[0]
+
+        # PLAYER 2
+        pl2 = df.loc[df['Player'] == playerName]
+        val2 = pl2[cols].values[0]
+
+        values = [val1, val2]
+        #Obtenção do alcance minimo e máximo dos valores
+        ranges = [(df[col].min(), df[col].max()) for col in cols]
+
+        #Criação do radar #181818
+        radar = Radar(background_color="#181818", patch_color='#181818', range_color="#181818", label_color="#181818", label_fontsize=0, range_fontsize=0)
+        fig, ax5 = radar.plot_radar(ranges=ranges, 
+                                params=cols, 
+                                values=values, 
+                                radar_color=['#2d92df', '#548135'],
+                                figax=(fig, ax5),
+                                end_size=0, end_color="#181818",
+                                compare=True)
+
+        age = pl1['Age'].unique()
+        age = age.tolist()
+        age = age[0]
+
+        tier = pl1['Tier'].unique()
+        tier = tier.tolist()
+        tier = tier[0]
+
+        ax_text(x = -8, y = -27,
+                s= data.get('Players')[3],
+                size=48,
+                color='#181818',
+                ax=ax5)
+
+        ax_text(x = -4, y = -34,
+                s='(' + str(age) + ')',
+                size=40,
+                color='#181818',
+                ax=ax5)
+
+        team = pl1['Team'].unique()
+        team = team.tolist()
+        team = team[0]
+
+        ax_text(x = -5, y = -19,
+                s=team + ' ' + '(' + str(tier) + ')',
+                size=35,
+                color='#181818',
+                ax=ax5)
+
+        ########################################################################################################################################################
+
+        ax7 = plt.subplot(
+                        gspec[0, 6],
+                )
+
+        cols = role
+
+        #PLAYER 1
+        pl1 = df.loc[df['Player'] == data.get('Players')[4]]
+        val1 = pl1[cols].values[0]
+
+        # PLAYER 2
+        pl2 = df.loc[df['Player'] == playerName]
+        val2 = pl2[cols].values[0]
+
+        values = [val1, val2]
+        #Obtenção do alcance minimo e máximo dos valores
+        ranges = [(df[col].min(), df[col].max()) for col in cols]
+
+        #Criação do radar chart
+        radar = Radar(background_color="#181818", patch_color='#181818', range_color="#181818", label_color="#181818", label_fontsize=0, range_fontsize=0)
+        fig, ax7 = radar.plot_radar(ranges=ranges, 
+                                params=cols, 
+                                values=values, 
+                                radar_color=['#2d92df', '#548135'],
+                                figax=(fig, ax7),
+                                end_size=0, end_color="#181818",
+                                compare=True)
+
+        age = pl1['Age'].unique()
+        age = age.tolist()
+        age = age[0]
+
+        tier = pl1['Tier'].unique()
+        tier = tier.tolist()
+        tier = tier[0]
+
+        ax_text(x = -8, y = -27,
+                s= data.get('Players')[4],
+                size=48,
+                color='#181818',
+                ax=ax7)
+
+        ax_text(x = -4, y = -34,
+                s='(' + str(age) + ')',
+                size=40,
+                color='#181818',
+                ax=ax7)
+
+        team = pl1['Team'].unique()
+        team = team.tolist()
+        team = team[0]
+
+        ax_text(x = -5, y = -19,
+                s=team + ' ' + '(' + str(tier) + ')',
+                size=35,
+                color='#181818',
+                ax=ax7)
+
+########################################################################################################################################################
+
+        #Params for the text inside the <> this is a function to highlight text
+        highlight_textprops =\
+        [{"color": "#548135","fontweight": 'bold'}]
+
+        fig_text(x = 0.15, y = 0.8,
+                s= 'Similar to:' + ' ' + f'<{playerName}>',
+                size=100,
+                highlight_textprops = highlight_textprops,
+                color='#181818')
+
+########################################################################################################################################################
+
+        subtitle = df.loc[df['Player'] == playerName]
+
+        team = subtitle.Team.unique()
+
+        team = team.tolist()
+
+        team = team[0]
+
+########################################################################################################################################################
+
+        league = subtitle.Comp.unique()
+
+        league = league.tolist()
+
+        league = league[0]
+
+########################################################################################################################################################
+
+        season = subtitle.Season.unique()
+
+        season = season.tolist()
+
+        season = season[0]
+
+########################################################################################################################################################
+
+        fig_text(x = 0.15, y = 0.768,
+                s= team + ' |' + league + ' |' + season,
+                size=35,
+                color='#181818',
+                ax=ax6)
+
+        ax_text(x = 0.15, y = -0.70,
+                s= 'Visualization made by: menesesp20',
+                size=30,
+                color='#181818',
+                ax=ax6)
+
+        ax_text(x = 0.15, y = -1,
+                s= 'Data from WyScout',
+                size=25,
+                color='#181818',
+                ax=ax6)
+
+################################################################################################################################################
+
+def createTier(league):
+    if league in tier0:
+        return 0
+
+    elif league in tier1:
+        return 1
+
+    elif league in tier2:
+        return 2
+
+    elif league in tier3:
+        return 3
+
+    elif league in tier4:
+        return 4
+
+################################################################################################################################################
+
+def tierLeague(df, playerName):
+
+    df = df.loc[df.Player == playerName].reset_index(drop=True)
+
+    tier = df.Tier.unique()
+    tier = tier.tolist()
+    tier = tier[0]
+
+    rating = df[['Box Forward', 'False 9', 'Target Man', 'Advanced Forward', 'Ball Winner', 'Deep Lying Playmaker',
+                                                        'Attacking Playmaker', 'Box-to-box','Attacking FB', 'Defensive FB', 'Full Back CB',
+                                                        'Wing Back', 'Inverted Wing Back', 'Stopper', 'Aerial CB', 'Ball Playing CB',
+                                                        'Ball Carrying CB', 'Banda', 'Defensivo', 'Falso', 'Por dentro']].max(axis=0).sort_values(ascending=False)
+
+    rating = rating[0]
+
+    if tier == 0:
+        rating = round(rating * 1, 2)
+
+        return rating
+
+    if tier == 1:
+        rating = round(rating * 0.95, 2)
+
+        return rating
+
+    elif tier == 2:
+        rating = round(rating * 0.88, 2)
+
+        return rating
+
+    elif tier == 3:
+        rating = round(rating * 0.8, 2)
+
+        return rating
+
+    elif tier == 4:
+        rating = round(rating * 0.75, 2)
+
+        return rating
+
+################################################################################################################################################
+
+def gameTime(col):
+    if col >= 0.8:
+        return 'Titular'
+
+    elif (col >= 0.5) & (col < 0.8):
+        return 'Suplente'
+
+    elif col < 0.5:
+        return 'Reserva'
+
+################################################################################################################################################
+
+def positionMain(col):
+    if (col.__contains__('RB')) | (col.__contains__('LB')) | (col.__contains__('RWB')) | (col.__contains__('LWB')):
+        return 'Full Back'
+
+    elif col.__contains__('CB') | col.__contains__('RCB') | col.__contains__('LCB'):
+        return 'Center Back'
+
+    elif (col.__contains__('CF')):
+        return 'Forward'
+
+    elif (col.__contains__('RCMF')) | (col.__contains__('LCMF')) | (col.__contains__('LDMF')) | (col.__contains__('RDMF')) | (col.__contains__('AMF')) | (col.__contains__('DMF')):
+        return 'Midfield'
+
+    elif (col.__contains__('LW')) | (col.__contains__('LM')) | (col.__contains__('RM')) | (col.__contains__('RW')) | (col.__contains__('RAMF')) | (col.__contains__('LAMF')) | (col.__contains__('RWF')) | (col.__contains__('LWF')):
+        return 'Winger'
+
+################################################################################################################################################
+
+def evaluation(df, league, club, playerName, role):
+
+    # plot
+    fig, ax = plt.subplots(figsize=(10, 8))
+
+    #Set color background outside the graph
+    fig.set_facecolor('#E8E8E8')
+
+    #Set color background inside the graph
+    ax.set_facecolor('#E8E8E8')
+
+    ax.tick_params(axis='x', colors='#181818', labelsize=12)
+    ax.tick_params(axis='y', colors='#181818', labelsize=12)
+
+    ax.spines['bottom'].set_color('#181818')
+    ax.spines['top'].set_visible(False)
+    ax.spines['left'].set_color('#181818')
+    ax.spines['right'].set_visible(False)
+
+    test = df.loc[df.Player == playerName].sort_values('Season', ascending=True).reset_index(drop=True)
+    test.drop_duplicates(subset=['Season'], keep='last', inplace=True)
+
+    y = test[role]
+    x = test['Season']
+
+    ax.set_ylim([0, 100])
+    
+    ax.plot(x, y,  marker='.', markersize=12)
+
+    plt.title(playerName + ' Evaluation', c='#181818', fontsize=35, y=1.09)
+
+    plt.ylabel('menesesp20 VALUE', color='#181818', size=11)
+    plt.xlabel('SEASON', color='#181818', size=11)
+
+    fig = add_image(image='C:/Users/menes/Documents/Data Hub/Images/Players/' + league + '/' + club + '/' + playerName + '.png', fig=fig, left=0.12, bottom=0.93, width=0.12, height=0.11)
+
+    plt.show()
+
+################################################################################################################################################
+
+def beeswarm_Individual(df, event, ax, Player, Player2=None, Player3=None, Player4=None, Player5=None, Player6=None, Player7=None, Player8=None):
+
+  #set default colors
+  text_color = '#181818'
+  background = '#E8E8E8'
+
+  player = df.loc[(df['Player'] == Player)]
+  league = player.Comp.unique()
+  league = league.tolist()
+  league = league[0]
+
+  player2 = df.loc[(df['Player'] == Player2)]
+
+  player3 = df.loc[(df['Player'] == Player3)]
+
+  player4 = df.loc[(df['Player'] == Player4)]
+
+  player5 = df.loc[(df['Player'] == Player5)]
+
+  player6 = df.loc[(df['Player'] == Player6)]
+
+  player7 = df.loc[(df['Player'] == Player7)]
+
+  player8 = df.loc[(df['Player'] == Player8)]
+
+  #set up our base layer
+  mpl.rcParams['xtick.color'] = '#E8E8E8'
+  mpl.rcParams['ytick.color'] = '#E8E8E8'
+
+  ax.grid(ls='dotted', lw=.5, color='#E8E8E8', axis='y', zorder=2)
+  spines = ['top', 'bottom', 'left', 'right']
+  for x in spines:
+      if x in spines:
+          ax.spines[x].set_visible(False)
 
 
+  #BeeSwarm
+
+  df = df.loc[(df['Comp'] == league) | (df['Player'] == Player2) | (df['Player'] == Player3) |
+              (df['Player'] == Player4) | (df['Player'] == Player5) | (df['Player'] == Player6) | (df['Player'] == Player7)]
+
+  besswarm = sns.swarmplot(x=event, data=df, color='#181818', alpha=0.8, zorder=2)
+
+  besswarm.set(xlabel=None)
+
+  #plot Player
+  for i in range(len(player)):
+    plt.scatter(x=player[event].values[i], y=0, c='#c70216', edgecolor='black', s=150, zorder=2, label=f'{Player}')
+    
+  #plot player2
+  for i in range(len(player2)):
+    plt.scatter(x=player2[event].values[i], y=0, c='#00659c', edgecolor='black', s=150, zorder=2, label=f'{Player2}')
+
+  #plot player3
+  for i in range(len(player3)):
+    plt.scatter(x=player3[event].values[i], y=0, c='#03b976', edgecolor='black',s=150, zorder=2, label=f'{Player3}')
+
+  #plot player4
+  for i in range(len(player4)):
+    plt.scatter(x=player4[event].values[i], y=0, c='pink', edgecolor='black', s=150, zorder=2, label=f'{Player4}')
+
+  #plot player5
+  for i in range(len(player5)):
+    plt.scatter(x=player5[event].values[i], y=0, c='yellow', edgecolor='black', s=150, zorder=2, label=f'{Player5}')
+
+  #plot player6
+  for i in range(len(player6)):
+    plt.scatter(x=player6[event].values[i], y=0, c='#fb8c04', edgecolor='black', s=150, zorder=2, label=f'{Player6}')
+
+  #plot player7
+  for i in range(len(player7)):
+    plt.scatter(x=player7[event].values[i], y=0, c='#00bbf9', edgecolor='black', s=150, zorder=2, label=f'{Player7}')
+
+  #plot player7
+  for i in range(len(player8)):
+    plt.scatter(x=player8[event].values[i], y=0, c='#cad2c5', edgecolor='black', s=150, zorder=2, label=f'{Player8}')
+
+  plt.title(event, c=text_color, fontsize=20)
+  #Criação da legenda
+  l = plt.legend(facecolor='#181818', framealpha=.05, labelspacing=.7, prop={'size': 8})
+  #Ciclo FOR para atribuir a white color na legend
+  for text in l.get_texts():
+      text.set_color("#181818")
+
+################################################################################################################################################
+
+def beeSwarm(wyscout):
+        fig = plt.figure(figsize=(20, 15), dpi=500, facecolor = '#E8E8E8')
+        gspec = gridspec.GridSpec(
+        ncols=2, nrows=3, wspace = 0.5
+        )
+
+        background = '#E8E8E8'
+
+        # LEFT
+        ax1 = plt.subplot(
+                        gspec[0, 0],
+                )
+        ax1.patch.set_facecolor(background)
+        ax1.axis('off')
+        beeswarm_Individual(wyscout, Forward[0], ax1, 'A. da Silva', 'K. Kondo', 'A. Dowds', 'P. Knudsen', 'L. Vardanyan')
 
 
+        ax2 = plt.subplot(
+                        gspec[1, 0],
+                )
+        ax2.patch.set_facecolor(background)
+        ax2.axis('off')
+        beeswarm_Individual(wyscout, Forward[1], ax2, 'A. da Silva', 'K. Kondo', 'A. Dowds', 'P. Knudsen', 'L. Vardanyan')
 
 
+        ax3 = plt.subplot(
+                        gspec[2, 0],
+                        
+                )
+        ax3.patch.set_facecolor(background)
+        ax3.axis('off')
+        beeswarm_Individual(wyscout, Forward[2], ax3, 'A. da Silva', 'K. Kondo', 'A. Dowds', 'P. Knudsen', 'L. Vardanyan')
 
 
+        # RIGHT
+        ax4 = plt.subplot(
+                        gspec[0, 1],
+                )
+        ax4.patch.set_facecolor(background)
+        ax4.axis('off')
+        beeswarm_Individual(wyscout, Forward[3], ax4, 'A. da Silva', 'K. Kondo', 'A. Dowds', 'P. Knudsen', 'L. Vardanyan')
 
 
+        ax5 = plt.subplot(
+                        gspec[1, 1],
+                )
+        ax5.patch.set_facecolor(background)
+        ax5.axis('off')
+        beeswarm_Individual(wyscout, Forward[4], ax5, 'A. da Silva', 'K. Kondo', 'A. Dowds', 'P. Knudsen', 'L. Vardanyan')
 
 
+        ax6 = plt.subplot(
+                        gspec[2, 1],
+                )
+        ax6.patch.set_facecolor(background)
+        ax6.axis('off')
+        beeswarm_Individual(wyscout, Forward[6], ax6, 'A. da Silva', 'K. Kondo', 'A. Dowds', 'P. Knudsen', 'L. Vardanyan')
+
+################################################################################################################################################
+
+def PizzaChart(df, cols, playerName, league):
+    # parameter list
+    params = cols
+
+    playerDF = df.loc[(df.Player == playerName) & (df.Comp == league)]
+
+    league = playerDF.Comp.unique()
+
+    league = league.tolist()
+
+    league = league[0]
+
+    position = playerDF['Position'].unique()
+
+    position = position.tolist()
+
+    position = position[0]
+    if ', ' in position:
+        position = position.split(', ')[0]
+
+    marketValue = playerDF['Market value'].unique()
+
+    marketValue = marketValue.tolist()
+    
+    marketValue = marketValue[0]
+
+    df = df.loc[(df['Comp'] == league) & (df['Position'].str.contains(position))].reset_index(drop=True)
+
+    player = df.loc[(df['Player'] == playerName) & (df['Comp'] == league)][cols].reset_index()
+    player = list(player.loc[0])
+    player = player[1:]
+
+    values = []
+    for x in range(len(params)):   
+        values.append(math.floor(stats.percentileofscore(df[params[x]], player[x])))
+
+    for n,i in enumerate(values):
+        if i == 100:
+            values[n] = 99
+
+    if cols == Forward:
+        # color for the slices and text
+        slice_colors = ["#2d92df"] * 4 + ["#fb8c04"] * 4 + ["#eb04e3"] * 4
+        text_colors = ["#F2F2F2"] * 12
+
+    elif cols == Winger:
+        # color for the slices and text
+        slice_colors = ["#2d92df"] * 3 + ["#fb8c04"] * 8 + ["#eb04e3"] * 2
+        text_colors = ["#F2F2F2"] * 13
+
+    elif cols == defensive_Midfield:
+        # color for the slices and text
+        slice_colors = ["#2d92df"] * 4 + ["#fb8c04"] * 4 + ["#eb04e3"] * 5
+        text_colors = ["#F2F2F2"] * 13
+        
+    elif cols == Midfield:
+        # color for the slices and text
+        slice_colors = ["#2d92df"] * 4 + ["#fb8c04"] * 8 + ["#eb04e3"] * 3
+        text_colors = ["#F2F2F2"] * 15
+
+    elif cols == full_Back:
+        # color for the slices and text
+        slice_colors = ["#2d92df"] * 6 + ["#fb8c04"] * 5 + ["#eb04e3"] * 4
+        text_colors = ["#F2F2F2"] * 15
+
+    elif cols == center_Back:
+        # color for the slices and text
+        slice_colors = ["#2d92df"] * 3 + ["#fb8c04"] * 4 + ["#eb04e3"] * 7
+        text_colors = ["#F2F2F2"] * 14
+
+    elif cols == offensive_Midfield:
+        # color for the slices and text
+        slice_colors = ["#2d92df"] * 4 + ["#fb8c04"] * 8 + ["#eb04e3"] * 4
+        text_colors = ["#F2F2F2"] * 16
+
+    # instantiate PyPizza class
+    baker = PyPizza(
+        params=params,                  # list of parameters
+        background_color="#1b1b1b",     # background color
+        straight_line_color="#000000",  # color for straight lines
+        straight_line_lw=1,             # linewidth for straight lines
+        last_circle_color="#000000",    # color for last line
+        last_circle_lw=1,               # linewidth of last circle
+        other_circle_lw=0,              # linewidth for other circles
+        inner_circle_size=20            # size of inner circle
+    )
+
+    # plot pizza
+    fig, ax = baker.make_pizza(
+        values,                          # list of values
+        figsize=(15, 10),                # adjust the figsize according to your need
+        color_blank_space="same",        # use the same color to fill blank space
+        slice_colors=slice_colors,       # color for individual slices
+        value_colors=text_colors,        # color for the value-text
+        value_bck_colors=slice_colors,   # color for the blank spaces
+        blank_alpha=0.4,                 # alpha for blank-space colors
+        kwargs_slices=dict(
+            edgecolor="#000000", zorder=2, linewidth=1
+        ),                               # values to be used when plotting slices
+        kwargs_params=dict(
+            color="#F2F2F2", fontsize=10,
+            va="center"
+        ),                               # values to be used when adding parameter labels
+        kwargs_values=dict(
+            color="#F2F2F2", fontsize=11,
+            zorder=3,
+            bbox=dict(
+                edgecolor="#000000", facecolor="cornflowerblue",
+                boxstyle="round,pad=0.2", lw=1
+            )
+        )                                # values to be used when adding parameter-values labels
+    )
+
+    if cols == Forward:
+
+        fig_text(s =  'Forward Template',
+             x = 0.253, y = 0.035,
+             color='#F2F2F2',
+             fontweight='bold', ha='center',
+             fontsize=8)
+
+    elif cols == Winger:
+
+        fig_text(s =  'Winger Template',
+             x = 0.253, y = 0.035,
+             color='#F2F2F2',
+             fontweight='bold', ha='center',
+             fontsize=8)
+
+    elif cols == defensive_Midfield:
+
+        fig_text(s =  'Defensive Midfield Template',
+             x = 0.253, y = 0.035,
+             color='#F2F2F2',
+             fontweight='bold', ha='center',
+             fontsize=8)
+
+    elif cols == Midfield:
+
+        fig_text(s =  'Midfield Template',
+             x = 0.253, y = 0.035,
+             color='#F2F2F2',
+             fontweight='bold', ha='center',
+             fontsize=8)
+
+    elif cols == full_Back:
+
+        fig_text(s =  'Full Back Template',
+             x = 0.253, y = 0.035,
+             color='#F2F2F2',
+             fontweight='bold', ha='center',
+             fontsize=8)
+    elif cols == center_Back:
+
+        fig_text(s =  'Center Back Template',
+             x = 0.253, y = 0.035,
+             color='#F2F2F2',
+             fontweight='bold', ha='center',
+             fontsize=8)
+
+    elif cols == offensive_Midfield:
+
+        fig_text(s =  'Offensive Midfield Template',
+             x = 0.253, y = 0.035,
+             color='#F2F2F2',
+             fontweight='bold', ha='center',
+             fontsize=8)
+
+    ###########################################################################################################
+
+    fig_text(s =  playerName,
+             x = 0.5, y = 1.12,
+             color='#F2F2F2',
+             fontweight='bold', ha='center',
+             fontsize=50);
+
+    if playerName != 'David Neres':
+
+        fig_text(s =  'Percentile Rank | ' + league + ' | Pizza Chart | Season 2021-22',
+                x = 0.5, y = 1.03,
+                color='#F2F2F2',
+                fontweight='bold', ha='center',
+                fontsize=14);
+
+    elif playerName == 'David Neres':
+
+        fig_text(s =  'Percentile Rank | ' + league + ' | Pizza Chart | Calendar Year 2021',
+                x = 0.5, y = 1.03,
+                color='#F2F2F2',
+                fontweight='bold', ha='center',
+                fontsize=14);
+
+    #fig_text(s =  str(marketValue),
+    #         x = 0.5, y = 1.02,
+    #         color='#F2F2F2',
+    #         fontweight='bold', ha='center',
+    #         fontsize=18);
+
+    # add credits
+    CREDIT_1 = "data: WyScout"
+    CREDIT_2 = "made by: @menesesp20"
+    CREDIT_3 = "inspired by: @Worville, @FootballSlices, @somazerofc & @Soumyaj15209314"
 
 
+    # CREDITS
+    fig_text(s =  f"{CREDIT_1}\n{CREDIT_2}\n{CREDIT_3}",
+             x = 0.35, y = 0.02,
+             color='#F2F2F2',
+             fontweight='bold', ha='center',
+             fontsize=8);
+
+    # Attacking
+    fig_text(s =  'Attacking',
+             x = 0.41, y = 0.988,
+             color='#F2F2F2',
+             fontweight='bold', ha='center',
+             fontsize=16);
+
+    # Possession
+    fig_text(s =  'Possession',
+             x = 0.535, y = 0.988,
+             color='#F2F2F2',
+             fontweight='bold', ha='center',
+             fontsize=16);
+
+    # Defending
+    fig_text(s =  'Defending',
+             x = 0.665, y = 0.988,
+             color='#F2F2F2',
+             fontweight='bold', ha='center',
+             fontsize=16);
+
+    # add rectangles
+    fig.patches.extend([
+        plt.Rectangle(
+            (0.34, 0.97), 0.025, 0.021, fill=True, color="#2d92df",
+            transform=fig.transFigure, figure=fig
+        ),
+        plt.Rectangle(
+            (0.47, 0.97), 0.025, 0.021, fill=True, color="#fb8c04",
+            transform=fig.transFigure, figure=fig
+        ),
+        plt.Rectangle(
+            (0.60, 0.97), 0.025, 0.021, fill=True, color="#eb04e3",
+            transform=fig.transFigure, figure=fig
+        ),
+    ])
+
+    # add image
+    add_image('C:/Users/menes/Documents/Data Hub/Images/SWL LOGO.png', fig, left=0.462, bottom=0.436, width=0.10, height=0.132)
+
+################################################################################################################################################
+
+def scoutReport(df, playerName, team, setPieces, isDefensive, tier, contrato, pé, valor, altura):
+
+    playerAbility(df)
+
+    playerClub = df.loc[(df['Player'] == playerName) & (df['Team'] == team) & (df['Season'] == '2021/22')]
+
+    playerClub['Market value'] = playerClub['Market value'].astype(str)
+
+    age = playerClub['Age'].unique()
+    age = age.tolist()
+    age = age[0]
+
+    league = playerClub['Comp'].unique()
+    league = league.tolist()
+    league = league[0]
+
+    country = playerClub['Birth country'].unique()
+    country = country.tolist()
+    country = country[0]
+    if country == '0':
+        country = playerClub['Passport country'].unique()
+        country = country.tolist()
+        country = country[0]
+    if ',' in country:
+        country = country.split(', ')[0]
+
+    Market = playerClub['Market value'].unique()
+    Market = Market.tolist()
+    Market = Market[0]
+
+    if len(str(Market)) == 6:
+        Market = str(Market)[:3]
+                
+    elif len(str(Market)) == 7:
+        if str(Market)[:2][1] != 0:
+            Market = str(Market)[:2][0] + '.' + str(Market)[:2][1] + 'M'
+            
+    elif len(str(Market)) == 8:
+        Market = str(Market)[:2] + 'M'
+
+    elif len(str(Market)) == 9:
+        Market = str(Market)[:3] + 'M'
+
+    position = playerClub['Position'].unique()
+    position = position.tolist()
+    position = position[0]
+    if ', ' in position:
+        position = position.split(', ')[0]
+
+    Contract = playerClub['Contract expires'].unique()
+    Contract = Contract.tolist()
+    Contract = Contract[0]
+
+    Height = playerClub['Height'].unique()
+    Height = Height.tolist()
+    Height = str(Height[0])
+
+    Foot = playerClub['Foot'].unique()
+    Foot = Foot.tolist()
+    Foot = Foot[0]
+
+    Minutes = playerClub['Minutes played'].unique()
+    Minutes = Minutes.tolist()
+    Minutes = str(Minutes[0])
+    Minutes = int(Minutes)
+
+    club = playerClub['Team'].unique()
+    club = club.tolist()
+    club = club[0]
+
+    color = ['#FF0000', '#181818']
+
+    #######################################################################################################################################
+
+    fig = plt.figure(figsize=(15, 10), dpi=1000, facecolor = '#E8E8E8')
+    gspec = gridspec.GridSpec(
+    ncols=2, nrows=2, wspace = 0.5
+    )
+
+    ########################################################################################################################################################
+
+    ax1 = plt.subplot(
+                    gspec[0, 0],
+            )
 
 
+    ax1.axis('off')
+
+    ax2 = plt.subplot(
+                    gspec[1, 1],
+            )
+
+    pitch = Pitch(pitch_type='opta',pad_top=-0.5, pad_bottom=0.5, pad_right=-0.5,
+                                pitch_color='#E8E8E8', line_color='#1b1b1b',line_zorder=1, linewidth=5, spot_scale=0.002)
+
+    pitch.draw(ax=ax2)
+
+    if 'GK' in position:
+        # GK
+        pitch.scatter(x=5.8, y=50, ax=ax2, c=color[0], edgecolor='#1b1b1b', s=500, zorder=3)
+
+#######################################################################################################################################
+
+    elif 'RB' in position:
+        # RIGHT FULLBACK
+        pitch.scatter(x=17, y=15, ax=ax2, c=color[0], edgecolor='#1b1b1b', s=500, zorder=3)
+
+    elif 'RCB' in position:
+        # RIGHT CENTER BACK
+        pitch.scatter(x=17, y=36.8, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
+
+    elif 'LCB' in position:
+        # LEFT CENTER BACK
+        pitch.scatter(x=17, y=63.2, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
+
+    elif 'LB' in position:
+        # LEFT FULLBACK
+        pitch.scatter(x=17, y=85, ax=ax2, c=color[0], edgecolor='#1b1b1b', s=500, zorder=3)
+
+#######################################################################################################################################
+
+    elif 'DM' in position:
+        # DEFENSIVE MIDFIELDER
+        pitch.scatter(x=40, y=50, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
+
+    elif 'RCMF' in position:
+        # CENTER MIDFIELDER RIGHT
+        pitch.scatter(x=55, y=36.8, ax=ax2, c=color[0], edgecolor='#1b1b1b', s=500, zorder=3)
+
+    elif 'LCMF' in position:
+        # CENTER MIDFIELDER LEFT
+        pitch.scatter(x=40, y=50, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
+
+#######################################################################################################################################
+    elif 'RAMF' in position:
+        # RIGHT MIDFIELDER
+        pitch.scatter(x=70, y=15, ax=ax2, c=color[0], edgecolor='#1b1b1b', s=500, zorder=3)
+
+    elif 'AMF' in position:
+        # OFFENSIVE MIDFIELDER
+        pitch.scatter(x=70, y=50, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
+
+    elif 'LAMF' in position:
+        # LEFT MIDFIELDER
+        pitch.scatter(x=70, y=85, ax=ax2, c=color[0], edgecolor='#1b1b1b', s=500, zorder=3)
+
+#######################################################################################################################################
+
+    elif 'LW' in position:
+        # WINGER LEFT
+        pitch.scatter(x=85, y=88, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
+
+    elif 'LWB' in position:
+        # WINGER LEFT
+        pitch.scatter(x=85, y=88, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
+
+    elif 'RW' in position:
+        # WINGER RIGHT
+        pitch.scatter(x=85, y=12, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
+
+#######################################################################################################################################
+
+    elif 'CF' in position:
+        # FORWARD
+        pitch.scatter(x=88.5, y=50, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
+
+######################################################## MUTIPLE POSITIONS - LW / RW AND OM ###############################################################################
+
+    elif (position == 'LCB & RCB') | (position == 'RCB & LCB'):
+        # LEFT CENTER BACK
+        pitch.scatter(x=17, y=63.2, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
+        
+        # RIGHT CENTER BACK
+        pitch.scatter(x=17, y=36.8, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
+
+    elif (position == 'LW & AMF') | (position == 'OM & LW'):
+        # WINGER LEFT
+        pitch.scatter(x=85, y=88, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
+
+        # OFFENSIVE MIDFIELDER
+        pitch.scatter(x=70, y=50, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
+
+    elif (position == 'RW & AMF') | (position == 'AMF & RW'):
+        # WINGER RIGHT
+        pitch.scatter(x=85, y=12, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
+
+        # OFFENSIVE MIDFIELDER
+        pitch.scatter(x=70, y=50, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
+
+######################################################## MUTIPLE POSITIONS - LM / RM AND OM ###############################################################################
+
+    elif (position == 'LAMF & AMF') | (position == 'AMF & LAMF'):
+        # LEFT MIDFIELDER
+        pitch.scatter(x=70, y=85, ax=ax2, c=color[0], edgecolor='#1b1b1b', s=500, zorder=3)
+
+        # OFFENSIVE MIDFIELDER
+        pitch.scatter(x=70, y=50, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
+
+    elif (position == 'RAMF & AMF') | (position == 'AMF & RAMF'):
+        # RIGHT MIDFIELDER
+        pitch.scatter(x=70, y=15, ax=ax2, c=color[0], edgecolor='#1b1b1b', s=500, zorder=3)
+
+        # OFFENSIVE MIDFIELDER
+        pitch.scatter(x=70, y=50, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
+
+######################################################## MUTIPLE POSITIONS - AMF, CF, RCMF ###############################################################################
+
+    elif (position == 'AMF, CF, RCMF'):
+        # FORWARD
+        pitch.scatter(x=88.5, y=50, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
+
+        # OFFENSIVE MIDFIELDER
+        pitch.scatter(x=70, y=50, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
+
+        # RIGHT MIDFIELDER
+        pitch.scatter(x=70, y=15, ax=ax2, c=color[0], edgecolor='#1b1b1b', s=500, zorder=3)
+######################################################## MUTIPLE POSITIONS - FW AND OM ###############################################################################
+
+    elif (position == 'FW & AMF') | (position == 'AMF & FW'):
+        # FORWARD
+        pitch.scatter(x=88.5, y=50, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
+
+        # OFFENSIVE MIDFIELDER
+        pitch.scatter(x=70, y=50, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
+
+######################################################## MUTIPLE POSITIONS - RB AND LB ###############################################################################
+
+    elif (position == 'LB & RB') | (position == 'RB & LB'):
+        # RIGHT FULLBACK
+        pitch.scatter(x=17, y=15, ax=ax2, c=color[0], edgecolor='#1b1b1b', s=500, zorder=3)
+
+        # LEFT FULLBACK
+        pitch.scatter(x=17, y=85, ax=ax2, c=color[0], edgecolor='#1b1b1b', s=500, zorder=3)
+
+######################################################## MUTIPLE POSITIONS - LCB AND LB ###############################################################################
+
+    elif (position == 'LB & LCB') | (position == 'LCB & LB'):
+        # LEFT CENTER BACK
+        pitch.scatter(x=17, y=36.8, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
+        
+        # LEFT FULLBACK
+        pitch.scatter(x=17, y=15, ax=ax2, c=color[0], edgecolor='#1b1b1b', s=500, zorder=3)
+
+######################################################## MUTIPLE POSITIONS - RCB AND RB ###############################################################################
+
+    elif (position == 'RB & RCB') | (position == 'RCB & RB'):
+        # RIGHT CENTER BACK
+        pitch.scatter(x=17, y=63.2, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
+        
+        # RIGHT FULLBACK
+        pitch.scatter(x=17, y=15, ax=ax2, c=color[0], edgecolor='#1b1b1b', s=500, zorder=3)
+
+######################################################## MUTIPLE POSITIONS - DM AND CML ###############################################################################
+
+    elif (position == 'DMF & LDMF') | (position == 'LDMF & DMF'):
+        # DEFENSIVE MIDFIELDER
+        pitch.scatter(x=40, y=50, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
+        
+        # CENTER MIDFIELDER LEFT
+        pitch.scatter(x=55, y=36.8, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
+
+######################################################## MUTIPLE POSITIONS - DM AND CMR ###############################################################################
+
+    elif (position == 'RDMF & DMF') | (position == 'DMF, RDMF'):
+        # DEFENSIVE MIDFIELDER
+        pitch.scatter(x=40, y=50, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
+        
+        # CENTER MIDFIELDER RIGHT
+        pitch.scatter(x=55, y=36.8, ax=ax2, c=color[0], edgecolor='#1b1b1b', s=500, zorder=3)
+
+######################################################## MUTIPLE POSITIONS - CML AND CMR ###############################################################################
+
+    elif (position == 'LCMF, RCMF') | (position == 'RCMF, LCMF'):
+        # CENTER MIDFIELDER RIGHT
+        pitch.scatter(x=55, y=36.8, ax=ax2, c=color[0], edgecolor='#1b1b1b', s=500, zorder=3)
+        
+        # CENTER MIDFIELDER LEFT
+        pitch.scatter(x=55, y=63.2, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
+
+#######################################################################################################################################
+
+    cols_Offensive = ['Finishing Ability', 'Heading Ability', 'Concentration Ability', 'Sight play', 'Aerial Ability', 'Create Chances Ability', 'Dribbling Ability', 'SetPieces Ability', 'KeyPass Ability', 'Pass Ability']
+    cols_Defensive = ['Heading Ability', 'Concentration Ability', 'Pass Ability', 'SetPieces Ability', 'Aerial Ability', 'Tackle Ability', 'Interception Ability']
+
+    if (isDefensive == True) & (setPieces == False):
+        params = cols_Defensive
+
+        cols_Defensive.remove('SetPieces Ability')
+    
+        player = df.loc[(df['Player'] == playerName) & (df['Comp'] == league)][cols_Defensive].reset_index()
+        player = list(player.loc[0])
+        player = player[1:]
+
+    elif (isDefensive == True) & (setPieces == True):
+
+        params = cols_Defensive
+
+        player = df.loc[(df['Player'] == playerName) & (df['Comp'] == league)][cols_Defensive].reset_index()
+        player = list(player.loc[0])
+        player = player[1:]
+
+    elif (isDefensive == False) & (setPieces == True):
+
+        params = cols_Offensive
+
+        player = df.loc[(df['Player'] == playerName) & (df['Comp'] == league)][cols_Offensive].reset_index()
+        player = list(player.loc[0])
+        player = player[1:]
+
+    elif (isDefensive == False) & (setPieces == False):
+
+        params = cols_Offensive
+
+        cols_Offensive.remove('SetPieces Ability')
+    
+        player = df.loc[(df['Player'] == playerName) & (df['Comp'] == league)][cols_Offensive].reset_index()
+        player = list(player.loc[0])
+        player = player[1:]
+
+    #######################################################################################################################################
+
+    df2 = df.loc[(df['Tier'] == tier) & (df['Minutes played'] >= Minutes) | (df.Player == playerName)].reset_index(drop=True)
+
+    values = []
+    for x in range(len(params)):   
+        values.append(math.floor(stats.percentileofscore(df2[params[x]], player[x])))
+
+    for n,i in enumerate(values):
+        if i == 100:
+            values[n] = 99
+    
+    elite = []
+    veryStrong = []
+    strong = []
+    improve = []
+    weak = []
+    veryWeak = []
+    for i in range(len(values)):
+        if values[i] >= 95:
+            elite.append(params[i])
+
+        elif values[i] >= 80 | values[i] < 95:
+            veryStrong.append(params[i])
+
+        elif values[i] >= 70 | values[i] < 80:
+            strong.append(params[i])
+
+        elif values[i] >= 50 | values[i] < 70:
+            improve.append(params[i])
+
+        elif values[i] < 50:
+            weak.append(params[i])
+
+        elif values[i] <= 30:
+            veryWeak.append(params[i])
+        
+
+    #######################################################################################################################################
+    highlight_textpropsStrong =\
+    [{"color": '#2ae102', "fontweight": 'bold'}]
+
+    fig_text(x = 0.53, y = 0.9,
+            s='Strengths',
+            size=28,
+            color='#2ae102')
+
+    h=0.94
+    for i in elite:
+        ax_text(x=1.5, y=h - 0.1, s='<Elite:>' + ' ' + i, va='center', ha='center',
+                highlight_textprops = highlight_textpropsStrong, size=18, color='#1b1b1b', ax=ax1)
+        h=h-0.1
+
+    h=h
+    for i in veryStrong:
+        ax_text(x=1.5, y=h - 0.1, s='<Very Strong:>' + ' ' + i, va='center', ha='center',
+                highlight_textprops = highlight_textpropsStrong, size=18, color='#1b1b1b', ax=ax1)
+        h=h-0.1
+
+    h=h
+    for i in strong:
+        ax_text(x=1.5, y=h - 0.1, s='<Strong:>' + ' ' + i, va='center', ha='center',
+                highlight_textprops = highlight_textpropsStrong, size=18, color='#1b1b1b', ax=ax1)
+        h=h-0.1
+
+    highlight_textprops =\
+    [{"color": '#ff0000', "fontweight": 'bold'},
+     {"color": '#f48515', "fontweight": 'bold'}]
+
+    fig_text(x = 0.75, y = 0.9,
+             s='<Weaknesses>/<To improve>',
+             highlight_textprops = highlight_textprops,
+             size=28)
+
+    highlight_textpropsImprove =\
+    [{"color": '#f48515', "fontweight": 'bold'}]
+
+    highlight_textpropsWeak =\
+    [{"color": '#ff0000', "fontweight": 'bold'}]
+
+    h=0.94
+    for i in improve:
+        ax_text(x=2.5, y=h - 0.1, s='<Improve:>' + ' ' + i, va='center', ha='center',
+                highlight_textprops = highlight_textpropsImprove, size=18, color='#1b1b1b', ax=ax1)
+        h=h-0.1
+
+    h=h
+    for i in weak:
+        ax_text(x=2.5, y=h - 0.1, s='<Weak:>' + ' ' + i, va='center', ha='center',
+                highlight_textprops = highlight_textpropsWeak, size=18, color='#1b1b1b', ax=ax1)
+        h=h-0.1
+
+    h=h
+    for i in veryWeak:
+        ax_text(x=2.5, y=h - 0.1, s='<Very Weak:>' + ' ' + i, va='center', ha='center',
+                highlight_textprops = highlight_textpropsWeak, size=18, color='#1b1b1b', ax=ax1)
+        h=h-0.1
+        
+    #######################################################################################################################################
+
+    fig_text(x = 0.23, y = 0.91,
+            s=playerName,
+            size=30,
+            color='#1b1b1b')
+
+    fig_text(x = 0.23, y = 0.75,
+            s='Club: ',
+            size=20,
+            color='#1b1b1b')
+
+    fig_text(x = 0.21, y = 0.71,
+            s='League: ',
+            size=20,
+            color='#1b1b1b')
+
+    fig_text(x = 0.16, y = 0.67,
+            s='Market Value: ',
+            size=20,
+            color='#1b1b1b')
+
+    fig_text(x = 0.15, y = 0.63,
+            s='Contract until: ',
+            size=20,
+            color='#1b1b1b')
+
+    fig_text(x = 0.15, y = 0.59,
+            s='Minutes played: ',
+            size=20,
+            color='#1b1b1b')
+
+    fig_text(x = 0.223, y = 0.55,
+            s='Age: ',
+            size=20,
+            color='#1b1b1b')
+
+    fig_text(x = 0.223, y = 0.51,
+            s='Height: ',
+            size=20,
+            color='#1b1b1b')
+
+    fig_text(x = 0.233, y = 0.47,
+            s='Foot: ',
+            size=20,
+            color='#1b1b1b')
+
+#######################################################################################################################################
+
+    highlight_textprops =\
+    [{"color": color[0], "fontweight": 'bold'}]
+
+    fig_text(x = 0.3, y = 0.75,
+            s=f'<{club}>',
+            highlight_textprops = highlight_textprops,
+            size=18,
+            color='#1b1b1b')
+
+    fig_text(x = 0.301, y = 0.71,
+            s=league,
+            size=18,
+            color='#1b1b1b')
+
+    fig_text(x = 0.301, y = 0.67,
+            s=valor,
+            size=18,
+            color='#1b1b1b')
+
+    #if 'M' not in Market:
+    #    fig_text(x = 0.33, y = 0.667,
+    #            s='Thousand',
+    #            size=11,
+    #            color='#1b1b1b')
+
+    fig_text(x = 0.301, y = 0.63,
+            s=contrato,
+            size=18,
+            color='#1b1b1b')
+
+    fig_text(x = 0.301, y = 0.59,
+            s=str(Minutes),
+            size=18,
+            color='#1b1b1b')
+
+    fig_text(x = 0.301, y = 0.55,
+            s=str(age),
+            size=18,
+            color='#1b1b1b')
+
+    fig_text(x = 0.301, y = 0.51,
+            s=altura,
+            size=18,
+            color='#1b1b1b')
+
+    fig_text(x = 0.301, y = 0.47,
+            s=pé,
+            size=18,
+            color='#1b1b1b')
+
+#######################################################################################################################################
+
+    fig_text(x = 0.47, y = 0.41,
+            s='<Main Position>',
+            highlight_textprops = highlight_textprops,
+            size=18,
+            color='#1b1b1b')
+
+    if (position.split(', ')[0] == 'RAMF') | (position == 'RAMF'):
+        fig_text(x = 0.423, y = 0.38,
+                s='RIGHT MIDFIELDER',
+                size=18,
+                color='#1b1b1b')
+
+    elif (position.split(', ')[0] == 'LAMF') | (position == 'LAMF'):
+        fig_text(x = 0.423, y = 0.38,
+                s='LEFT MIDFIELDER',
+                size=18,
+                color='#1b1b1b')
+    
+    elif (position.split(', ')[0] == 'CF') | (position == 'CF'):
+        fig_text(x = 0.423, y = 0.38,
+                s='FORWARD',
+                size=18,
+                color='#1b1b1b')
+    
+    elif (position.split(', ')[0] == 'RW') | (position == 'RW'):
+        fig_text(x = 0.423, y = 0.38,
+                s='RIGHT WINGER',
+                size=18,
+                color='#1b1b1b')
+
+    elif (position.split(', ')[0] == 'LW') | (position == 'LW') | (position.split(', ')[0] == 'LWB') :
+        fig_text(x = 0.423, y = 0.38,
+                s='LEFT WINGER',
+                size=18,
+                color='#1b1b1b')
+
+    elif (position.split(', ')[0] == 'LB') | (position == 'LB'):
+        fig_text(x = 0.423, y = 0.38,
+                s='LEFT BACK',
+                size=18,
+                color='#1b1b1b')
+    
+    elif (position.split(', ')[0] == 'RB') | (position == 'RB'):
+        fig_text(x = 0.423, y = 0.38,
+                s='RIGHT BACK',
+                size=18,
+                color='#1b1b1b')
+    
+    elif (position.split(', ')[0] == 'LCB') | (position == 'LCB'):
+        fig_text(x = 0.423, y = 0.38,
+                s='LEFT CENTER BACK',
+                size=18,
+                color='#1b1b1b')
+    
+    elif (position.split(', ')[0] == 'RCB') | (position == 'RCB'):
+        fig_text(x = 0.423, y = 0.38,
+                s='RIGHT CENTER BACK',
+                size=18,
+                color='#1b1b1b')
+
+    elif (position.split(', ')[0] == 'DMF') | (position == 'DMF'):
+        fig_text(x = 0.423, y = 0.38,
+                s='DEFENSIVE MIDFIELDER',
+                size=18,
+                color='#1b1b1b')
+
+    elif (position.split(', ')[0] == 'RCMF') | (position == 'RCMF'):
+        fig_text(x = 0.423, y = 0.38,
+                s='CENTER MIDFIELDER RIGHT',
+                size=18,
+                color='#1b1b1b')
 
 
+    elif (position.split(', ')[0] == 'LCMF') | (position == 'LCMF'):
+        fig_text(x = 0.423, y = 0.38,
+                s='CENTER MIDFIELDER LEFT',
+                size=18,
+                color='#1b1b1b')
+
+    elif (position.split(', ')[0] == 'AMF') | (position == 'AMF'):
+        fig_text(x = 0.423, y = 0.38,
+                s='OFFENSIVE MIDFIELDER',
+                size=18,
+                color='#1b1b1b')
+
+    elif (position.split(' &')[0] == 'GK') | (position == 'GK'):
+        fig_text(x = 0.423, y = 0.38,
+                s='GOALKEEPER',
+                size=18,
+                color='#1b1b1b')
 
 
+    #######################################################################################################################################
+        
+    if (position.__contains__('CB')):
+
+        cols = ['Stopper', 'Aerial CB', 'Ball Playing CB', 'Ball Carrying CB']
+
+        dfLeague = df.loc[df['Comp'] == league].reset_index(drop=True)
+
+        center_Back(dfLeague)
+
+        player = dfLeague.loc[(dfLeague['Position'].str.contains(position))].reset_index(drop=True)
+
+        player = player.loc[(player['Player'] == playerName)][cols].reset_index()
+        player = list(player.loc[0])
+        player = player[1:]
+
+        params = cols
+
+        values = []
+        for x in range(len(params)):   
+            values.append(math.floor(stats.percentileofscore(dfLeague[params[x]], player[x])))
+
+        for n,i in enumerate(values):
+            if i == 100:
+                values[n] = 99
+
+    elif ((position.__contains__('RB')) | (position.__contains__('RWB')) | (position.__contains__('LWB')) | (position.__contains__('LB'))):
+
+        cols = ['Inverted Wing Back', 'Wing Back', 'Attacking FB', 'Defensive FB', 'Full Back CB']
+
+        dfLeague = df.loc[df['Comp'] == league].reset_index(drop=True)
+
+        center_Back(dfLeague)
+
+        player = dfLeague.loc[(dfLeague['Position'].str.contains(position))].reset_index(drop=True)
+
+        player = player.loc[(player['Player'] == playerName)][cols].reset_index()
+        player = list(player.loc[0])
+        player = player[1:]
+
+        params = cols
+
+        values = []
+        for x in range(len(params)):   
+            values.append(math.floor(stats.percentileofscore(dfLeague[params[x]], player[x])))
+
+        for n,i in enumerate(values):
+            if i == 100:
+                values[n] = 99
 
 
+    elif ((position.__contains__('RCMF')) | (position.__contains__('LCMF')) | (position.__contains__('LDMF')) | (position.__contains__('RDMF')) | (position.__contains__('AMF')) | (position.__contains__('DMF'))):
+
+        cols = ['Ball Winner', 'Deep Lying Playmaker', 'Box-to-box', 'Attacking Playmaker', 'Media Punta llegador']
+
+        dfLeague = df.loc[df['Comp'] == league].reset_index(drop=True)
+
+        center_Back(dfLeague)
+
+        player = dfLeague.loc[(dfLeague['Position'].str.contains(position))].reset_index(drop=True)
+
+        player = player.loc[(player['Player'] == playerName)][cols].reset_index()
+        player = list(player.loc[0])
+        player = player[1:]
+
+        params = cols
+
+        values = []
+        for x in range(len(params)):   
+            values.append(math.floor(stats.percentileofscore(dfLeague[params[x]], player[x])))
+
+        for n,i in enumerate(values):
+            if i == 100:
+                values[n] = 99
 
 
+    elif ((position.__contains__('LW')) | (position.__contains__('RW')) | (position.__contains__('LAMF')) | (position.__contains__('RAMF')) | (position.__contains__('LWF')) | (position.__contains__('RWF'))):
+
+        cols = ['Banda', 'Por dentro', 'Falso', 'Defensivo']
+
+        dfLeague = df.loc[df['Comp'] == league].reset_index(drop=True)
+
+        center_Back(dfLeague)
+
+        player = dfLeague.loc[(dfLeague['Position'].str.contains(position))].reset_index(drop=True)
+
+        player = player.loc[(player['Player'] == playerName)][cols].reset_index()
+        player = list(player.loc[0])
+        player = player[1:]
+
+        params = cols
+
+        values = []
+        for x in range(len(params)):   
+            values.append(math.floor(stats.percentileofscore(dfLeague[params[x]], player[x])))
+
+        for n,i in enumerate(values):
+            if i == 100:
+                values[n] = 99
 
 
+    elif (position.__contains__('CF')):
+
+        cols = ['Box Forward', 'Advanced Forward', 'Target Man', 'False 9']
+
+        dfLeague = df.loc[df['Comp'] == league].reset_index(drop=True)
+
+        center_Back(dfLeague)
+
+        player = dfLeague.loc[(dfLeague['Position'].str.contains(position))].reset_index(drop=True)
+
+        player = player.loc[(player['Player'] == playerName)][cols].reset_index()
+        player = list(player.loc[0])
+        player = player[1:]
+
+        params = cols
+
+        values = []
+        for x in range(len(params)):   
+            values.append(math.floor(stats.percentileofscore(dfLeague[params[x]], player[x])))
+
+        for n,i in enumerate(values):
+            if i == 100:
+                values[n] = 99
+
+    # PLAYER ROLE   
+    #playerRole.index[0]
+
+    fig_text(x = 0.17, y = 0.4,
+            s='Final Rating',
+            size=16,
+            color='#1b1b1b')
+
+    if max(values) >= 90:
+        fig_text(x = 0.25, y = 0.38,
+                s='A',
+                size=100,
+                color='#2ae102')
+
+    elif (max(values) >= 65) & (max(values) < 90):
+        fig_text(x = 0.25, y = 0.38,
+                s='B',
+                size=100,
+                color='#d7ee1a')
+
+    elif (max(values) >= 50) & (max(values) < 65):
+        fig_text(x = 0.25, y = 0.38,
+                s='C',
+                size=100,
+                color='#fdab16')
+
+    elif max(values) < 50:
+        fig_text(x = 0.25, y = 0.38,
+                s='D',
+                size=100,
+                color='#ff0000')
+
+    fig = add_image(image='C:/Users/menes/Documents/Data Hub/Images/Players/' + league + '/' + club + '/' + playerName + '.png', fig=fig, left=0.12, bottom=0.78, width=0.1, height=0.23)
+
+    fig = add_image(image='C:/Users/menes/Documents/Data Hub/Images/Country/' + country + '.png', fig=fig, left=0.23, bottom=0.775, width=0.1, height=0.07)
+
+################################################################################################################################################
+
+def role_Chart(df, playerName, pos, league):
+    # parameter and value list
+    if pos == 'Goalkepper':
+        df = df.loc[df.Position == 'GK'].reset_index(drop=True)
+        params = ['1v1 GK', 'BOX GK', 'Ball Playing GK']
+
+    elif pos == 'Center Back':
+        params = ['Ball Playing CB', 'Ball Carrying CB', 'Stopper', 'Aerial CB']
+
+        df = df.loc[(df.Position.str.contains('CB')) & (df.Comp == league)].reset_index(drop=True)
+
+        playerAbility(df)
+
+        RoleCenterBack(df)
+
+        szcore_df(df)
+
+    elif pos == 'Full Back':
+        params = ['Attacking FB', 'Wing Back', 'Inverted Wing Back', 'Defensive FB', 'Full Back CB']
+
+        df = df.loc[((df.Position.str.contains('RB')) | (df.Position.str.contains('RWB')) | (df.Position.str.contains('LWB')) | (df.Position.str.contains('LB')))].reset_index(drop=True)
+
+        playerAbility(df)
+
+        roleFullBack(df)
+
+        szcore_df(df)
+
+    elif pos == 'Midfield':
+        params = ['Box-to-box', 'Attacking Playmaker', 'Deep Lying Playmaker', 'Ball Winner', 'Media Punta llegador']
+
+        df = df.loc[((df.Position.str.contains('RCMF')) | (df.Position.str.contains('LCMF')) | (df.Position.str.contains('LDMF')) | (df.Position.str.contains('RDMF')) |
+                            (df.Position.str.contains('AMF')) | (df.Position.str.contains('DMF')) | (df.Position.str.contains('RAMF')))].reset_index(drop=True)
+
+        playerAbility(df)
+
+        RoleMidfield(df)
+
+        szcore_df(df)
+
+    elif pos == 'Winger':
+        params = ['Banda' , 'Por dentro', 'Defensivo', 'Falso']
+
+        df = df.loc[(df.Position.str.contains('LW')) | (df.Position.str.contains('RW')) | (df.Position.str.contains('LAMF')) |
+                     (df.Position.str.contains('RAMF')) | (df.Position.str.contains('LWF')) | (df.Position.str.contains('RWF'))].reset_index(drop=True)
+
+        playerAbility(df)
+
+        RoleExtremo(df)
+
+        szcore_df(df)
+
+    elif pos == 'Forward':
+        params = ['Advanced Forward', 'Target Man', 'False 9', 'Box Forward']
+        df = df.loc[(df.Position.str.contains('CF'))].reset_index(drop=True)
+
+        playerAbility(df)
+
+        RoleForward(df)
+
+        szcore_df(df)
+    
+    players = df.loc[df['Player'] == playerName]
+
+    club = players.Team.unique()
+    club = club.tolist()
+    club = club[0]
+
+    league = players.Comp.unique()
+    league = league.tolist()
+    league = league[0]
+
+    #Valores que pretendemos visualizar no radar chart, acedemos ao index 0 para obtermos os valores dentro da lista correta
+
+    df = df.loc[(df['Comp'] == league)].reset_index(drop=True)
+
+    player = df.loc[(df['Player'] == playerName) & (df['Comp'] == league)][params].reset_index()
+    player = list(player.loc[0])
+    player = player[1:]
+    
+    values = []
+    for x in range(len(params)):   
+        values.append(math.floor(stats.percentileofscore(df[params[x]], player[x])))
+
+    for n,i in enumerate(values):
+        if i == 100:
+            values[n] = 99
+
+    # instantiate PyPizza class
+    baker = PyPizza(
+        params=params,                  # list of parameters
+        straight_line_color="#F2F2F2",  # color for straight lines
+        straight_line_lw=1,             # linewidth for straight lines
+        straight_line_limit=100.0,        # max limit of straight lines
+        last_circle_lw=0,               # linewidth of last circle
+        other_circle_lw=0,              # linewidth for other circles
+        inner_circle_size=0.4,          # size of inner circle
+    )
+
+    # plot pizza
+    fig, ax = baker.make_pizza(
+        values,                     # list of values
+        figsize=(8, 8),             # adjust figsize according to your need
+        color_blank_space="same",   # use same color to fill blank space
+        blank_alpha=0.4,            # alpha for blank-space colors
+        param_location=104.7,         # where the parameters will be added
+        kwargs_slices=dict(
+            facecolor="#043484", edgecolor="#F2F2F2",
+            zorder=2, linewidth=1
+        ),                          # values to be used when plotting slices
+        kwargs_params=dict(
+            color="#000000", fontsize=12,
+            va="center"
+        ),                          # values to be used when adding parameter
+        kwargs_values=dict(
+            color="#E8E8E8", fontsize=12,
+            zorder=3,
+            bbox=dict(
+                edgecolor="#E8E8E8", facecolor="#043484",
+                boxstyle="round,pad=0.2", lw=1
+            )
+        )                           # values to be used when adding parameter-values
+    )
+
+    fig.set_facecolor('#E8E8E8')
+
+    fig_text(s =  playerName,
+                x = 0.5, y = 1.07,
+                color='#181818',
+                fontweight='bold', ha='center',
+                fontsize=28)
+
+    fig_text(s =  'Rank vs Players Position | Season 21/22',
+                x = 0.5, y = 1.02,
+                color='#181818',
+                fontweight='bold', ha='center',
+                fontsize=12)
+
+################################################################################################################################################
+#--------------------------------------------------- DEFENSIVE --------------------------------------------------------------------------------
+################################################################################################################################################
+
+def RoleCenterBackDefensive(df):
+
+    df['Defensive Ability'] = ((df['rank_Defensive duels/90'] * 35) + (df[ 'rank_Defensive duels %'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['crossing'] = ((df['rank_Crosses/90'] * 30) + (df[ 'rank_Accurate crosses, %'] * 30) +
+                     (df[ 'rank_Crosses to goalie box/90'] * 40)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['defending1v1'] = ((df['rank_Defensive duels/90'] * 35) + (df[ 'rank_PAdj Sliding tackles'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['positioning Defence'] = ((df['rank_Shots blocked/90'] * 40) + (df[ 'rank_PAdj Interceptions'] * 60)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['positioning Midfield'] = ((df['rank_Shots blocked/90'] * 30) + (df[ 'rank_PAdj Interceptions'] * 70)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['Aerial'] = ((df['rank_Aerial duels/90'] * 35) + (df[ 'rank_Aerial duels %'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['ballPlaying'] = ((df['rank_Passes %'] * 20) + (df[ 'rank_Forward passes %'] * 15) +
+                            (df[ 'rank_Forward passes/90'] * 25) + (df[ 'rank_Progressive passes/90'] * 25) +
+                            (df[ 'rank_Accurate progressive passes, %'] * 15)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['ballPlaying Deep'] = ((df['rank_Passes %'] * 20) + (df[ 'rank_Forward passes %'] * 12.5) +
+                              (df[ 'rank_Forward passes/90'] * 22.5) + (df[ 'rank_Progressive passes/90'] * 10) +
+                              (df[ 'rank_Accurate progressive passes, %'] * 10) + (df['rank_Lateral passes/90'] * 10) +
+                              (df['rank_Accurate lateral passes, %'] * 10)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['dribbles'] = ((df['rank_Dribbles/90'] * 65) + (df[ 'rank_Successful dribbles %'] * 35)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['progressiveRuns'] = ((df['rank_Progressive runs/90'] * 50) + (df[ 'rank_Accelerations/90'] * 20) +
+                                (df[ 'rank_Dribbles/90'] * 30)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['Pass_Forward'] =  ((df['rank_Forward passes %'] * 20) + (df['rank_Forward passes/90'] * 50) + (df['rank_Progressive passes/90'] * 30)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['runs'] =  ((df['rank_Progressive runs/90'] * 35) + (df['rank_Accelerations/90'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['decisionMake'] = ((df['rank_Shot assists/90'] * 20) + (df[ 'rank_Passes penalty area %'] * 20) +
+                            (df[ 'rank_Assists/90'] * 10) + (df[ 'rank_Second assists/90'] * 15) +
+                            (df[ 'rank_xA/90'] * 15) + (df[ 'rank_Passes to penalty area/90'] * 10) + (df[ 'rank_Deep completions/90'] * 10)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['touchQuality'] = ((df['rank_Key passes/90'] * 30) + (df[ 'rank_Accurate smart passes, %'] * 25) +
+                            (df[ 'rank_Smart passes/90'] * 25) + (df[ 'rank_Fouls suffered/90'] * 20)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['attackingThreat'] = ((df['rank_xG/90'] * 25) + (df[ 'rank_Goals/90'] * 25) +
+                                (df[ 'rank_Head goals/90'] * 12) + (df[ 'rank_Shots/90'] * 12) + (df[ 'rank_Shots on target, %'] * 14) +
+                                (df[ 'rank_Goal conversion, %'] * 12)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['attackingThreat FW'] = ((df['rank_xG'] * 20) + (df[ 'rank_Goals'] * 80)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['attackingThreat Defence'] = ((df[ 'rank_Head goals/90'] * 50) + (df[ 'rank_Head goals'] * 50)) / 10
 
 
+    ##########################################################################################################################################################################
+    ##########################################################################################################################################################################
+    ##########################################################################################################################################################################
+    ##########################################################################################################################################################################
+
+    df['Stopper'] = round(((df['Defensive Ability'] * 27.5) + (df['positioning Defence'] * 37.5) + (df[ 'Aerial'] * 20) +
+                           (df[ 'ballPlaying'] * 5) + (df['attackingThreat Defence'] * 10)) / 10, 2)
+
+    ##########################################################################################################################################################################
+
+    df['Aerial CB'] =  round(((df['Defensive Ability'] * 20) + (df['positioning Defence'] * 25) +
+                             (df[ 'Aerial'] * 45) + (df['attackingThreat Defence'] * 10)) / 10, 2)
+ 
+    ##########################################################################################################################################################################
+
+    df['Ball Playing CB'] =  round(((df['Defensive Ability'] * 27.5) + (df['positioning Defence'] * 17.5) + (df[ 'Aerial'] * 10) +
+                                    (df[ 'ballPlaying'] * 30) + (df[ 'progressiveRuns'] * 10) + (df['attackingThreat Defence'] * 5)) / 10, 2)
+
+    ##########################################################################################################################################################################
+
+    df['Ball Carrying CB'] =  round(((df['Defensive Ability'] * 25) + (df[ 'positioning Defence'] * 20) + (df[ 'Aerial'] * 15) +
+                            (df[ 'ballPlaying'] * 10) + (df[ 'progressiveRuns'] * 25) + (df[ 'attackingThreat Defence'] * 5)) / 10, 2)
+
+################################################################################################################################################
+
+def roleFullBackDefensive(df):
+
+    ##########################################################################################################################################################################
+
+    df['Defensive Ability'] = ((df['rank_Defensive duels/90'] * 35) + (df[ 'rank_Defensive duels %'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['crossing'] = ((df['rank_Crosses/90'] * 30) + (df[ 'rank_Accurate crosses, %'] * 30) +
+                     (df[ 'rank_Crosses to goalie box/90'] * 40)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['defending1v1'] = ((df['rank_Defensive duels/90'] * 35) + (df[ 'rank_PAdj Sliding tackles'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['positioning Defence'] = ((df['rank_Shots blocked/90'] * 40) + (df[ 'rank_PAdj Interceptions'] * 60)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['positioning Midfield'] = ((df['rank_Shots blocked/90'] * 30) + (df[ 'rank_PAdj Interceptions'] * 70)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['Aerial'] = ((df['rank_Aerial duels/90'] * 35) + (df[ 'rank_Aerial duels %'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['ballPlaying'] = ((df['rank_Passes %'] * 20) + (df[ 'rank_Forward passes %'] * 15) +
+                            (df[ 'rank_Forward passes/90'] * 25) + (df[ 'rank_Progressive passes/90'] * 25) +
+                            (df[ 'rank_Accurate progressive passes, %'] * 15)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['ballPlaying Deep'] = ((df['rank_Passes %'] * 20) + (df[ 'rank_Forward passes %'] * 12.5) +
+                              (df[ 'rank_Forward passes/90'] * 22.5) + (df[ 'rank_Progressive passes/90'] * 10) +
+                              (df[ 'rank_Accurate progressive passes, %'] * 10) + (df['rank_Lateral passes/90'] * 10) +
+                              (df['rank_Accurate lateral passes, %'] * 10)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['dribbles'] = ((df['rank_Dribbles/90'] * 65) + (df[ 'rank_Successful dribbles %'] * 35)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['progressiveRuns'] = ((df['rank_Progressive runs/90'] * 50) + (df[ 'rank_Accelerations/90'] * 20) +
+                                (df[ 'rank_Dribbles/90'] * 30)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['Pass_Forward'] =  ((df['rank_Forward passes %'] * 20) + (df['rank_Forward passes/90'] * 50) + (df['rank_Progressive passes/90'] * 30)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['runs'] =  ((df['rank_Progressive runs/90'] * 35) + (df['rank_Accelerations/90'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['decisionMake'] = ((df['rank_Shot assists/90'] * 20) + (df[ 'rank_Passes penalty area %'] * 20) +
+                            (df[ 'rank_Assists/90'] * 10) + (df[ 'rank_Second assists/90'] * 15) +
+                            (df[ 'rank_xA/90'] * 15) + (df[ 'rank_Passes to penalty area/90'] * 10) + (df[ 'rank_Deep completions/90'] * 10)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['touchQuality'] = ((df['rank_Key passes/90'] * 30) + (df[ 'rank_Accurate smart passes, %'] * 25) +
+                            (df[ 'rank_Smart passes/90'] * 25) + (df[ 'rank_Fouls suffered/90'] * 20)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['attackingThreat'] = ((df['rank_xG/90'] * 25) + (df[ 'rank_Goals/90'] * 25) +
+                                (df[ 'rank_Head goals/90'] * 12) + (df[ 'rank_Shots/90'] * 12) + (df[ 'rank_Shots on target, %'] * 14) +
+                                (df[ 'rank_Goal conversion, %'] * 12)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['attackingThreat FW'] = ((df['rank_xG'] * 20) + (df[ 'rank_Goals'] * 80)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['attackingThreat Defence'] = ((df[ 'rank_Head goals/90'] * 50) + (df[ 'rank_Head goals'] * 50)) / 10
+
+    ##########################################################################################################################################################################
+    ##########################################################################################################################################################################
+    ##########################################################################################################################################################################
+    ##########################################################################################################################################################################
+
+    df['Attacking FB'] =  round(((df['crossing'] * 17.5) + (df['dribbles'] * 10) + (df['positioning Defence'] * 20) +
+                                (df['progressiveRuns'] * 10) + (df['defending1v1'] * 20) +
+                                (df['decisionMake'] * 12.5) + (df[ 'touchQuality'] * 10)) / 10, 2)
+
+    ##########################################################################################################################################################################
+
+    df['Wing Back'] =  round(((df['crossing'] * 25) + (df[ 'defending1v1'] * 20) + (df[ 'positioning Defence'] * 25) +
+                              (df[ 'progressiveRuns'] * 15) + (df[ 'decisionMake'] * 15)) / 10, 2)
+
+    ##########################################################################################################################################################################
+
+    df['Inverted Wing Back'] =  round(((df['dribbles'] * 10) + (df['defending1v1'] * 30) + (df['positioning Midfield'] * 20) +
+                                      (df['positioning Defence'] * 25) + (df['decisionMake'] * 15)) / 10, 2)
+
+    ##########################################################################################################################################################################
+
+    df['Defensive FB'] =  round(((df['crossing'] * 10) + (df[ 'defending1v1'] * 40) +
+                                (df['positioning Defence'] * 30) + (df[ 'Aerial'] * 20)) / 10, 2)
+
+    ##########################################################################################################################################################################
+
+    df['Full Back CB'] =  round(((df['crossing'] * 10) + (df[ 'defending1v1'] * 45) +
+                                (df['positioning Defence'] * 35) + (df[ 'Aerial'] * 10)) / 10, 2)
+
+################################################################################################################################################
+
+def RoleMidfieldDefensive(df):
+
+    ##########################################################################################################################################################################
+
+    df['Defensive Ability'] = ((df['rank_Defensive duels/90'] * 35) + (df[ 'rank_Defensive duels %'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['crossing'] = ((df['rank_Crosses/90'] * 30) + (df[ 'rank_Accurate crosses, %'] * 30) +
+                     (df[ 'rank_Crosses to goalie box/90'] * 40)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['defending1v1'] = ((df['rank_Defensive duels/90'] * 35) + (df[ 'rank_PAdj Sliding tackles'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['positioning Defence'] = ((df['rank_Shots blocked/90'] * 40) + (df[ 'rank_PAdj Interceptions'] * 60)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['positioning Midfield'] = ((df['rank_Shots blocked/90'] * 30) + (df[ 'rank_PAdj Interceptions'] * 70)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['Aerial'] = ((df['rank_Aerial duels/90'] * 35) + (df[ 'rank_Aerial duels %'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['ballPlaying'] = ((df['rank_Passes %'] * 20) + (df[ 'rank_Forward passes %'] * 15) +
+                            (df[ 'rank_Forward passes/90'] * 25) + (df[ 'rank_Progressive passes/90'] * 25) +
+                            (df[ 'rank_Accurate progressive passes, %'] * 15)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['ballPlaying Deep'] = ((df['rank_Passes %'] * 20) + (df[ 'rank_Forward passes %'] * 12.5) +
+                              (df[ 'rank_Forward passes/90'] * 22.5) + (df[ 'rank_Progressive passes/90'] * 10) +
+                              (df[ 'rank_Accurate progressive passes, %'] * 10) + (df['rank_Lateral passes/90'] * 10) +
+                              (df['rank_Accurate lateral passes, %'] * 10)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['dribbles'] = ((df['rank_Dribbles/90'] * 65) + (df[ 'rank_Successful dribbles %'] * 35)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['progressiveRuns'] = ((df['rank_Progressive runs/90'] * 50) + (df[ 'rank_Accelerations/90'] * 20) +
+                                (df[ 'rank_Dribbles/90'] * 30)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['Pass_Forward'] =  ((df['rank_Forward passes %'] * 20) + (df['rank_Forward passes/90'] * 50) + (df['rank_Progressive passes/90'] * 30)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['runs'] =  ((df['rank_Progressive runs/90'] * 35) + (df['rank_Accelerations/90'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['decisionMake'] = ((df['rank_Shot assists/90'] * 20) + (df[ 'rank_Passes penalty area %'] * 20) +
+                            (df[ 'rank_Assists/90'] * 10) + (df[ 'rank_Second assists/90'] * 15) +
+                            (df[ 'rank_xA/90'] * 15) + (df[ 'rank_Passes to penalty area/90'] * 10) + (df[ 'rank_Deep completions/90'] * 10)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['touchQuality'] = ((df['rank_Key passes/90'] * 30) + (df[ 'rank_Accurate smart passes, %'] * 25) +
+                            (df[ 'rank_Smart passes/90'] * 25) + (df[ 'rank_Fouls suffered/90'] * 20)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['attackingThreat'] = ((df['rank_xG/90'] * 25) + (df[ 'rank_Goals/90'] * 25) +
+                                (df[ 'rank_Head goals/90'] * 12) + (df[ 'rank_Shots/90'] * 12) + (df[ 'rank_Shots on target, %'] * 14) +
+                                (df[ 'rank_Goal conversion, %'] * 12)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['attackingThreat FW'] = ((df['rank_xG'] * 20) + (df[ 'rank_Goals'] * 80)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['attackingThreat Defence'] = ((df[ 'rank_Head goals/90'] * 50) + (df[ 'rank_Head goals'] * 50)) / 10
+
+    ##########################################################################################################################################################################
+    ##########################################################################################################################################################################
+    ##########################################################################################################################################################################
+    ##########################################################################################################################################################################
+
+    df['Ball Winner'] =  round(((df['positioning Midfield'] * 35) + (df['defending1v1'] * 30) +
+                               (df['ballPlaying'] * 5) + (df['Aerial'] * 30)) / 10, 2)
+
+    ##########################################################################################################################################################################
+
+    df['Deep Lying Playmaker'] =  round(((df['positioning Midfield'] * 35) + (df['decisionMake'] * 15) +
+                                        (df['Aerial'] * 25) + (df['defending1v1'] * 15) + (df['ballPlaying Deep'] * 10)) / 10, 2)
+
+    ##########################################################################################################################################################################
+
+    df['Attacking Playmaker'] =  round(((df['positioning Midfield'] * 30) + (df['progressiveRuns'] * 15) +
+                                    (df['decisionMake'] * 15) + (df['touchQuality'] * 10) + (df['dribbles'] * 15) + (df['ballPlaying'] * 15)) / 10, 2)
+
+    ##########################################################################################################################################################################
+
+    df['Media Punta llegador'] =  round(((df['attackingThreat'] * 10) + (df['progressiveRuns'] * 10) + (df['positioning Midfield'] * 20) +
+                                    (df['decisionMake'] * 20) + (df['touchQuality'] * 15) + (df['dribbles'] * 10) + (df['ballPlaying'] * 15)) / 10, 2)
+
+    ##########################################################################################################################################################################
+
+    df['Box-to-box'] =  round(((df['Pass_Forward'] * 25) + (df['defending1v1'] * 40) + (df['runs'] * 30))/ 10, 2)
+
+################################################################################################################################################
+
+def RoleExtremoDefensivo(df):
+    
+    ##########################################################################################################################################################################
+
+    df['Defensive Ability'] = ((df['rank_Defensive duels/90'] * 35) + (df[ 'rank_Defensive duels %'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['crossing'] = ((df['rank_Crosses/90'] * 30) + (df[ 'rank_Accurate crosses, %'] * 30) +
+                     (df[ 'rank_Crosses to goalie box/90'] * 40)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['defending1v1'] = ((df['rank_Defensive duels/90'] * 35) + (df[ 'rank_PAdj Sliding tackles'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['positioning Defence'] = ((df['rank_Shots blocked/90'] * 40) + (df[ 'rank_PAdj Interceptions'] * 60)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['positioning Midfield'] = ((df['rank_Shots blocked/90'] * 30) + (df[ 'rank_PAdj Interceptions'] * 70)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['Aerial'] = ((df['rank_Aerial duels/90'] * 35) + (df[ 'rank_Aerial duels %'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['ballPlaying'] = ((df['rank_Passes %'] * 20) + (df[ 'rank_Forward passes %'] * 15) +
+                            (df[ 'rank_Forward passes/90'] * 25) + (df[ 'rank_Progressive passes/90'] * 25) +
+                            (df[ 'rank_Accurate progressive passes, %'] * 15)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['ballPlaying Deep'] = ((df['rank_Passes %'] * 20) + (df[ 'rank_Forward passes %'] * 12.5) +
+                              (df[ 'rank_Forward passes/90'] * 22.5) + (df[ 'rank_Progressive passes/90'] * 10) +
+                              (df[ 'rank_Accurate progressive passes, %'] * 10) + (df['rank_Lateral passes/90'] * 10) +
+                              (df['rank_Accurate lateral passes, %'] * 10)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['dribbles'] = ((df['rank_Dribbles/90'] * 65) + (df[ 'rank_Successful dribbles %'] * 35)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['progressiveRuns'] = ((df['rank_Progressive runs/90'] * 50) + (df[ 'rank_Accelerations/90'] * 20) +
+                                (df[ 'rank_Dribbles/90'] * 30)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['Pass_Forward'] =  ((df['rank_Forward passes %'] * 20) + (df['rank_Forward passes/90'] * 50) + (df['rank_Progressive passes/90'] * 30)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['runs'] =  ((df['rank_Progressive runs/90'] * 35) + (df['rank_Accelerations/90'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['decisionMake'] = ((df['rank_Shot assists/90'] * 20) + (df[ 'rank_Passes penalty area %'] * 20) +
+                            (df[ 'rank_Assists/90'] * 10) + (df[ 'rank_Second assists/90'] * 15) +
+                            (df[ 'rank_xA/90'] * 15) + (df[ 'rank_Passes to penalty area/90'] * 10) + (df[ 'rank_Deep completions/90'] * 10)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['touchQuality'] = ((df['rank_Key passes/90'] * 30) + (df[ 'rank_Accurate smart passes, %'] * 25) +
+                            (df[ 'rank_Smart passes/90'] * 25) + (df[ 'rank_Fouls suffered/90'] * 20)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['attackingThreat'] = ((df['rank_xG/90'] * 25) + (df[ 'rank_Goals/90'] * 25) +
+                                (df[ 'rank_Head goals/90'] * 12) + (df[ 'rank_Shots/90'] * 12) + (df[ 'rank_Shots on target, %'] * 14) +
+                                (df[ 'rank_Goal conversion, %'] * 12)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['attackingThreat FW'] = ((df['rank_xG'] * 20) + (df[ 'rank_Goals'] * 80)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['attackingThreat Defence'] = ((df[ 'rank_Head goals/90'] * 50) + (df[ 'rank_Head goals'] * 50)) / 10
+
+    ##########################################################################################################################################################################
+    ##########################################################################################################################################################################
+    ##########################################################################################################################################################################
+    ##########################################################################################################################################################################
+
+    df['Banda'] =  round(((df['progressiveRuns'] * 25) + (df['decisionMake'] * 10) +
+                          (df['defending1v1'] * 25) + (df['dribbles'] * 7.5) + (df['crossing'] * 22.5) +
+                          (df['attackingThreat'] * 10)) / 10, 2)
+
+    ##########################################################################################################################################################################
+
+    df['Por dentro'] =  round(((df['progressiveRuns'] * 20) + (df['defending1v1'] * 17.5) + (df['decisionMake'] * 12.5) +
+                                (df['touchQuality'] * 15) + (df['dribbles'] * 20) +
+                                (df['attackingThreat'] * 15)) / 10, 2)
+
+    ##########################################################################################################################################################################
+
+    df['Defensivo'] =  round(((df['crossing'] * 20) + (df['dribbles'] * 10) + (df['positioning Midfield'] * 25) +
+                              (df['decisionMake'] * 15) + (df['defending1v1'] * 30)) / 10, 2)
+
+    ##########################################################################################################################################################################
+
+    df['Falso'] =  round(((df['attackingThreat'] * 28.5) + (df['dribbles'] * 15) + (df['defending1v1'] * 20) +
+                          (df['decisionMake'] * 10) + (df[ 'touchQuality'] * 12.5) + (df['Aerial'] * 15)) / 10, 2)
+
+################################################################################################################################################
+
+def RoleForwardDefensivo(df):
+
+    ##########################################################################################################################################################################
+
+    df['Defensive Ability'] = ((df['rank_Defensive duels/90'] * 35) + (df[ 'rank_Defensive duels %'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['crossing'] = ((df['rank_Crosses/90'] * 30) + (df[ 'rank_Accurate crosses, %'] * 30) +
+                     (df[ 'rank_Crosses to goalie box/90'] * 40)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['defending1v1'] = ((df['rank_Defensive duels/90'] * 35) + (df[ 'rank_PAdj Sliding tackles'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['positioning Defence'] = ((df['rank_Shots blocked/90'] * 40) + (df[ 'rank_PAdj Interceptions'] * 60)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['positioning Midfield'] = ((df['rank_Shots blocked/90'] * 30) + (df[ 'rank_PAdj Interceptions'] * 70)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['Aerial'] = ((df['rank_Aerial duels/90'] * 35) + (df[ 'rank_Aerial duels %'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['ballPlaying'] = ((df['rank_Passes %'] * 20) + (df[ 'rank_Forward passes %'] * 15) +
+                            (df[ 'rank_Forward passes/90'] * 25) + (df[ 'rank_Progressive passes/90'] * 25) +
+                            (df[ 'rank_Accurate progressive passes, %'] * 15)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['ballPlaying Deep'] = ((df['rank_Passes %'] * 20) + (df[ 'rank_Forward passes %'] * 12.5) +
+                              (df[ 'rank_Forward passes/90'] * 22.5) + (df[ 'rank_Progressive passes/90'] * 10) +
+                              (df[ 'rank_Accurate progressive passes, %'] * 10) + (df['rank_Lateral passes/90'] * 10) +
+                              (df['rank_Accurate lateral passes, %'] * 10)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['dribbles'] = ((df['rank_Dribbles/90'] * 65) + (df[ 'rank_Successful dribbles %'] * 35)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['progressiveRuns'] = ((df['rank_Progressive runs/90'] * 50) + (df[ 'rank_Accelerations/90'] * 20) +
+                                (df[ 'rank_Dribbles/90'] * 30)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['Pass_Forward'] =  ((df['rank_Forward passes %'] * 20) + (df['rank_Forward passes/90'] * 50) + (df['rank_Progressive passes/90'] * 30)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['runs'] =  ((df['rank_Progressive runs/90'] * 35) + (df['rank_Accelerations/90'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['decisionMake'] = ((df['rank_Shot assists/90'] * 20) + (df[ 'rank_Passes penalty area %'] * 20) +
+                            (df[ 'rank_Assists/90'] * 10) + (df[ 'rank_Second assists/90'] * 15) +
+                            (df[ 'rank_xA/90'] * 15) + (df[ 'rank_Passes to penalty area/90'] * 10) + (df[ 'rank_Deep completions/90'] * 10)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['touchQuality'] = ((df['rank_Key passes/90'] * 30) + (df[ 'rank_Accurate smart passes, %'] * 25) +
+                            (df[ 'rank_Smart passes/90'] * 25) + (df[ 'rank_Fouls suffered/90'] * 20)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['attackingThreat'] = ((df['rank_xG/90'] * 25) + (df[ 'rank_Goals/90'] * 25) +
+                                (df[ 'rank_Head goals/90'] * 12) + (df[ 'rank_Shots/90'] * 12) + (df[ 'rank_Shots on target, %'] * 14) +
+                                (df[ 'rank_Goal conversion, %'] * 12)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['attackingThreat FW'] = ((df['rank_xG'] * 20) + (df[ 'rank_Goals'] * 80)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['attackingThreat Defence'] = ((df[ 'rank_Head goals/90'] * 50) + (df[ 'rank_Head goals'] * 50)) / 10
+
+    ##########################################################################################################################################################################
+    ##########################################################################################################################################################################
+    ##########################################################################################################################################################################
+    ##########################################################################################################################################################################
+
+    df['False 9'] =  round(((df['decisionMake'] * 20) + (df['positioning Midfield'] * 15) +
+                            (df['touchQuality'] * 15) + (df['dribbles'] * 10) + (df['ballPlaying'] * 10) +
+                            (df['attackingThreat'] * 30)) / 10, 2)
+
+    ##########################################################################################################################################################################
+
+    df['Target Man'] =  round(((df['decisionMake'] * 15) + (df['touchQuality'] * 10) +
+                            (df['Aerial'] * 45) + (df['attackingThreat'] * 30)) / 10, 2)
+    
+    ##########################################################################################################################################################################
+
+    df['Box Forward'] =  round(((df['decisionMake'] * 12.5) + (df['Aerial'] * 12.5) + (df['attackingThreat FW'] * 75)) / 10, 2)
+
+    ##########################################################################################################################################################################
+
+    df['Advanced Forward'] =  round(((df['ballPlaying'] * 10) + (df[ 'decisionMake'] * 15) +
+                                    (df['touchQuality'] * 10) + (df[ 'dribbles'] * 10) +
+                                    (df['Aerial'] * 20) + (df[ 'attackingThreat'] * 35)) / 10, 2)
+
+################################################################################################################################################
+#--------------------------------------------------- DIRECT --------------------------------------------------------------------------------
+################################################################################################################################################
+
+def RoleCenterBackDirect(df):
+
+    df['Defensive Ability'] = ((df['rank_Defensive duels/90'] * 35) + (df[ 'rank_Defensive duels %'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['crossing'] = ((df['rank_Crosses/90'] * 30) + (df[ 'rank_Accurate crosses, %'] * 30) +
+                     (df[ 'rank_Crosses to goalie box/90'] * 40)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['defending1v1'] = ((df['rank_Defensive duels/90'] * 35) + (df[ 'rank_PAdj Sliding tackles'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['positioning Defence'] = ((df['rank_Shots blocked/90'] * 40) + (df[ 'rank_PAdj Interceptions'] * 60)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['positioning Midfield'] = ((df['rank_Shots blocked/90'] * 30) + (df[ 'rank_PAdj Interceptions'] * 70)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['Aerial'] = ((df['rank_Aerial duels/90'] * 35) + (df[ 'rank_Aerial duels %'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['ballPlaying'] = ((df['rank_Passes %'] * 20) + (df[ 'rank_Forward passes %'] * 15) +
+                            (df[ 'rank_Forward passes/90'] * 25) + (df[ 'rank_Progressive passes/90'] * 25) +
+                            (df[ 'rank_Accurate progressive passes, %'] * 15)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['ballPlaying Deep'] = ((df['rank_Passes %'] * 20) + (df[ 'rank_Forward passes %'] * 12.5) +
+                              (df[ 'rank_Forward passes/90'] * 22.5) + (df[ 'rank_Progressive passes/90'] * 10) +
+                              (df[ 'rank_Accurate progressive passes, %'] * 10) + (df['rank_Lateral passes/90'] * 10) +
+                              (df['rank_Accurate lateral passes, %'] * 10)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['dribbles'] = ((df['rank_Dribbles/90'] * 65) + (df[ 'rank_Successful dribbles %'] * 35)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['progressiveRuns'] = ((df['rank_Progressive runs/90'] * 50) + (df[ 'rank_Accelerations/90'] * 20) +
+                                (df[ 'rank_Dribbles/90'] * 30)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['Pass_Forward'] =  ((df['rank_Forward passes %'] * 20) + (df['rank_Forward passes/90'] * 50) + (df['rank_Progressive passes/90'] * 30)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['runs'] =  ((df['rank_Progressive runs/90'] * 35) + (df['rank_Accelerations/90'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['decisionMake'] = ((df['rank_Shot assists/90'] * 20) + (df[ 'rank_Passes penalty area %'] * 20) +
+                            (df[ 'rank_Assists/90'] * 10) + (df[ 'rank_Second assists/90'] * 15) +
+                            (df[ 'rank_xA/90'] * 15) + (df[ 'rank_Passes to penalty area/90'] * 10) + (df[ 'rank_Deep completions/90'] * 10)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['touchQuality'] = ((df['rank_Key passes/90'] * 30) + (df[ 'rank_Accurate smart passes, %'] * 25) +
+                            (df[ 'rank_Smart passes/90'] * 25) + (df[ 'rank_Fouls suffered/90'] * 20)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['attackingThreat'] = ((df['rank_xG/90'] * 25) + (df[ 'rank_Goals/90'] * 25) +
+                                (df[ 'rank_Head goals/90'] * 12) + (df[ 'rank_Shots/90'] * 12) + (df[ 'rank_Shots on target, %'] * 14) +
+                                (df[ 'rank_Goal conversion, %'] * 12)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['attackingThreat FW'] = ((df['rank_xG'] * 20) + (df[ 'rank_Goals'] * 80)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['attackingThreat Defence'] = ((df[ 'rank_Head goals/90'] * 50) + (df[ 'rank_Head goals'] * 50)) / 10
 
 
+    ##########################################################################################################################################################################
+    ##########################################################################################################################################################################
+    ##########################################################################################################################################################################
+    ##########################################################################################################################################################################
+
+    df['Stopper'] = round(((df['Defensive Ability'] * 27.5) + (df['positioning Defence'] * 30) + (df[ 'Aerial'] * 20) +
+                           (df['ballPlaying'] * 12.5) + (df['attackingThreat Defence'] * 10)) / 10, 2)
+
+    ##########################################################################################################################################################################
+
+    df['Aerial CB'] =  round(((df['Defensive Ability'] * 15) + (df['positioning Defence'] * 20) + (df[ 'Aerial'] * 40) +
+                              (df[ 'ballPlaying'] * 10) + (df[ 'progressiveRuns'] * 5) + (df['attackingThreat Defence'] * 10)) / 10, 2)
+ 
+    ##########################################################################################################################################################################
+
+    df['Ball Playing CB'] =  round(((df['Defensive Ability'] * 20) + (df['positioning Defence'] * 15) + (df[ 'Aerial'] * 5) +
+                                    (df[ 'ballPlaying'] * 37.5) + (df[ 'progressiveRuns'] * 17.5) + (df['attackingThreat Defence'] * 5)) / 10, 2)
+
+    ##########################################################################################################################################################################
+
+    df['Ball Carrying CB'] =  round(((df['Defensive Ability'] * 22.5) + (df[ 'positioning Defence'] * 15) + (df[ 'Aerial'] * 10) +
+                            (df[ 'ballPlaying'] * 12.5) + (df[ 'progressiveRuns'] * 35) + (df[ 'attackingThreat Defence'] * 5)) / 10, 2)
+
+################################################################################################################################################
+
+def roleFullBackDirect(df):
+
+    ##########################################################################################################################################################################
+
+    df['Defensive Ability'] = ((df['rank_Defensive duels/90'] * 35) + (df[ 'rank_Defensive duels %'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['crossing'] = ((df['rank_Crosses/90'] * 30) + (df[ 'rank_Accurate crosses, %'] * 30) +
+                     (df[ 'rank_Crosses to goalie box/90'] * 40)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['defending1v1'] = ((df['rank_Defensive duels/90'] * 35) + (df[ 'rank_PAdj Sliding tackles'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['positioning Defence'] = ((df['rank_Shots blocked/90'] * 40) + (df[ 'rank_PAdj Interceptions'] * 60)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['positioning Midfield'] = ((df['rank_Shots blocked/90'] * 30) + (df[ 'rank_PAdj Interceptions'] * 70)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['Aerial'] = ((df['rank_Aerial duels/90'] * 35) + (df[ 'rank_Aerial duels %'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['ballPlaying'] = ((df['rank_Passes %'] * 20) + (df[ 'rank_Forward passes %'] * 15) +
+                            (df[ 'rank_Forward passes/90'] * 25) + (df[ 'rank_Progressive passes/90'] * 25) +
+                            (df[ 'rank_Accurate progressive passes, %'] * 15)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['ballPlaying Deep'] = ((df['rank_Passes %'] * 20) + (df[ 'rank_Forward passes %'] * 12.5) +
+                              (df[ 'rank_Forward passes/90'] * 22.5) + (df[ 'rank_Progressive passes/90'] * 10) +
+                              (df[ 'rank_Accurate progressive passes, %'] * 10) + (df['rank_Lateral passes/90'] * 10) +
+                              (df['rank_Accurate lateral passes, %'] * 10)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['dribbles'] = ((df['rank_Dribbles/90'] * 65) + (df[ 'rank_Successful dribbles %'] * 35)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['progressiveRuns'] = ((df['rank_Progressive runs/90'] * 50) + (df[ 'rank_Accelerations/90'] * 20) +
+                                (df[ 'rank_Dribbles/90'] * 30)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['Pass_Forward'] =  ((df['rank_Forward passes %'] * 20) + (df['rank_Forward passes/90'] * 50) + (df['rank_Progressive passes/90'] * 30)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['runs'] =  ((df['rank_Progressive runs/90'] * 35) + (df['rank_Accelerations/90'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['decisionMake'] = ((df['rank_Shot assists/90'] * 20) + (df[ 'rank_Passes penalty area %'] * 20) +
+                            (df[ 'rank_Assists/90'] * 10) + (df[ 'rank_Second assists/90'] * 15) +
+                            (df[ 'rank_xA/90'] * 15) + (df[ 'rank_Passes to penalty area/90'] * 10) + (df[ 'rank_Deep completions/90'] * 10)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['touchQuality'] = ((df['rank_Key passes/90'] * 30) + (df[ 'rank_Accurate smart passes, %'] * 25) +
+                            (df[ 'rank_Smart passes/90'] * 25) + (df[ 'rank_Fouls suffered/90'] * 20)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['attackingThreat'] = ((df['rank_xG/90'] * 25) + (df[ 'rank_Goals/90'] * 25) +
+                                (df[ 'rank_Head goals/90'] * 12) + (df[ 'rank_Shots/90'] * 12) + (df[ 'rank_Shots on target, %'] * 14) +
+                                (df[ 'rank_Goal conversion, %'] * 12)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['attackingThreat FW'] = ((df['rank_xG'] * 20) + (df[ 'rank_Goals'] * 80)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['attackingThreat Defence'] = ((df[ 'rank_Head goals/90'] * 50) + (df[ 'rank_Head goals'] * 50)) / 10
+
+    ##########################################################################################################################################################################
+    ##########################################################################################################################################################################
+    ##########################################################################################################################################################################
+    ##########################################################################################################################################################################
+
+    df['Attacking FB'] =  round(((df['crossing'] * 15) + (df['dribbles'] * 10) + (df['positioning Defence'] * 10) +
+                                 (df['progressiveRuns'] * 20) + (df['defending1v1'] * 10) + (df['decisionMake'] * 15) + (df['touchQuality'] * 20)) / 10, 2)
+
+    ##########################################################################################################################################################################
+
+    df['Wing Back'] =  round(((df['crossing'] * 15) + (df[ 'dribbles'] * 10) + (df[ 'positioning Defence'] * 15) +
+                              (df['progressiveRuns'] * 25) +(df[ 'decisionMake'] * 17.5) + (df[ 'touchQuality'] * 17.5)) / 10, 2)
+
+    ##########################################################################################################################################################################
+
+    df['Inverted Wing Back'] =  round(((df['dribbles'] * 15) + (df['defending1v1'] * 20) + (df['positioning Midfield'] * 10) +
+                            (df['positioning Defence'] * 20) + (df['decisionMake'] * 20) + (df[ 'touchQuality'] * 15)) / 10, 2)
+
+    ##########################################################################################################################################################################
+
+    df['Defensive FB'] =  round(((df['crossing'] * 10) + (df[ 'defending1v1'] * 35) +
+                                (df['positioning Defence'] * 25) + (df['progressiveRuns'] * 10)  + (df['touchQuality'] * 10) + (df[ 'Aerial'] * 10)) / 10, 2)
+
+    ##########################################################################################################################################################################
+
+    df['Full Back CB'] =  round(((df['crossing'] * 10) + (df[ 'defending1v1'] * 45) +
+                                (df['positioning Defence'] * 35) + (df[ 'Aerial'] * 10)) / 10, 2)
+
+################################################################################################################################################
+
+def RoleMidfieldDirect(df):
+
+    ##########################################################################################################################################################################
+
+    df['Defensive Ability'] = ((df['rank_Defensive duels/90'] * 35) + (df[ 'rank_Defensive duels %'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['crossing'] = ((df['rank_Crosses/90'] * 30) + (df[ 'rank_Accurate crosses, %'] * 30) +
+                     (df[ 'rank_Crosses to goalie box/90'] * 40)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['defending1v1'] = ((df['rank_Defensive duels/90'] * 35) + (df[ 'rank_PAdj Sliding tackles'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['positioning Defence'] = ((df['rank_Shots blocked/90'] * 40) + (df[ 'rank_PAdj Interceptions'] * 60)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['positioning Midfield'] = ((df['rank_Shots blocked/90'] * 30) + (df[ 'rank_PAdj Interceptions'] * 70)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['Aerial'] = ((df['rank_Aerial duels/90'] * 35) + (df[ 'rank_Aerial duels %'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['ballPlaying'] = ((df['rank_Passes %'] * 20) + (df[ 'rank_Forward passes %'] * 15) +
+                            (df['rank_Forward passes/90'] * 25) + (df['rank_Progressive passes/90'] * 25) +
+                            (df['rank_Accurate progressive passes, %'] * 15)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['ballPlaying Deep'] = ((df['rank_Passes %'] * 20) + (df['rank_Forward passes %'] * 12.5) +
+                              (df['rank_Forward passes/90'] * 22.5) + (df['rank_Progressive passes/90'] * 10) +
+                              (df['rank_Accurate progressive passes, %'] * 10) + (df['rank_Lateral passes/90'] * 10) +
+                              (df['rank_Accurate lateral passes, %'] * 10)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['dribbles'] = ((df['rank_Dribbles/90'] * 65) + (df[ 'rank_Successful dribbles %'] * 35)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['progressiveRuns'] = ((df['rank_Progressive runs/90'] * 50) + (df[ 'rank_Accelerations/90'] * 20) +
+                                (df[ 'rank_Dribbles/90'] * 30)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['Pass_Forward'] =  ((df['rank_Forward passes %'] * 20) + (df['rank_Forward passes/90'] * 50) + (df['rank_Progressive passes/90'] * 30)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['runs'] =  ((df['rank_Progressive runs/90'] * 35) + (df['rank_Accelerations/90'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['decisionMake'] = ((df['rank_Shot assists/90'] * 20) + (df[ 'rank_Passes penalty area %'] * 20) +
+                            (df[ 'rank_Assists/90'] * 10) + (df[ 'rank_Second assists/90'] * 15) +
+                            (df[ 'rank_xA/90'] * 15) + (df[ 'rank_Passes to penalty area/90'] * 10) + (df[ 'rank_Deep completions/90'] * 10)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['touchQuality'] = ((df['rank_Key passes/90'] * 30) + (df[ 'rank_Accurate smart passes, %'] * 25) +
+                            (df[ 'rank_Smart passes/90'] * 25) + (df[ 'rank_Fouls suffered/90'] * 20)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['attackingThreat'] = ((df['rank_xG/90'] * 25) + (df[ 'rank_Goals/90'] * 25) +
+                                (df[ 'rank_Head goals/90'] * 12) + (df[ 'rank_Shots/90'] * 12) + (df[ 'rank_Shots on target, %'] * 14) +
+                                (df[ 'rank_Goal conversion, %'] * 12)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['attackingThreat FW'] = ((df['rank_xG'] * 20) + (df[ 'rank_Goals'] * 80)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['attackingThreat Defence'] = ((df[ 'rank_Head goals/90'] * 50) + (df[ 'rank_Head goals'] * 50)) / 10
+
+    ##########################################################################################################################################################################
+    ##########################################################################################################################################################################
+    ##########################################################################################################################################################################
+    ##########################################################################################################################################################################
+
+    df['Ball Winner'] =  round(((df['positioning Midfield'] * 20) + (df['defending1v1'] * 21) +
+                                (df['touchQuality'] * 17) + (df['ballPlaying'] * 25) +
+                                (df['Aerial'] * 17)) / 10, 2)
+
+    ##########################################################################################################################################################################
+
+    df['Deep Lying Playmaker'] =  round(((df['positioning Midfield'] * 12) + (df['decisionMake'] * 20) +
+                                         (df['touchQuality'] * 30) + (df[ 'ballPlaying Deep'] * 38)) / 10, 2)
+
+    ##########################################################################################################################################################################
+
+    df['Attacking Playmaker'] =  round(((df['positioning Midfield'] * 10) + (df['progressiveRuns'] * 10) +
+                                    (df['decisionMake'] * 25.5) + (df['touchQuality'] * 20.5) + (df['dribbles'] * 14) + (df['ballPlaying'] * 20)) / 10, 2)
+
+    ##########################################################################################################################################################################
+
+    df['Media Punta llegador'] =  round(((df['attackingThreat'] * 10) + (df['progressiveRuns'] * 14) +
+                                    (df['decisionMake'] * 25.5) + (df['touchQuality'] * 16.5) + (df['dribbles'] * 14) + (df['ballPlaying'] * 20)) / 10, 2)
+
+    ##########################################################################################################################################################################
+
+    df['Box-to-box'] =  round(((df['Pass_Forward'] * 35) + (df['positioning Midfield'] * 35) + (df['runs'] * 30))/ 10, 2)
+
+################################################################################################################################################
+
+def RoleExtremoDirect(df):
+    
+    ##########################################################################################################################################################################
+
+    df['Defensive Ability'] = ((df['rank_Defensive duels/90'] * 35) + (df[ 'rank_Defensive duels %'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['crossing'] = ((df['rank_Crosses/90'] * 30) + (df[ 'rank_Accurate crosses, %'] * 30) +
+                     (df[ 'rank_Crosses to goalie box/90'] * 40)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['defending1v1'] = ((df['rank_Defensive duels/90'] * 35) + (df[ 'rank_PAdj Sliding tackles'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['positioning Defence'] = ((df['rank_Shots blocked/90'] * 40) + (df[ 'rank_PAdj Interceptions'] * 60)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['positioning Midfield'] = ((df['rank_Shots blocked/90'] * 30) + (df[ 'rank_PAdj Interceptions'] * 70)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['Aerial'] = ((df['rank_Aerial duels/90'] * 35) + (df[ 'rank_Aerial duels %'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['ballPlaying'] = ((df['rank_Passes %'] * 20) + (df[ 'rank_Forward passes %'] * 15) +
+                            (df[ 'rank_Forward passes/90'] * 25) + (df[ 'rank_Progressive passes/90'] * 25) +
+                            (df[ 'rank_Accurate progressive passes, %'] * 15)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['ballPlaying Deep'] = ((df['rank_Passes %'] * 20) + (df[ 'rank_Forward passes %'] * 12.5) +
+                              (df[ 'rank_Forward passes/90'] * 22.5) + (df[ 'rank_Progressive passes/90'] * 10) +
+                              (df[ 'rank_Accurate progressive passes, %'] * 10) + (df['rank_Lateral passes/90'] * 10) +
+                              (df['rank_Accurate lateral passes, %'] * 10)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['dribbles'] = ((df['rank_Dribbles/90'] * 65) + (df[ 'rank_Successful dribbles %'] * 35)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['progressiveRuns'] = ((df['rank_Progressive runs/90'] * 50) + (df[ 'rank_Accelerations/90'] * 20) +
+                                (df[ 'rank_Dribbles/90'] * 30)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['Pass_Forward'] =  ((df['rank_Forward passes %'] * 20) + (df['rank_Forward passes/90'] * 50) + (df['rank_Progressive passes/90'] * 30)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['runs'] =  ((df['rank_Progressive runs/90'] * 35) + (df['rank_Accelerations/90'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['decisionMake'] = ((df['rank_Shot assists/90'] * 20) + (df[ 'rank_Passes penalty area %'] * 20) +
+                            (df[ 'rank_Assists/90'] * 10) + (df[ 'rank_Second assists/90'] * 15) +
+                            (df[ 'rank_xA/90'] * 15) + (df[ 'rank_Passes to penalty area/90'] * 10) + (df[ 'rank_Deep completions/90'] * 10)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['touchQuality'] = ((df['rank_Key passes/90'] * 30) + (df[ 'rank_Accurate smart passes, %'] * 25) +
+                            (df[ 'rank_Smart passes/90'] * 25) + (df[ 'rank_Fouls suffered/90'] * 20)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['attackingThreat'] = ((df['rank_xG/90'] * 25) + (df[ 'rank_Goals/90'] * 25) +
+                                (df[ 'rank_Head goals/90'] * 12) + (df[ 'rank_Shots/90'] * 12) + (df[ 'rank_Shots on target, %'] * 14) +
+                                (df[ 'rank_Goal conversion, %'] * 12)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['attackingThreat FW'] = ((df['rank_xG'] * 20) + (df[ 'rank_Goals'] * 80)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['attackingThreat Defence'] = ((df[ 'rank_Head goals/90'] * 50) + (df[ 'rank_Head goals'] * 50)) / 10
+
+    ##########################################################################################################################################################################
+    ##########################################################################################################################################################################
+    ##########################################################################################################################################################################
+    ##########################################################################################################################################################################
+
+    df['Banda'] =  round(((df['progressiveRuns'] * 30) + (df['decisionMake'] * 10) +
+                          (df['defending1v1'] * 5) + (df['dribbles'] * 15) + (df['crossing'] * 30) +
+                          (df['attackingThreat'] * 10)) / 10, 2)
+
+    ##########################################################################################################################################################################
+
+    df['Por dentro'] =  round(((df['progressiveRuns'] * 20) + (df['decisionMake'] * 17.5) +
+                                (df['touchQuality'] * 20) + (df['dribbles'] * 27.5) +
+                                (df['attackingThreat'] * 15)) / 10, 2)
+
+    ##########################################################################################################################################################################
+
+    df['Defensivo'] =  round(((df['crossing'] * 20) + (df['dribbles'] * 10) + (df['positioning Midfield'] * 20) +
+                              (df['decisionMake'] * 15) + (df[ 'touchQuality'] * 15) + (df['defending1v1'] * 15)) / 10, 2)
+
+    ##########################################################################################################################################################################
+
+    df['Falso'] =  round(((df['attackingThreat'] * 40) + (df['dribbles'] * 10) +
+                          (df['decisionMake'] * 15) + (df[ 'touchQuality'] * 15) + (df['Aerial'] * 10)) / 10, 2)
+
+################################################################################################################################################
+
+def RoleForwardDirect(df):
+
+    ##########################################################################################################################################################################
+
+    df['Defensive Ability'] = ((df['rank_Defensive duels/90'] * 35) + (df[ 'rank_Defensive duels %'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['crossing'] = ((df['rank_Crosses/90'] * 30) + (df[ 'rank_Accurate crosses, %'] * 30) +
+                     (df[ 'rank_Crosses to goalie box/90'] * 40)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['defending1v1'] = ((df['rank_Defensive duels/90'] * 35) + (df[ 'rank_PAdj Sliding tackles'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['positioning Defence'] = ((df['rank_Shots blocked/90'] * 40) + (df[ 'rank_PAdj Interceptions'] * 60)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['positioning Midfield'] = ((df['rank_Shots blocked/90'] * 30) + (df[ 'rank_PAdj Interceptions'] * 70)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['Aerial'] = ((df['rank_Aerial duels/90'] * 35) + (df[ 'rank_Aerial duels %'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['ballPlaying'] = ((df['rank_Passes %'] * 20) + (df[ 'rank_Forward passes %'] * 15) +
+                            (df[ 'rank_Forward passes/90'] * 25) + (df[ 'rank_Progressive passes/90'] * 25) +
+                            (df[ 'rank_Accurate progressive passes, %'] * 15)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['ballPlaying Deep'] = ((df['rank_Passes %'] * 20) + (df[ 'rank_Forward passes %'] * 12.5) +
+                              (df[ 'rank_Forward passes/90'] * 22.5) + (df[ 'rank_Progressive passes/90'] * 10) +
+                              (df[ 'rank_Accurate progressive passes, %'] * 10) + (df['rank_Lateral passes/90'] * 10) +
+                              (df['rank_Accurate lateral passes, %'] * 10)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['dribbles'] = ((df['rank_Dribbles/90'] * 65) + (df[ 'rank_Successful dribbles %'] * 35)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['progressiveRuns'] = ((df['rank_Progressive runs/90'] * 50) + (df[ 'rank_Accelerations/90'] * 20) +
+                                (df[ 'rank_Dribbles/90'] * 30)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['Pass_Forward'] =  ((df['rank_Forward passes %'] * 20) + (df['rank_Forward passes/90'] * 50) + (df['rank_Progressive passes/90'] * 30)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['runs'] =  ((df['rank_Progressive runs/90'] * 35) + (df['rank_Accelerations/90'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['decisionMake'] = ((df['rank_Shot assists/90'] * 20) + (df[ 'rank_Passes penalty area %'] * 20) +
+                            (df[ 'rank_Assists/90'] * 10) + (df[ 'rank_Second assists/90'] * 15) +
+                            (df[ 'rank_xA/90'] * 15) + (df[ 'rank_Passes to penalty area/90'] * 10) + (df[ 'rank_Deep completions/90'] * 10)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['touchQuality'] = ((df['rank_Key passes/90'] * 30) + (df[ 'rank_Accurate smart passes, %'] * 25) +
+                            (df[ 'rank_Smart passes/90'] * 25) + (df[ 'rank_Fouls suffered/90'] * 20)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['attackingThreat'] = ((df['rank_xG/90'] * 25) + (df[ 'rank_Goals/90'] * 25) +
+                                (df[ 'rank_Head goals/90'] * 12) + (df[ 'rank_Shots/90'] * 12) + (df[ 'rank_Shots on target, %'] * 14) +
+                                (df[ 'rank_Goal conversion, %'] * 12)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['attackingThreat FW'] = ((df['rank_xG'] * 20) + (df[ 'rank_Goals'] * 80)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['attackingThreat Defence'] = ((df[ 'rank_Head goals/90'] * 50) + (df[ 'rank_Head goals'] * 50)) / 10
+
+    ##########################################################################################################################################################################
+    ##########################################################################################################################################################################
+    ##########################################################################################################################################################################
+    ##########################################################################################################################################################################
+
+    df['False 9'] =  round(((df['decisionMake'] * 20) + (df['touchQuality'] * 25) + (df['dribbles'] * 10) + (df['ballPlaying'] * 15) +
+                            (df['attackingThreat'] * 30)) / 10, 2)
+
+    ##########################################################################################################################################################################
+
+    df['Target Man'] =  round(((df['decisionMake'] * 17.5) + (df['touchQuality'] * 15) +
+                            (df['Aerial'] * 40) + (df['attackingThreat'] * 30)) / 10, 2)
+    
+    ##########################################################################################################################################################################
+
+    df['Box Forward'] =  round(((df['decisionMake'] * 12.5) + (df['Aerial'] * 12.5) + (df['attackingThreat FW'] * 75)) / 10, 2)
+
+    ##########################################################################################################################################################################
+
+    df['Advanced Forward'] =  round(((df['ballPlaying'] * 10) + (df['decisionMake'] * 20) +
+                                    (df['touchQuality'] * 17.5) + (df['dribbles'] * 5) +
+                                    (df['Aerial'] * 15) + (df[ 'attackingThreat'] * 32.5)) / 10, 2)
+    
+################################################################################################################################################
+#--------------------------------------------------- POSSESSION --------------------------------------------------------------------------------
+################################################################################################################################################
+
+def RoleCenterBack(df):
+
+    df['Defensive Ability'] = ((df['rank_Defensive duels/90'] * 35) + (df[ 'rank_Defensive duels %'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['crossing'] = ((df['rank_Crosses/90'] * 30) + (df[ 'rank_Accurate crosses, %'] * 30) +
+                     (df[ 'rank_Crosses to goalie box/90'] * 40)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['defending1v1'] = ((df['rank_Defensive duels/90'] * 35) + (df[ 'rank_PAdj Sliding tackles'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['positioning Defence'] = ((df['rank_Shots blocked/90'] * 40) + (df[ 'rank_PAdj Interceptions'] * 60)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['positioning Midfield'] = ((df['rank_Shots blocked/90'] * 30) + (df[ 'rank_PAdj Interceptions'] * 70)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['Aerial'] = ((df['rank_Aerial duels/90'] * 35) + (df[ 'rank_Aerial duels %'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['ballPlaying'] = ((df['rank_Passes %'] * 20) + (df[ 'rank_Forward passes %'] * 15) +
+                            (df[ 'rank_Forward passes/90'] * 25) + (df[ 'rank_Progressive passes/90'] * 25) +
+                            (df[ 'rank_Accurate progressive passes, %'] * 15)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['ballPlaying Deep'] = ((df['rank_Passes %'] * 20) + (df[ 'rank_Forward passes %'] * 12.5) +
+                              (df[ 'rank_Forward passes/90'] * 22.5) + (df[ 'rank_Progressive passes/90'] * 10) +
+                              (df[ 'rank_Accurate progressive passes, %'] * 10) + (df['rank_Lateral passes/90'] * 10) +
+                              (df['rank_Accurate lateral passes, %'] * 10)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['dribbles'] = ((df['rank_Dribbles/90'] * 65) + (df[ 'rank_Successful dribbles %'] * 35)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['progressiveRuns'] = ((df['rank_Progressive runs/90'] * 50) + (df[ 'rank_Accelerations/90'] * 20) +
+                                (df[ 'rank_Dribbles/90'] * 30)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['Pass_Forward'] =  ((df['rank_Forward passes %'] * 20) + (df['rank_Forward passes/90'] * 50) + (df['rank_Progressive passes/90'] * 30)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['runs'] =  ((df['rank_Progressive runs/90'] * 35) + (df['rank_Accelerations/90'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['decisionMake'] = ((df['rank_Shot assists/90'] * 20) + (df[ 'rank_Passes penalty area %'] * 20) +
+                            (df[ 'rank_Assists/90'] * 10) + (df[ 'rank_Second assists/90'] * 15) +
+                            (df[ 'rank_xA/90'] * 15) + (df[ 'rank_Passes to penalty area/90'] * 10) + (df[ 'rank_Deep completions/90'] * 10)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['touchQuality'] = ((df['rank_Key passes/90'] * 30) + (df[ 'rank_Accurate smart passes, %'] * 25) +
+                            (df[ 'rank_Smart passes/90'] * 25) + (df[ 'rank_Fouls suffered/90'] * 20)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['attackingThreat'] = ((df['rank_xG/90'] * 25) + (df[ 'rank_Goals/90'] * 25) +
+                                (df[ 'rank_Head goals/90'] * 12) + (df[ 'rank_Shots/90'] * 12) + (df[ 'rank_Shots on target, %'] * 14) +
+                                (df[ 'rank_Goal conversion, %'] * 12)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['attackingThreat FW'] = ((df['rank_xG'] * 20) + (df[ 'rank_Goals'] * 80)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['attackingThreat Defence'] = ((df[ 'rank_Head goals/90'] * 50) + (df[ 'rank_Head goals'] * 50)) / 10
 
 
+    ##########################################################################################################################################################################
+    ##########################################################################################################################################################################
+    ##########################################################################################################################################################################
+    ##########################################################################################################################################################################
+
+    df['Stopper'] = round(((df['Defensive Ability'] * 27.5) + (df['positioning Defence'] * 30) + (df[ 'Aerial'] * 20) +
+                           (df['ballPlaying'] * 12.5) + (df['attackingThreat Defence'] * 10)) / 10, 2)
+
+    ##########################################################################################################################################################################
+
+    df['Aerial CB'] =  round(((df['Defensive Ability'] * 15) + (df['positioning Defence'] * 20) + (df[ 'Aerial'] * 40) +
+                              (df[ 'ballPlaying'] * 10) + (df[ 'progressiveRuns'] * 5) + (df['attackingThreat Defence'] * 10)) / 10, 2)
+ 
+    ##########################################################################################################################################################################
+
+    df['Ball Playing CB'] =  round(((df['Defensive Ability'] * 20) + (df['positioning Defence'] * 15) + (df[ 'Aerial'] * 5) +
+                                    (df[ 'ballPlaying'] * 37.5) + (df[ 'progressiveRuns'] * 17.5) + (df['attackingThreat Defence'] * 5)) / 10, 2)
+
+    ##########################################################################################################################################################################
+
+    df['Ball Carrying CB'] =  round(((df['Defensive Ability'] * 22.5) + (df[ 'positioning Defence'] * 15) + (df[ 'Aerial'] * 10) +
+                            (df[ 'ballPlaying'] * 12.5) + (df[ 'progressiveRuns'] * 35) + (df[ 'attackingThreat Defence'] * 5)) / 10, 2)
+
+################################################################################################################################################
+
+def roleFullBack(df):
+
+    ##########################################################################################################################################################################
+
+    df['Defensive Ability'] = ((df['rank_Defensive duels/90'] * 35) + (df[ 'rank_Defensive duels %'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['crossing'] = ((df['rank_Crosses/90'] * 30) + (df[ 'rank_Accurate crosses, %'] * 30) +
+                     (df[ 'rank_Crosses to goalie box/90'] * 40)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['defending1v1'] = ((df['rank_Defensive duels/90'] * 35) + (df[ 'rank_PAdj Sliding tackles'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['positioning Defence'] = ((df['rank_Shots blocked/90'] * 40) + (df[ 'rank_PAdj Interceptions'] * 60)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['positioning Midfield'] = ((df['rank_Shots blocked/90'] * 30) + (df[ 'rank_PAdj Interceptions'] * 70)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['Aerial'] = ((df['rank_Aerial duels/90'] * 35) + (df[ 'rank_Aerial duels %'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['ballPlaying'] = ((df['rank_Passes %'] * 20) + (df[ 'rank_Forward passes %'] * 15) +
+                            (df[ 'rank_Forward passes/90'] * 25) + (df[ 'rank_Progressive passes/90'] * 25) +
+                            (df[ 'rank_Accurate progressive passes, %'] * 15)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['ballPlaying Deep'] = ((df['rank_Passes %'] * 20) + (df[ 'rank_Forward passes %'] * 12.5) +
+                              (df[ 'rank_Forward passes/90'] * 22.5) + (df[ 'rank_Progressive passes/90'] * 10) +
+                              (df[ 'rank_Accurate progressive passes, %'] * 10) + (df['rank_Lateral passes/90'] * 10) +
+                              (df['rank_Accurate lateral passes, %'] * 10)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['dribbles'] = ((df['rank_Dribbles/90'] * 65) + (df[ 'rank_Successful dribbles %'] * 35)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['progressiveRuns'] = ((df['rank_Progressive runs/90'] * 50) + (df[ 'rank_Accelerations/90'] * 20) +
+                                (df[ 'rank_Dribbles/90'] * 30)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['Pass_Forward'] =  ((df['rank_Forward passes %'] * 20) + (df['rank_Forward passes/90'] * 50) + (df['rank_Progressive passes/90'] * 30)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['runs'] =  ((df['rank_Progressive runs/90'] * 35) + (df['rank_Accelerations/90'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['decisionMake'] = ((df['rank_Shot assists/90'] * 20) + (df[ 'rank_Passes penalty area %'] * 20) +
+                            (df[ 'rank_Assists/90'] * 10) + (df[ 'rank_Second assists/90'] * 15) +
+                            (df[ 'rank_xA/90'] * 15) + (df[ 'rank_Passes to penalty area/90'] * 10) + (df[ 'rank_Deep completions/90'] * 10)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['touchQuality'] = ((df['rank_Key passes/90'] * 30) + (df[ 'rank_Accurate smart passes, %'] * 25) +
+                            (df[ 'rank_Smart passes/90'] * 25) + (df[ 'rank_Fouls suffered/90'] * 20)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['attackingThreat'] = ((df['rank_xG/90'] * 25) + (df[ 'rank_Goals/90'] * 25) +
+                                (df[ 'rank_Head goals/90'] * 12) + (df[ 'rank_Shots/90'] * 12) + (df[ 'rank_Shots on target, %'] * 14) +
+                                (df[ 'rank_Goal conversion, %'] * 12)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['attackingThreat FW'] = ((df['rank_xG'] * 20) + (df[ 'rank_Goals'] * 80)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['attackingThreat Defence'] = ((df[ 'rank_Head goals/90'] * 50) + (df[ 'rank_Head goals'] * 50)) / 10
+
+    ##########################################################################################################################################################################
+    ##########################################################################################################################################################################
+    ##########################################################################################################################################################################
+    ##########################################################################################################################################################################
+
+    df['Attacking FB'] =  round(((df['crossing'] * 15) + (df['dribbles'] * 20) + (df['positioning Defence'] * 10) +
+                                 (df['progressiveRuns'] * 20) + (df['defending1v1'] * 10) + (df['decisionMake'] * 12.5) + (df[ 'touchQuality'] * 12.5)) / 10, 2)
+
+    ##########################################################################################################################################################################
+
+    df['Wing Back'] =  round(((df['crossing'] * 20) + (df[ 'dribbles'] * 10) + (df[ 'positioning Defence'] * 15) +
+                              (df[ 'progressiveRuns'] * 30) +(df[ 'decisionMake'] * 15) + (df[ 'touchQuality'] * 10)) / 10, 2)
+
+    ##########################################################################################################################################################################
+
+    df['Inverted Wing Back'] =  round(((df['dribbles'] * 15) + (df['defending1v1'] * 20) + (df['positioning Midfield'] * 10) +
+                            (df['positioning Defence'] * 20) + (df['decisionMake'] * 20) + (df[ 'touchQuality'] * 15)) / 10, 2)
+
+    ##########################################################################################################################################################################
+
+    df['Defensive FB'] =  round(((df['crossing'] * 10) + (df[ 'defending1v1'] * 35) +
+                                (df['positioning Defence'] * 25) + (df['progressiveRuns'] * 10)  + (df['touchQuality'] * 10) + (df[ 'Aerial'] * 10)) / 10, 2)
+
+    ##########################################################################################################################################################################
+
+    df['Full Back CB'] =  round(((df['crossing'] * 10) + (df[ 'defending1v1'] * 45) +
+                                (df['positioning Defence'] * 35) + (df[ 'Aerial'] * 10)) / 10, 2)
+
+################################################################################################################################################
+
+def RoleMidfield(df):
+
+    ##########################################################################################################################################################################
+
+    df['Defensive Ability'] = ((df['rank_Defensive duels/90'] * 35) + (df[ 'rank_Defensive duels %'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['crossing'] = ((df['rank_Crosses/90'] * 30) + (df[ 'rank_Accurate crosses, %'] * 30) +
+                     (df[ 'rank_Crosses to goalie box/90'] * 40)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['defending1v1'] = ((df['rank_Defensive duels/90'] * 35) + (df[ 'rank_PAdj Sliding tackles'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['positioning Defence'] = ((df['rank_Shots blocked/90'] * 40) + (df[ 'rank_PAdj Interceptions'] * 60)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['positioning Midfield'] = ((df['rank_Shots blocked/90'] * 30) + (df[ 'rank_PAdj Interceptions'] * 70)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['Aerial'] = ((df['rank_Aerial duels/90'] * 35) + (df[ 'rank_Aerial duels %'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['ballPlaying'] = ((df['rank_Passes %'] * 20) + (df[ 'rank_Forward passes %'] * 15) +
+                            (df['rank_Forward passes/90'] * 25) + (df['rank_Progressive passes/90'] * 25) +
+                            (df['rank_Accurate progressive passes, %'] * 15)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['ballPlaying Deep'] = ((df['rank_Passes %'] * 20) + (df['rank_Forward passes %'] * 12.5) +
+                              (df['rank_Forward passes/90'] * 22.5) + (df['rank_Progressive passes/90'] * 10) +
+                              (df['rank_Accurate progressive passes, %'] * 10) + (df['rank_Lateral passes/90'] * 10) +
+                              (df['rank_Accurate lateral passes, %'] * 10)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['dribbles'] = ((df['rank_Dribbles/90'] * 65) + (df[ 'rank_Successful dribbles %'] * 35)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['progressiveRuns'] = ((df['rank_Progressive runs/90'] * 50) + (df[ 'rank_Accelerations/90'] * 20) +
+                                (df[ 'rank_Dribbles/90'] * 30)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['Pass_Forward'] =  ((df['rank_Forward passes %'] * 20) + (df['rank_Forward passes/90'] * 50) + (df['rank_Progressive passes/90'] * 30)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['runs'] =  ((df['rank_Progressive runs/90'] * 35) + (df['rank_Accelerations/90'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['decisionMake'] = ((df['rank_Shot assists/90'] * 20) + (df[ 'rank_Passes penalty area %'] * 20) +
+                            (df[ 'rank_Assists/90'] * 10) + (df[ 'rank_Second assists/90'] * 15) +
+                            (df[ 'rank_xA/90'] * 15) + (df[ 'rank_Passes to penalty area/90'] * 10) + (df[ 'rank_Deep completions/90'] * 10)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['touchQuality'] = ((df['rank_Key passes/90'] * 30) + (df[ 'rank_Accurate smart passes, %'] * 25) +
+                            (df[ 'rank_Smart passes/90'] * 25) + (df[ 'rank_Fouls suffered/90'] * 20)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['attackingThreat'] = ((df['rank_xG/90'] * 25) + (df[ 'rank_Goals/90'] * 25) +
+                                (df[ 'rank_Head goals/90'] * 12) + (df[ 'rank_Shots/90'] * 12) + (df[ 'rank_Shots on target, %'] * 14) +
+                                (df[ 'rank_Goal conversion, %'] * 12)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['attackingThreat FW'] = ((df['rank_xG'] * 20) + (df[ 'rank_Goals'] * 80)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['attackingThreat Defence'] = ((df[ 'rank_Head goals/90'] * 50) + (df[ 'rank_Head goals'] * 50)) / 10
+
+    ##########################################################################################################################################################################
+    ##########################################################################################################################################################################
+    ##########################################################################################################################################################################
+    ##########################################################################################################################################################################
+
+    df['Ball Winner'] =  round(((df['positioning Midfield'] * 20) + (df['defending1v1'] * 21) +
+                                (df['touchQuality'] * 17) + (df['ballPlaying'] * 25) +
+                                (df['Aerial'] * 17)) / 10, 2)
+
+    ##########################################################################################################################################################################
+
+    df['Deep Lying Playmaker'] =  round(((df['positioning Midfield'] * 12) + (df['decisionMake'] * 20) +
+                                         (df['touchQuality'] * 30) + (df[ 'ballPlaying Deep'] * 38)) / 10, 2)
+
+    ##########################################################################################################################################################################
+
+    df['Attacking Playmaker'] =  round(((df['positioning Midfield'] * 10) + (df['progressiveRuns'] * 10) +
+                                    (df['decisionMake'] * 25.5) + (df['touchQuality'] * 20.5) + (df['dribbles'] * 14) + (df['ballPlaying'] * 20)) / 10, 2)
+
+    ##########################################################################################################################################################################
+
+    df['Media Punta llegador'] =  round(((df['attackingThreat'] * 10) + (df['progressiveRuns'] * 14) +
+                                    (df['decisionMake'] * 25.5) + (df['touchQuality'] * 16.5) + (df['dribbles'] * 14) + (df['ballPlaying'] * 20)) / 10, 2)
+
+    ##########################################################################################################################################################################
+
+    df['Box-to-box'] =  round(((df['Pass_Forward'] * 35) + (df['positioning Midfield'] * 35) + (df['runs'] * 30))/ 10, 2)
+
+################################################################################################################################################
+
+def RoleExtremo(df):
+    
+    ##########################################################################################################################################################################
+
+    df['Defensive Ability'] = ((df['rank_Defensive duels/90'] * 35) + (df[ 'rank_Defensive duels %'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['crossing'] = ((df['rank_Crosses/90'] * 30) + (df[ 'rank_Accurate crosses, %'] * 30) +
+                     (df[ 'rank_Crosses to goalie box/90'] * 40)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['defending1v1'] = ((df['rank_Defensive duels/90'] * 35) + (df[ 'rank_PAdj Sliding tackles'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['positioning Defence'] = ((df['rank_Shots blocked/90'] * 40) + (df[ 'rank_PAdj Interceptions'] * 60)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['positioning Midfield'] = ((df['rank_Shots blocked/90'] * 30) + (df[ 'rank_PAdj Interceptions'] * 70)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['Aerial'] = ((df['rank_Aerial duels/90'] * 35) + (df[ 'rank_Aerial duels %'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['ballPlaying'] = ((df['rank_Passes %'] * 20) + (df[ 'rank_Forward passes %'] * 15) +
+                            (df[ 'rank_Forward passes/90'] * 25) + (df[ 'rank_Progressive passes/90'] * 25) +
+                            (df[ 'rank_Accurate progressive passes, %'] * 15)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['ballPlaying Deep'] = ((df['rank_Passes %'] * 20) + (df[ 'rank_Forward passes %'] * 12.5) +
+                              (df[ 'rank_Forward passes/90'] * 22.5) + (df[ 'rank_Progressive passes/90'] * 10) +
+                              (df[ 'rank_Accurate progressive passes, %'] * 10) + (df['rank_Lateral passes/90'] * 10) +
+                              (df['rank_Accurate lateral passes, %'] * 10)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['dribbles'] = ((df['rank_Dribbles/90'] * 65) + (df[ 'rank_Successful dribbles %'] * 35)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['progressiveRuns'] = ((df['rank_Progressive runs/90'] * 50) + (df[ 'rank_Accelerations/90'] * 20) +
+                                (df[ 'rank_Dribbles/90'] * 30)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['Pass_Forward'] =  ((df['rank_Forward passes %'] * 20) + (df['rank_Forward passes/90'] * 50) + (df['rank_Progressive passes/90'] * 30)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['runs'] =  ((df['rank_Progressive runs/90'] * 35) + (df['rank_Accelerations/90'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['decisionMake'] = ((df['rank_Shot assists/90'] * 20) + (df[ 'rank_Passes penalty area %'] * 20) +
+                            (df[ 'rank_Assists/90'] * 10) + (df[ 'rank_Second assists/90'] * 15) +
+                            (df[ 'rank_xA/90'] * 15) + (df[ 'rank_Passes to penalty area/90'] * 10) + (df[ 'rank_Deep completions/90'] * 10)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['touchQuality'] = ((df['rank_Key passes/90'] * 30) + (df[ 'rank_Accurate smart passes, %'] * 25) +
+                            (df[ 'rank_Smart passes/90'] * 25) + (df[ 'rank_Fouls suffered/90'] * 20)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['attackingThreat'] = ((df['rank_xG/90'] * 25) + (df[ 'rank_Goals/90'] * 25) +
+                                (df[ 'rank_Head goals/90'] * 12) + (df[ 'rank_Shots/90'] * 12) + (df[ 'rank_Shots on target, %'] * 14) +
+                                (df[ 'rank_Goal conversion, %'] * 12)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['attackingThreat FW'] = ((df['rank_xG'] * 20) + (df[ 'rank_Goals'] * 80)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['attackingThreat Defence'] = ((df[ 'rank_Head goals/90'] * 50) + (df[ 'rank_Head goals'] * 50)) / 10
+
+    ##########################################################################################################################################################################
+    ##########################################################################################################################################################################
+    ##########################################################################################################################################################################
+    ##########################################################################################################################################################################
+
+    df['Banda'] =  round(((df['progressiveRuns'] * 30) + (df['decisionMake'] * 10) +
+                          (df['defending1v1'] * 5) + (df['dribbles'] * 15) + (df['crossing'] * 30) +
+                          (df['attackingThreat'] * 10)) / 10, 2)
+
+    ##########################################################################################################################################################################
+
+    df['Por dentro'] =  round(((df['progressiveRuns'] * 20) + (df['decisionMake'] * 17.5) +
+                                (df['touchQuality'] * 17.5) + (df['dribbles'] * 30) +
+                                (df['attackingThreat'] * 15)) / 10, 2)
+
+    ##########################################################################################################################################################################
+
+    df['Defensivo'] =  round(((df['crossing'] * 20) + (df['dribbles'] * 10) + (df['positioning Midfield'] * 20) +
+                              (df['decisionMake'] * 15) + (df[ 'touchQuality'] * 15) + (df['defending1v1'] * 15)) / 10, 2)
+
+    ##########################################################################################################################################################################
+
+    df['Falso'] =  round(((df['attackingThreat'] * 40) + (df['dribbles'] * 15) +
+                          (df['decisionMake'] * 15) + (df[ 'touchQuality'] * 20) + (df['Aerial'] * 10)) / 10, 2)
+
+################################################################################################################################################
+
+def RoleForward(df):
+
+    ##########################################################################################################################################################################
+
+    df['Defensive Ability'] = ((df['rank_Defensive duels/90'] * 35) + (df[ 'rank_Defensive duels %'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['crossing'] = ((df['rank_Crosses/90'] * 30) + (df[ 'rank_Accurate crosses, %'] * 30) +
+                     (df[ 'rank_Crosses to goalie box/90'] * 40)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['defending1v1'] = ((df['rank_Defensive duels/90'] * 35) + (df[ 'rank_PAdj Sliding tackles'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['positioning Defence'] = ((df['rank_Shots blocked/90'] * 40) + (df[ 'rank_PAdj Interceptions'] * 60)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['positioning Midfield'] = ((df['rank_Shots blocked/90'] * 30) + (df[ 'rank_PAdj Interceptions'] * 70)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['Aerial'] = ((df['rank_Aerial duels/90'] * 35) + (df[ 'rank_Aerial duels %'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['ballPlaying'] = ((df['rank_Passes %'] * 20) + (df[ 'rank_Forward passes %'] * 15) +
+                            (df[ 'rank_Forward passes/90'] * 25) + (df[ 'rank_Progressive passes/90'] * 25) +
+                            (df[ 'rank_Accurate progressive passes, %'] * 15)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['ballPlaying Deep'] = ((df['rank_Passes %'] * 20) + (df[ 'rank_Forward passes %'] * 12.5) +
+                              (df[ 'rank_Forward passes/90'] * 22.5) + (df[ 'rank_Progressive passes/90'] * 10) +
+                              (df[ 'rank_Accurate progressive passes, %'] * 10) + (df['rank_Lateral passes/90'] * 10) +
+                              (df['rank_Accurate lateral passes, %'] * 10)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['dribbles'] = ((df['rank_Dribbles/90'] * 65) + (df[ 'rank_Successful dribbles %'] * 35)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['progressiveRuns'] = ((df['rank_Progressive runs/90'] * 50) + (df[ 'rank_Accelerations/90'] * 20) +
+                                (df[ 'rank_Dribbles/90'] * 30)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['Pass_Forward'] =  ((df['rank_Forward passes %'] * 20) + (df['rank_Forward passes/90'] * 50) + (df['rank_Progressive passes/90'] * 30)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['runs'] =  ((df['rank_Progressive runs/90'] * 35) + (df['rank_Accelerations/90'] * 65)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['decisionMake'] = ((df['rank_Shot assists/90'] * 20) + (df[ 'rank_Passes penalty area %'] * 20) +
+                            (df[ 'rank_Assists/90'] * 10) + (df[ 'rank_Second assists/90'] * 15) +
+                            (df[ 'rank_xA/90'] * 15) + (df[ 'rank_Passes to penalty area/90'] * 10) + (df[ 'rank_Deep completions/90'] * 10)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['touchQuality'] = ((df['rank_Key passes/90'] * 30) + (df[ 'rank_Accurate smart passes, %'] * 25) +
+                            (df[ 'rank_Smart passes/90'] * 25) + (df[ 'rank_Fouls suffered/90'] * 20)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['attackingThreat'] = ((df['rank_xG/90'] * 25) + (df[ 'rank_Goals/90'] * 25) +
+                                (df[ 'rank_Head goals/90'] * 12) + (df[ 'rank_Shots/90'] * 12) + (df[ 'rank_Shots on target, %'] * 14) +
+                                (df[ 'rank_Goal conversion, %'] * 12)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['attackingThreat FW'] = ((df['rank_xG'] * 20) + (df[ 'rank_Goals'] * 80)) / 10
+
+    ##########################################################################################################################################################################
+
+    df['attackingThreat Defence'] = ((df[ 'rank_Head goals/90'] * 50) + (df[ 'rank_Head goals'] * 50)) / 10
+
+    ##########################################################################################################################################################################
+    ##########################################################################################################################################################################
+    ##########################################################################################################################################################################
+    ##########################################################################################################################################################################
+
+    df['False 9'] =  round(((df['progressiveRuns'] * 5) + (df['decisionMake'] * 20) +
+                            (df['touchQuality'] * 20) + (df['dribbles'] * 10) + (df['ballPlaying'] * 15) +
+                            (df['attackingThreat'] * 30)) / 10, 2)
+
+    ##########################################################################################################################################################################
+
+    df['Target Man'] =  round(((df['decisionMake'] * 17.5) + (df['touchQuality'] * 15) +
+                            (df['Aerial'] * 40) + (df['attackingThreat'] * 30)) / 10, 2)
+    
+    ##########################################################################################################################################################################
+
+    df['Box Forward'] =  round(((df['decisionMake'] * 12.5) + (df['Aerial'] * 12.5) + (df['attackingThreat FW'] * 75)) / 10, 2)
+
+    ##########################################################################################################################################################################
+
+    df['Advanced Forward'] =  round(((df['ballPlaying'] * 10) + (df[ 'decisionMake'] * 20) +
+                                    (df['touchQuality'] * 12.5) + (df[ 'dribbles'] * 10) +
+                                    (df['Aerial'] * 15) + (df[ 'attackingThreat'] * 32.5)) / 10, 2)
+
+################################################################################################################################################
+#--------------------------------------------------- ROLES --------------------------------------------------------------------------------
+################################################################################################################################################
+
+def szcore_df(df):
+
+    cols_cat = []
+    for col in df.columns:
+        if col not in df.select_dtypes([np.number]).columns:
+            cols_cat.append(col)
+
+    for i in ['Age', 'Market value', 'Matches played', 'Minutes played', 'Height', 'Weight']:
+        cols_cat.append(i)
+
+    cols_num = [] 
+    for col in df.select_dtypes([np.number]).columns:
+            cols_num.append(col)
+    
+    for i in ['Age', 'Market value', 'Matches played', 'Minutes played', 'Height', 'Weight']:
+        cols_num.remove(i)
+        
+    data = df[cols_cat]
+
+    test = stats.zscore(df[cols_num])
+
+    data = pd.concat([data, test], axis=1)
+
+    if 'Team within selected timeframe' not in data.columns:
+        pass
+    else:
+        data.drop(['Team within selected timeframe', 'On loan'], axis=1, inplace=True)
+
+    return data
 
 
+def bestRoleCB(df):
+    
+    df['Role'] = df[['Stopper', 'Aerial CB', 'Ball Playing CB', 'Ball Carrying CB']].T.apply(lambda x: x.nlargest(1).idxmin())
+
+    df['Role2'] = df[['Stopper', 'Aerial CB', 'Ball Playing CB', 'Ball Carrying CB']].T.apply(lambda x: x.nlargest(2).idxmin())
+
+    return df
+
+################################################################################################################################################
+
+def bestRoleFB(df):
+    
+    df['Role'] = df[['Inverted Wing Back', 'Wing Back', 'Attacking FB', 'Defensive FB', 'Full Back CB']].T.apply(lambda x: x.nlargest(1).idxmin())
+
+    df['Role2'] = df[['Inverted Wing Back', 'Wing Back', 'Attacking FB', 'Defensive FB', 'Full Back CB']].T.apply(lambda x: x.nlargest(2).idxmin())
+
+    return df
+
+################################################################################################################################################
+
+def bestRoleMidfield(df):
+    
+    df['Role'] = df[['Ball Winner', 'Deep Lying Playmaker', 'Box-to-box', 'Attacking Playmaker', 'Media Punta llegador']].T.apply(lambda x: x.nlargest(1).idxmin())
+
+    df['Role2'] = df[['Ball Winner', 'Deep Lying Playmaker', 'Box-to-box', 'Attacking Playmaker', 'Media Punta llegador']].T.apply(lambda x: x.nlargest(2).idxmin())
+
+    return df
+
+################################################################################################################################################
+
+def bestRoleExtremo(df):
+    
+    df['Role'] = df[['Banda', 'Por dentro', 'Falso', 'Defensivo']].T.apply(lambda x: x.nlargest(1).idxmin())
+
+    df['Role2'] = df[['Banda', 'Por dentro', 'Falso', 'Defensivo']].T.apply(lambda x: x.nlargest(2).idxmin())
+
+    return df
+
+################################################################################################################################################
+
+def bestRoleForward(df):
+    
+    df['Role'] = df[['Box Forward', 'Advanced Forward', 'Target Man', 'False 9']].T.apply(lambda x: x.nlargest(1).idxmin())
+
+    df['Role2'] = df[['Box Forward', 'Advanced Forward', 'Target Man', 'False 9']].T.apply(lambda x: x.nlargest(2).idxmin())
+
+    return df
+
+################################################################################################################################################
+
+def rangoCB(df, league, Role):
+    
+    dfCB = df.loc[df.Position.str.contains('CB')].reset_index(drop=True)
+
+    playerAbility(dfCB)
+
+    RoleCenterBack(dfCB)
+
+    szcore_df(dfCB)
+
+    bestRoleCB(dfCB)
+
+    test = dfCB.loc[(dfCB['Comp'] == league) & (dfCB['Minutes played'] >= 1500)]
+
+    role = Role
+
+    dfRole = test.loc[((test['Role'] == role) | (test['Role2'] == role)) & ((test[role] >= test[role].quantile(.25)) | (test[role] <= test[role].quantile(.75)))].sort_values(role, ascending=False)
+    
+    return dfRole[['Player', 'Team', 'Comp', 'Role', 'Role2']]
+
+################################################################################################################################################
+
+def rangoFB(df, league, Role):
+    
+    dfFB = df.loc[(df.Position.str.contains('RB')) | (df.Position.str.contains('LB'))| (df.Position.str.contains('LWB'))| (df.Position.str.contains('RWB'))].reset_index(drop=True)
+
+    playerAbility(dfFB)
+
+    roleFullBack(dfFB)
+
+    szcore_df(dfFB)
+
+    bestRoleFB(dfFB)
+
+    dfRole = dfFB.loc[(dfFB['Comp'] == league) & (dfFB['Minutes played'] >= 1000)]
+
+    role = Role
+
+    dfRole = dfRole.loc[((dfRole['Role'] == role) | (dfRole['Role2'] == role)) & ((dfRole[role] >= dfRole[role].quantile(.25)) | (dfRole[role] <= dfRole[role].quantile(.75)))].sort_values(role, ascending=False)
+    
+    return dfRole[['Player', 'Team', 'Comp', 'Role', 'Role2']]
+
+################################################################################################################################################
+
+def rangoMF(df, league, Role):
+    
+    dfMF = df.loc[(df.Position.str.contains('RCMF')) | (df.Position.str.contains('LCMF')) | (df.Position.str.contains('LDMF')) | (df.Position.str.contains('RDMF')) |
+                    (df.Position.str.contains('AMF')) | (df.Position.str.contains('DMF'))].reset_index(drop=True)
+
+    playerAbility(dfMF)
+
+    RoleMidfield(dfMF)
+
+    szcore_df(dfMF)
+
+    bestRoleMidfield(dfMF)
+
+    dfRole = dfMF.loc[(dfMF['Comp'] == league) & (dfMF['Minutes played'] >= 1500)]
+
+    role = Role
+
+    dfRole = dfRole.loc[((dfRole['Role'] == role) | (dfRole['Role2'] == role)) & ((dfRole[role] >= dfRole[role].quantile(.25)) | (dfRole[role] <= dfRole[role].quantile(.75)))].sort_values(role, ascending=False)
+
+    return dfRole[['Player', 'Team', 'Comp', 'Role', 'Role2']]
+
+################################################################################################################################################
+
+def rangoExtremo(df, league, Role):
+    
+    dfExtremo = df.loc[(df.Position.str.contains('LW')) | (df.Position.str.contains('RW')) | (df.Position.str.contains('LAMF')) |
+                       (df.Position.str.contains('RAMF')) | (df.Position.str.contains('LWF')) | (df.Position.str.contains('RWF'))].reset_index(drop=True)
+
+    RoleExtremo(dfExtremo)
+
+    szcore_df(dfExtremo)
+
+    bestRoleExtremo(dfExtremo)
+
+    dfRole = dfExtremo.loc[(dfExtremo['Comp'] == league) & (dfExtremo['Minutes played'] >= 1000)]
+
+    role = Role
+
+    dfRole = dfRole.loc[((dfRole['Role'] == role) | (dfRole['Role2'] == role)) & ((dfRole[role] >= dfRole[role].quantile(.25)) | (dfRole[role] <= dfRole[role].quantile(.75)))].sort_values(role, ascending=False)
+
+    return dfRole[['Player', 'Team', 'Comp', 'Role', 'Role2']]
+
+################################################################################################################################################
+
+def rangoFW(df, league, Role):
+    
+    dfFW = df.loc[(df.Position.str.contains('CF')) & (df['Season'] == '2021/22')].reset_index(drop=True)
+
+    RoleForward(dfFW)
+
+    szcore_df(dfFW)
+
+    bestRoleForward(dfFW)
+
+    dfRole = dfFW.loc[(dfFW['Comp'] == league) & (dfFW['Minutes played'] >= 1000)]
+
+    role = Role
+
+    dfRole = dfRole.loc[((dfRole['Role'] == role) | (dfRole['Role2'] == role)) & ((dfRole[role] >= dfRole[role].quantile(.25)) | (dfRole[role] <= dfRole[role].quantile(.75)))].sort_values(role, ascending=False)
+
+    return dfRole[['Player', 'Team', 'Comp', 'Role', 'Role2']]
+
+################################################################################################################################################
+
+def dataFrameCenterBack(df, contract, tier, role, league, tier2=None):
+
+    rango = rangoCB(df, league, role)
+
+    rango = rango.tail(1)
+
+    playeRange = rango.Player.values
+    playeRange = playeRange.tolist()
+    playeRange = playeRange[0]
+
+    df = df.loc[(df.Position.str.contains('CB'))]
+
+    playerAbility(df)
+
+    RoleCenterBack(df)
+
+    szcore_df(df)
+
+    bestRoleCB(df)
+
+    dfPlayer = df.loc[df.Player == playeRange].reset_index(drop=True)
+
+    rangoValue = dfPlayer[role].values
+    rangoValue = rangoValue.tolist()
+    rangoValue = rangoValue[0]
+    rangoValue
+
+    def tierValue(role, tier):
+
+       if tier == 0:
+          return role * 1
+
+       elif tier == 1:
+          return role * 0.9
+
+       elif tier == 2:
+          return role * 0.8
+
+       elif tier == 3:
+          return role * 0.7
+
+       elif tier == 4:
+          return role * 0.65
+
+    df[role] = df.apply(lambda x: tierValue(x[role], x['Tier']), axis=1)
+
+    if tier != 'All Data':
+        if contract == 'Yes':
+            df = df.loc[ ((df.Tier == tier) | (df.Tier == tier2)) & (df['Minutes played'] >= 1500) & (df['Contract expires'] == str(date.today().year) + '-06' + '-30') & (df[role] >= rangoValue) & ((df['Role'] == role) | (df['Role2'] == role))][['Player', 'Team', 'Position', 'Status', 'Age', 'Comp', 'Contract expires', 'Market value', 'Role', 'Role2', role, 'Tier']].sort_values(role, ascending=False)
+        
+        elif contract == 'No':
+            df = df.loc[((df.Tier == tier) | (df.Tier == tier2)) & (df['Minutes played'] >= 1500) & (df[role] >= rangoValue) & ((df['Role'] == role) | (df['Role2'] == role))][['Player', 'Team', 'Position', 'Status', 'Age', 'Comp', 'Contract expires', 'Market value', 'Role', 'Role2', role, 'Tier']].sort_values(role, ascending=False)
+            
+    elif tier == 'All Data':
+        if contract == 'Yes':
+            df = df.loc[(df['Contract expires'] == str(date.today().year) + '-06' + '-30') & (df['Minutes played'] >= 1500) & (df[role] >= rangoValue) & ((df['Role'] == role) | (df['Role2'] == role))][['Player', 'Team', 'Position', 'Status', 'Age', 'Comp', 'Contract expires', 'Market value', 'Role', 'Role2', role, 'Tier']].sort_values(role, ascending=False)
+        
+        elif contract == 'No':
+            df = df.loc[(df[role] >= rangoValue) & (df['Minutes played'] >= 1500) & ((df['Role'] == role) | (df['Role2'] == role))][['Player', 'Team', 'Position', 'Status', 'Age', 'Comp', 'Contract expires', 'Market value', 'Role', 'Role2', role, 'Tier']].sort_values(role, ascending=False)
+            
+    return df
+
+################################################################################################################################################
+
+def dataFrameFullBack(df, contract, tier, role, league, tier2=None):
+
+    rango = rangoFB(df, league, role)
+
+    rango = rango.tail(1)
+
+    playeRange = rango.Player.values
+    playeRange = playeRange.tolist()
+    playeRange = playeRange[0]
+
+    df = df.loc[((df.Position.str.contains('RB')) | (df.Position.str.contains('RWB')) | (df.Position.str.contains('LWB')) | (df.Position.str.contains('LB')))]
 
 
+    playerAbility(df)
+
+    roleFullBack(df)
+
+    szcore_df(df)
+
+    bestRoleFB(df)
+
+    dfPlayer = df.loc[df.Player == playeRange].reset_index(drop=True)
+
+    rangoValue = dfPlayer[role].values
+    rangoValue = rangoValue.tolist()
+    rangoValue = rangoValue[0]
+    rangoValue
+
+    def tierValue(role, tier):
+
+       if tier == 0:
+          return role * 1
+
+       elif tier == 1:
+          return role * 0.9
+
+       elif tier == 2:
+          return role * 0.8
+
+       elif tier == 3:
+          return role * 0.7
+
+       elif tier == 4:
+          return role * 0.65
+
+    df[role] = df.apply(lambda x: tierValue(x[role], x['Tier']), axis=1)
+
+    if tier != 'All Data':
+        if contract == 'Yes':
+            df = df.loc[ ((df.Tier == tier) | (df.Tier == tier2)) & (df['Minutes played'] >= 1500) & (df['Contract expires'] == str(date.today().year) + '-06' + '-30') & (df[role] >= rangoValue) & ((df['Role'] == role) | (df['Role2'] == role))][['Player', 'Team', 'Position', 'Status', 'Age', 'Comp', 'Contract expires', 'Market value', 'Role', 'Role2', role, 'Tier']].sort_values(role, ascending=False)
+        
+        elif contract == 'No':
+            df = df.loc[((df.Tier == tier) | (df.Tier == tier2)) & (df['Minutes played'] >= 1500) & (df[role] >= rangoValue) & ((df['Role'] == role) | (df['Role2'] == role))][['Player', 'Team', 'Position', 'Status', 'Age', 'Comp', 'Contract expires', 'Market value', 'Role', 'Role2', role, 'Tier']].sort_values(role, ascending=False)
+            
+    elif tier == 'All Data':
+        if contract == 'Yes':
+            df = df.loc[(df['Contract expires'] == str(date.today().year) + '-06' + '-30') & (df['Minutes played'] >= 1500) & (df[role] >= rangoValue) & ((df['Role'] == role) | (df['Role2'] == role))][['Player', 'Team', 'Position', 'Status', 'Age', 'Comp', 'Contract expires', 'Market value', 'Role', 'Role2', role, 'Tier']].sort_values(role, ascending=False)
+        
+        elif contract == 'No':
+            df = df.loc[(df[role] >= rangoValue) & (df['Minutes played'] >= 1500) & ((df['Role'] == role) | (df['Role2'] == role))][['Player', 'Team', 'Position', 'Status', 'Age', 'Comp', 'Contract expires', 'Market value', 'Role', 'Role2', role, 'Tier']].sort_values(role, ascending=False)
+            
+    return df
+
+################################################################################################################################################
+
+def dataFrameMidfield(df, contract, tier, role, league, tier2=None):
+
+    rango = rangoMF(df, league, role)
+
+    rango = rango.tail(1)
+
+    playeRange = rango.Player.values
+    playeRange = playeRange.tolist()
+    playeRange = playeRange[0]
+
+    df = df.loc[((df.Position.str.contains('RCMF')) | (df.Position.str.contains('LCMF')) | (df.Position.str.contains('LDMF')) | (df.Position.str.contains('RDMF')) |
+                    (df.Position.str.contains('AMF')) | (df.Position.str.contains('DMF')) | (df.Position.str.contains('RAMF')))].reset_index(drop=True)
+                    
+    playerAbility(df)
+
+    RoleMidfield(df)
+
+    szcore_df(df)
+
+    bestRoleMidfield(df)
+
+    def tierValue(role, tier):
+
+       if tier == 0:
+          return role * 1
+
+       elif tier == 1:
+          return role * 0.9
+
+       elif tier == 2:
+          return role * 0.8
+
+       elif tier == 3:
+          return role * 0.7
+
+       elif tier == 4:
+          return role * 0.65
+
+    df[role] = df.apply(lambda x: tierValue(x[role], x['Tier']), axis=1)
+
+    dfPlayer = df.loc[df.Player == playeRange].reset_index(drop=True)
+
+    rangoValue = dfPlayer[role].values
+    rangoValue = rangoValue.tolist()
+    rangoValue = rangoValue[0]
+    rangoValue
+
+    if tier != 'All Data':
+        if contract == 'Yes':
+            df = df.loc[ ((df.Tier == tier) | (df.Tier == tier2)) & (df['Contract expires'] == str(date.today().year) + '-06' + '-30') & (df[role] >= rangoValue) & ((df['Role'] == role) | (df['Role2'] == role))][['Player', 'Team', 'Position', 'Status', 'Age', 'Comp', 'Contract expires', 'Market value', 'Role', 'Role2', role, 'Tier']].sort_values(role, ascending=False)
+        
+        elif contract == 'No':
+            df = df.loc[((df.Tier == tier) | (df.Tier == tier2)) & (df[role] >= rangoValue) & ((df['Role'] == role) | (df['Role2'] == role))][['Player', 'Team', 'Position', 'Status', 'Age', 'Comp', 'Contract expires', 'Market value', 'Role', 'Role2', role, 'Tier']].sort_values(role, ascending=False)
+            
+    elif tier == 'All Data':
+        if contract == 'Yes':
+            df = df.loc[(df['Contract expires'] == str(date.today().year) + '-06' + '-30') & (df[role] >= rangoValue) & ((df['Role'] == role) | (df['Role2'] == role))][['Player', 'Team', 'Position', 'Status', 'Age', 'Comp', 'Contract expires', 'Market value', 'Role', 'Role2', role, 'Tier']].sort_values(role, ascending=False)
+        
+        elif contract == 'No':
+            df = df.loc[(df[role] >= rangoValue) & ((df['Role'] == role) | (df['Role2'] == role))][['Player', 'Team', 'Position', 'Status', 'Age', 'Comp', 'Contract expires', 'Market value', 'Role', 'Role2', role, 'Tier']].sort_values(role, ascending=False)
+            
+    return df
+
+################################################################################################################################################
+
+def dataFrameExtremo(df, contract, tier, role, league, tier2=None):
+
+    rango = rangoExtremo(df, league, role)
+
+    rango = rango.tail(1)
+
+    playeRange = rango.Player.values
+    playeRange = playeRange.tolist()
+    playeRange = playeRange[0]
+
+    df = df.loc[(df.Position.str.contains('LW')) | (df.Position.str.contains('RW')) | (df.Position.str.contains('LAMF')) |
+                     (df.Position.str.contains('RAMF')) | (df.Position.str.contains('LWF')) | (df.Position.str.contains('RWF'))]
+
+    playerAbility(df)
+
+    RoleExtremo(df)
+
+    szcore_df(df)
+
+    bestRoleExtremo(df)
+
+    dfPlayer = df.loc[df.Player == playeRange].reset_index(drop=True)
+
+    rangoValue = dfPlayer[role].values
+    rangoValue = rangoValue.tolist()
+    rangoValue = rangoValue[0]
+    rangoValue
+
+    def tierValue(role, tier):
+
+       if tier == 0:
+          return role * 1
+
+       elif tier == 1:
+          return role * 0.9
+
+       elif tier == 2:
+          return role * 0.8
+
+       elif tier == 3:
+          return role * 0.7
+
+       elif tier == 4:
+          return role * 0.65
+
+    df[role] = df.apply(lambda x: tierValue(x[role], x['Tier']), axis=1)
+
+    if tier != 'All Data':
+        if contract == 'Yes':
+            df = df.loc[ ((df.Tier == tier) | (df.Tier == tier2)) & (df['Minutes played'] >= 1500) & (df['Contract expires'] == str(date.today().year) + '-06' + '-30') & (df[role] >= rangoValue) & ((df['Role'] == role) | (df['Role2'] == role))][['Player', 'Team', 'Position', 'Status', 'Age', 'Comp', 'Contract expires', 'Market value', 'Role', 'Role2', role, 'Tier']].sort_values(role, ascending=False)
+        
+        elif contract == 'No':
+            df = df.loc[((df.Tier == tier) | (df.Tier == tier2)) & (df['Minutes played'] >= 1500) & (df[role] >= rangoValue) & ((df['Role'] == role) | (df['Role2'] == role))][['Player', 'Team', 'Position', 'Status', 'Age', 'Comp', 'Contract expires', 'Market value', 'Role', 'Role2', role, 'Tier']].sort_values(role, ascending=False)
+            
+    elif tier == 'All Data':
+        if contract == 'Yes':
+            df = df.loc[(df['Contract expires'] == str(date.today().year) + '-06' + '-30') & (df['Minutes played'] >= 1500) & (df[role] >= rangoValue) & ((df['Role'] == role) | (df['Role2'] == role))][['Player', 'Team', 'Position', 'Status', 'Age', 'Comp', 'Contract expires', 'Market value', 'Role', 'Role2', role, 'Tier']].sort_values(role, ascending=False)
+        
+        elif contract == 'No':
+            df = df.loc[(df[role] >= rangoValue) & (df['Minutes played'] >= 1500) & ((df['Role'] == role) | (df['Role2'] == role))][['Player', 'Team', 'Position', 'Status', 'Age', 'Comp', 'Contract expires', 'Market value', 'Role', 'Role2', role, 'Tier']].sort_values(role, ascending=False)
+            
+    return df
+
+################################################################################################################################################
+
+def dataFrameForward(df, contract, tier, role, league, tier2=None):
+
+    rango = rangoFW(df, league, role)
+
+    rango = rango.tail(1)
+
+    playeRange = rango.Player.values
+    playeRange = playeRange.tolist()
+    playeRange = playeRange[0]
+
+    df = df.loc[(df.Position.str.contains('CF')) & (df['Season'] == '2021/22')]
+
+    playerAbility(df)
+
+    RoleForward(df)
+
+    szcore_df(df)
+
+    bestRoleForward(df)
+
+    dfPlayer = df.loc[df.Player == playeRange].reset_index(drop=True)
+
+    rangoValue = dfPlayer[role].values
+    rangoValue = rangoValue.tolist()
+    rangoValue = rangoValue[0]
+    rangoValue
+
+    def tierValue(role, tier):
+
+       if tier == 0:
+          return role * 1
+
+       elif tier == 1:
+          return role * 0.9
+
+       elif tier == 2:
+          return role * 0.8
+
+       elif tier == 3:
+          return role * 0.7
+
+       elif tier == 4:
+          return role * 0.65
+
+    df[role] = df.apply(lambda x: tierValue(x[role], x['Tier']), axis=1)
+
+    if tier != 'All Data':
+        if contract == 'Yes':
+            df = df.loc[ ((df.Tier == tier) | (df.Tier == tier2)) & (df['Minutes played'] >= 1500) & (df['Contract expires'] == str(date.today().year) + '-06' + '-30') & (df[role] >= rangoValue) & ((df['Role'] == role) | (df['Role2'] == role))][['Player', 'Team', 'Position', 'Status', 'Age', 'Comp', 'Contract expires', 'Market value', 'Role', 'Role2', role, 'Tier']].sort_values(role, ascending=False)
+        
+        elif contract == 'No':
+            df = df.loc[((df.Tier == tier) | (df.Tier == tier2)) & (df['Minutes played'] >= 1500) & (df[role] >= rangoValue) & ((df['Role'] == role) | (df['Role2'] == role))][['Player', 'Team', 'Passport country', 'Position', 'Status', 'Age', 'Comp', 'Contract expires', 'Market value', 'Role', 'Role2', role, 'Tier']].sort_values(role, ascending=False)
+            
+    elif tier == 'All Data':
+        if contract == 'Yes':
+            df = df.loc[(df['Contract expires'] == str(date.today().year) + '-06' + '-30') & (df['Minutes played'] >= 1500) & (df[role] >= rangoValue) & ((df['Role'] == role) | (df['Role2'] == role))][['Player', 'Team', 'Position', 'Status', 'Age', 'Comp', 'Contract expires', 'Market value', 'Role', 'Role2', role, 'Tier']].sort_values(role, ascending=False)
+        
+        elif contract == 'No':
+            df = df.loc[(df[role] >= rangoValue) & (df['Minutes played'] >= 1500) & ((df['Role'] == role) | (df['Role2'] == role))][['Player', 'Team', 'Position', 'Status', 'Age', 'Comp', 'Contract expires', 'Market value', 'Role', 'Role2', role, 'Tier']].sort_values(role, ascending=False)
+            
+    return df
+
+################################################################################################################################################
+#------------------------------------------------ TABLES ----------------------------------------------------------------------
+################################################################################################################################################
+
+def pathColumn(df):
+        flag = []
+        for idx, row in df.iterrows():
+                if ', ' in df.loc[idx, 'Passport country']:
+                        df.loc[idx, 'Passport country'] = df.loc[idx, 'Passport country'].split(', ')[0]
+                        flag.append('C:/Users/menes/Documents/Data Hub/Country/' + df.loc[idx, 'Passport country'] + '.png')
+                else:
+                        flag.append('C:/Users/menes/Documents/Data Hub/Country/' + df.loc[idx, 'Passport country'] + '.png')
+
+################################################################################################################################################
+
+def table(boxForward):
+    boxForward = boxForward[['Player', 'Flag', 'Team', 'Position', 'Age', 'Comp', 'Contract expires', 'Market value', 'Role', 'Role2', 'Box Forward']].reset_index(drop=True)
+
+    pearl_earring_cmap = LinearSegmentedColormap.from_list("Pearl Earring - 10 colors",
+                                                            ['#E8E8E8', '#3d0000', '#FF0000'], N=10)
+    col_defs = (
+        [
+            ColumnDefinition(
+                name="Player",
+                textprops={"ha": "left", "weight": "bold"},
+                width=1.2,
+            ),
+            ColumnDefinition(
+                    name="Flag",
+                    title="",
+                    textprops={"ha": "center"},
+                    width=0.5,
+                    plot_fn=circled_image,
+                ),
+            ColumnDefinition(
+                name="Team",
+                textprops={"ha": "center"},
+                width=1.5,
+            ),
+            ColumnDefinition(
+                name="Position",
+                textprops={"ha": "center"},
+                width=0.75,
+            ),
+            ColumnDefinition(
+                name="Age",
+                textprops={"ha": "center"},
+                width=0.75,
+            ),
+            ColumnDefinition(
+                name="Comp",
+                textprops={"ha": "center"},
+                width=0.75,
+            ),
+            ColumnDefinition(
+                name="Contract expires",
+                textprops={"ha": "center"},
+                width=0.75,
+                group="Transfer data",
+                border='left',
+                plot_kw={"facecolor": "#E8E8E8"},
+            ),
+            ColumnDefinition(
+                name="Market value",
+                textprops={"ha": "center"},
+                width=0.75,
+                group="Transfer data",
+                border='right',
+                plot_kw={"facecolor": "#E8E8E8"},
+            ),
+            ColumnDefinition(
+                name="Role",
+                textprops={"ha": "center"},
+                width=0.75,
+                group="Role data",
+                border='left',
+            ),
+            ColumnDefinition(
+                name="Role2",
+                textprops={"ha": "center"},
+                width=0.75,
+                group="Role data",
+                border='right'
+            ),
+            ColumnDefinition(
+                name="Box Forward",
+                textprops={"ha": "center"},
+                width=0.75,
+                cmap=normed_cmap(boxForward["Box Forward"], cmap=pearl_earring_cmap, num_stds=2.5),
+                group="Role data",
+            )
+        ]
+    )
+
+    fig, ax = plt.subplots(figsize=(28, 35))
+
+    fig.set_facecolor('white')
+
+    table = Table(
+        boxForward.set_index('Player').head(15),
+        column_definitions=col_defs,
+        row_dividers=True,
+        footer_divider=True,
+        ax=ax,
+        textprops={"fontsize": 19},
+        #cell_kw={'facecolor' : '#E8E8E8'},
+        row_divider_kw={"linewidth": 1, "linestyle": (0, (1, 5))},
+        col_label_divider_kw={"linewidth": 3, "linestyle": "-"},
+        column_border_kw={"linewidth": 3, "linestyle": "-"},
+    ).autoset_fontcolors(colnames=["Box Forward"])
+
+    #table.col_label_row.set_facecolor("#E8E8E8")
 
 
+    fig_text(s = 'Best box forward players',
+                    x = 0.52, y = 0.9, fontweight='bold',
+                    ha='center',fontsize=65, color='#181818');
 
+    fig_text(s = 'Only players at the big 5 league | Season 2021-22',
+                    x = 0.5, y = 0.87, fontweight='bold',
+                    ha='center',fontsize=16, color='#181818', alpha=0.8);
 
-
-
-
-
+################################################################################################################################################
 
 
 
