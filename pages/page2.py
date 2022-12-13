@@ -59,6 +59,8 @@ matchID = matchID.tolist()
 
 matchID.insert(0, 'All Season')
 
+events = ['BallRecovery', 'Pass', 'defensiveActions', 'ballLost']
+
 layout = dbc.Row([
             dbc.Col([
                 dbc.Row([
@@ -70,7 +72,17 @@ layout = dbc.Row([
                                 options=teams,
                                 value='Portugal')
                             ])],
-                            md=6),
+                            md=4),
+
+                dbc.Col([
+                        html.Div([
+                                html.Label('Event Type'),
+                                dcc.Dropdown(
+                                        id='dp-event',
+                                        options=events,
+                                        value='Pass')
+                                ])],
+                        md=2),
 
                 dbc.Col([
                         html.Div([
@@ -81,6 +93,7 @@ layout = dbc.Row([
                                         value='All Season')
                                 ])],
                         md=4),
+
                 ], style={"margin-top": "10px"}),
                 
                 dbc.Row([
@@ -98,9 +111,10 @@ layout = dbc.Row([
     Input('dp-teams', 'value'),
     [State('rd-competition', 'value'),
      State('rd-viz', 'value'),
-     State('dp-matchID', 'value')])
+     State('dp-matchID', 'value'),
+     State('dp-event', 'value')])
 
-def visualization(club, rdCompetition, rdViz, rdMatchID):
+def visualization(club, rdCompetition, rdViz, rdMatchID, dpEvent):
        
         if (rdCompetition == 'Mundial') & (rdViz == 'Chances Created'):
                 return fc.heatMapChances(club, 'WhoScored')
@@ -128,3 +142,6 @@ def visualization(club, rdCompetition, rdViz, rdMatchID):
 
         elif (rdCompetition == 'Mundial') & (rdViz == 'xT Flow'):
                 return fc.xT_Flow(club, rdMatchID, 'WhoScored')
+        
+        elif (rdCompetition == 'Mundial') & (rdViz == 'Possession Gained'):
+                return fc.possessionGained(club, dpEvent)

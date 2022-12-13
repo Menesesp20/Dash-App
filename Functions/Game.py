@@ -5336,10 +5336,100 @@ def profilePlayer():
 
         return app.get_asset_url('profile.png')
 
+################################################################################################################################################
+
+def possessionGained(team, eventType):
+    fig, ax = plt.subplots(figsize=(6, 4))
+
+    pitch = Pitch(pitch_type='opta',
+                    pitch_color='#E8E8E8', line_color='#181818',
+                    line_zorder=3, linewidth=0.5, spot_scale=0.00)
+
+    pitch.draw(ax=ax)
+
+    fig.set_facecolor('#E8E8E8')
+
+    defensiveActions = ['Aerial', 'Tackle', 'Foul', 'Interception', 'Clearance']
+
+    #Params for the text inside the <> this is a function to highlight text
+    highlight_textprops =\
+        [{"color": '#9a1534',"fontweight": 'bold'}]
+
+    if eventType == 'BallRecovery':
+        test = df.loc[(df['typedisplayName'] == 'BallRecovery') & (df['team'] == team)].reset_index(drop=True)
+
+        fig_text(s = team + ' gained the most possession \n in their <defensive midfield>',
+                        highlight_textprops = highlight_textprops,
+                        x = 0.15, y = 0.895,
+                        color='#181818',
+                        fontsize=4)
+
+    elif eventType == 'defensiveActions':
+        test = df.loc[((df['typedisplayName'] == defensiveActions[0]) |
+                      (df['typedisplayName'] == defensiveActions[1]) |
+                      (df['typedisplayName'] == defensiveActions[2]) |
+                      (df['typedisplayName'] == defensiveActions[3]) |
+                      (df['typedisplayName'] == defensiveActions[4])) & (df['team'] == team)].reset_index(drop=True)
+
+        fig_text(s = team + ' made the most defensive actions \n in their <defensive midfield>',
+                        highlight_textprops = highlight_textprops,
+                        x = 0.15, y = 0.895,
+                        color='#181818',
+                        fontsize=4)
+
+    elif eventType == 'Pass':
+        test = df.loc[(df['typedisplayName'] == 'Pass') & (df['team'] == team)].reset_index(drop=True)
+
+        fig_text(s = team + ' made the most passes \n just before the <halfway line>',
+                        highlight_textprops = highlight_textprops,
+                        x = 0.15, y = 0.895,
+                        color='#181818',
+                        fontsize=4)
 
 
+    elif eventType == 'ballLost':
+        test = df.loc[(df['typedisplayName'] == 'Dispossessed') & (df['team'] == team)].reset_index(drop=True)
 
+        fig_text(s = team + ' lost possession the most  \n just after the <halfway line>',
+                        highlight_textprops = highlight_textprops,
+                        x = 0.15, y = 0.895,
+                        color='#181818',
+                        fontsize=4)
 
+        
+    path_eff = [path_effects.Stroke(linewidth=3, foreground='black'),
+                    path_effects.Normal()]
+
+    pearl_earring_cmap = LinearSegmentedColormap.from_list("Pearl Earring - 10 colors",
+                                                        ['#e8e8e8', '#9a1534'], N=10)
+
+    bs = pitch.bin_statistic(test['x'], test['y'], statistic='count', bins=(6, 1), normalize=True)
+
+    pitch.heatmap(bs, edgecolors='#e8e8e8', ax=ax, cmap=pearl_earring_cmap)
+            
+    pitch.label_heatmap(bs, color='#E8E8E8', fontsize=12,
+                                ax=ax, ha='center', va='bottom',
+                                str_format='{:.0%}', path_effects=path_eff)
+
+    fig_text(s = 'Possession Gained',
+                    x = 0.5, y = 0.96,
+                    color='#181818',
+                    ha='center', va='center',
+                    fontsize=14)
+
+    fig_text(s = 'World Cup 2022',
+                    x = 0.5, y = 0.91,
+                    color='#181818', alpha=0.8,
+                    ha='center', va='center',
+                    fontsize=5)
+
+    add_image(image='C:/Users/menes/Documents/Data Hub/Images/Clubs/' + 'Mundial' + '/' + team + '.png', fig=fig, left=0.25, bottom=0.905, width=0.08, height=0.09)
+    
+    add_image(image='C:/Users/menes/Documents/Data Hub/Images/WorldCup_Qatar.png', fig=fig, left=0.7, bottom=0.9, width=0.08, height=0.1)
+
+    plt.savefig('assets/possessionGained' + team + '.png', dpi=300)
+
+    return app.get_asset_url('possessionGained' + team + '.png')
 
 
 
