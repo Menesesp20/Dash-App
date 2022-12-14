@@ -5580,6 +5580,8 @@ def possessionGained(team, eventType):
 #--------------------------------------------------- SCOUTING --------------------------------------------------------------------------------
 ################################################################################################################################################
 
+df = pd.read_csv('WyScout.csv')
+
 def playerAbility(df):
 
   def rank(df):
@@ -6947,6 +6949,8 @@ def createTier(league):
     elif league in tier4:
         return 4
 
+df['Tier'] = df.apply(lambda x: createTier(x.Comp), axis=1)
+
 ################################################################################################################################################
 
 def tierLeague(df, playerName):
@@ -7460,778 +7464,6 @@ def PizzaChart(df, cols, playerName, league):
 
 ################################################################################################################################################
 
-def scoutReport(df, playerName, team, setPieces, isDefensive, tier, contrato, pé, valor, altura):
-
-    playerAbility(df)
-
-    playerClub = df.loc[(df['Player'] == playerName) & (df['Team'] == team) & (df['Season'] == '2021/22')]
-
-    playerClub['Market value'] = playerClub['Market value'].astype(str)
-
-    age = playerClub['Age'].unique()
-    age = age.tolist()
-    age = age[0]
-
-    league = playerClub['Comp'].unique()
-    league = league.tolist()
-    league = league[0]
-
-    country = playerClub['Birth country'].unique()
-    country = country.tolist()
-    country = country[0]
-    if country == '0':
-        country = playerClub['Passport country'].unique()
-        country = country.tolist()
-        country = country[0]
-    if ',' in country:
-        country = country.split(', ')[0]
-
-    Market = playerClub['Market value'].unique()
-    Market = Market.tolist()
-    Market = Market[0]
-
-    if len(str(Market)) == 6:
-        Market = str(Market)[:3]
-                
-    elif len(str(Market)) == 7:
-        if str(Market)[:2][1] != 0:
-            Market = str(Market)[:2][0] + '.' + str(Market)[:2][1] + 'M'
-            
-    elif len(str(Market)) == 8:
-        Market = str(Market)[:2] + 'M'
-
-    elif len(str(Market)) == 9:
-        Market = str(Market)[:3] + 'M'
-
-    position = playerClub['Position'].unique()
-    position = position.tolist()
-    position = position[0]
-    if ', ' in position:
-        position = position.split(', ')[0]
-
-    Contract = playerClub['Contract expires'].unique()
-    Contract = Contract.tolist()
-    Contract = Contract[0]
-
-    Height = playerClub['Height'].unique()
-    Height = Height.tolist()
-    Height = str(Height[0])
-
-    Foot = playerClub['Foot'].unique()
-    Foot = Foot.tolist()
-    Foot = Foot[0]
-
-    Minutes = playerClub['Minutes played'].unique()
-    Minutes = Minutes.tolist()
-    Minutes = str(Minutes[0])
-    Minutes = int(Minutes)
-
-    club = playerClub['Team'].unique()
-    club = club.tolist()
-    club = club[0]
-
-    color = ['#FF0000', '#181818']
-
-    #######################################################################################################################################
-
-    fig = plt.figure(figsize=(15, 10), dpi=1000, facecolor = '#E8E8E8')
-    gspec = gridspec.GridSpec(
-    ncols=2, nrows=2, wspace = 0.5
-    )
-
-    ########################################################################################################################################################
-
-    ax1 = plt.subplot(
-                    gspec[0, 0],
-            )
-
-
-    ax1.axis('off')
-
-    ax2 = plt.subplot(
-                    gspec[1, 1],
-            )
-
-    pitch = Pitch(pitch_type='opta',pad_top=-0.5, pad_bottom=0.5, pad_right=-0.5,
-                                pitch_color='#E8E8E8', line_color='#1b1b1b',line_zorder=1, linewidth=5, spot_scale=0.002)
-
-    pitch.draw(ax=ax2)
-
-    if 'GK' in position:
-        # GK
-        pitch.scatter(x=5.8, y=50, ax=ax2, c=color[0], edgecolor='#1b1b1b', s=500, zorder=3)
-
-#######################################################################################################################################
-
-    elif 'RB' in position:
-        # RIGHT FULLBACK
-        pitch.scatter(x=17, y=15, ax=ax2, c=color[0], edgecolor='#1b1b1b', s=500, zorder=3)
-
-    elif 'RCB' in position:
-        # RIGHT CENTER BACK
-        pitch.scatter(x=17, y=36.8, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
-
-    elif 'LCB' in position:
-        # LEFT CENTER BACK
-        pitch.scatter(x=17, y=63.2, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
-
-    elif 'LB' in position:
-        # LEFT FULLBACK
-        pitch.scatter(x=17, y=85, ax=ax2, c=color[0], edgecolor='#1b1b1b', s=500, zorder=3)
-
-#######################################################################################################################################
-
-    elif 'DM' in position:
-        # DEFENSIVE MIDFIELDER
-        pitch.scatter(x=40, y=50, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
-
-    elif 'RCMF' in position:
-        # CENTER MIDFIELDER RIGHT
-        pitch.scatter(x=55, y=36.8, ax=ax2, c=color[0], edgecolor='#1b1b1b', s=500, zorder=3)
-
-    elif 'LCMF' in position:
-        # CENTER MIDFIELDER LEFT
-        pitch.scatter(x=40, y=50, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
-
-#######################################################################################################################################
-    elif 'RAMF' in position:
-        # RIGHT MIDFIELDER
-        pitch.scatter(x=70, y=15, ax=ax2, c=color[0], edgecolor='#1b1b1b', s=500, zorder=3)
-
-    elif 'AMF' in position:
-        # OFFENSIVE MIDFIELDER
-        pitch.scatter(x=70, y=50, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
-
-    elif 'LAMF' in position:
-        # LEFT MIDFIELDER
-        pitch.scatter(x=70, y=85, ax=ax2, c=color[0], edgecolor='#1b1b1b', s=500, zorder=3)
-
-#######################################################################################################################################
-
-    elif 'LW' in position:
-        # WINGER LEFT
-        pitch.scatter(x=85, y=88, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
-
-    elif 'LWB' in position:
-        # WINGER LEFT
-        pitch.scatter(x=85, y=88, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
-
-    elif 'RW' in position:
-        # WINGER RIGHT
-        pitch.scatter(x=85, y=12, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
-
-#######################################################################################################################################
-
-    elif 'CF' in position:
-        # FORWARD
-        pitch.scatter(x=88.5, y=50, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
-
-######################################################## MUTIPLE POSITIONS - LW / RW AND OM ###############################################################################
-
-    elif (position == 'LCB & RCB') | (position == 'RCB & LCB'):
-        # LEFT CENTER BACK
-        pitch.scatter(x=17, y=63.2, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
-        
-        # RIGHT CENTER BACK
-        pitch.scatter(x=17, y=36.8, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
-
-    elif (position == 'LW & AMF') | (position == 'OM & LW'):
-        # WINGER LEFT
-        pitch.scatter(x=85, y=88, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
-
-        # OFFENSIVE MIDFIELDER
-        pitch.scatter(x=70, y=50, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
-
-    elif (position == 'RW & AMF') | (position == 'AMF & RW'):
-        # WINGER RIGHT
-        pitch.scatter(x=85, y=12, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
-
-        # OFFENSIVE MIDFIELDER
-        pitch.scatter(x=70, y=50, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
-
-######################################################## MUTIPLE POSITIONS - LM / RM AND OM ###############################################################################
-
-    elif (position == 'LAMF & AMF') | (position == 'AMF & LAMF'):
-        # LEFT MIDFIELDER
-        pitch.scatter(x=70, y=85, ax=ax2, c=color[0], edgecolor='#1b1b1b', s=500, zorder=3)
-
-        # OFFENSIVE MIDFIELDER
-        pitch.scatter(x=70, y=50, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
-
-    elif (position == 'RAMF & AMF') | (position == 'AMF & RAMF'):
-        # RIGHT MIDFIELDER
-        pitch.scatter(x=70, y=15, ax=ax2, c=color[0], edgecolor='#1b1b1b', s=500, zorder=3)
-
-        # OFFENSIVE MIDFIELDER
-        pitch.scatter(x=70, y=50, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
-
-######################################################## MUTIPLE POSITIONS - AMF, CF, RCMF ###############################################################################
-
-    elif (position == 'AMF, CF, RCMF'):
-        # FORWARD
-        pitch.scatter(x=88.5, y=50, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
-
-        # OFFENSIVE MIDFIELDER
-        pitch.scatter(x=70, y=50, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
-
-        # RIGHT MIDFIELDER
-        pitch.scatter(x=70, y=15, ax=ax2, c=color[0], edgecolor='#1b1b1b', s=500, zorder=3)
-######################################################## MUTIPLE POSITIONS - FW AND OM ###############################################################################
-
-    elif (position == 'FW & AMF') | (position == 'AMF & FW'):
-        # FORWARD
-        pitch.scatter(x=88.5, y=50, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
-
-        # OFFENSIVE MIDFIELDER
-        pitch.scatter(x=70, y=50, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
-
-######################################################## MUTIPLE POSITIONS - RB AND LB ###############################################################################
-
-    elif (position == 'LB & RB') | (position == 'RB & LB'):
-        # RIGHT FULLBACK
-        pitch.scatter(x=17, y=15, ax=ax2, c=color[0], edgecolor='#1b1b1b', s=500, zorder=3)
-
-        # LEFT FULLBACK
-        pitch.scatter(x=17, y=85, ax=ax2, c=color[0], edgecolor='#1b1b1b', s=500, zorder=3)
-
-######################################################## MUTIPLE POSITIONS - LCB AND LB ###############################################################################
-
-    elif (position == 'LB & LCB') | (position == 'LCB & LB'):
-        # LEFT CENTER BACK
-        pitch.scatter(x=17, y=36.8, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
-        
-        # LEFT FULLBACK
-        pitch.scatter(x=17, y=15, ax=ax2, c=color[0], edgecolor='#1b1b1b', s=500, zorder=3)
-
-######################################################## MUTIPLE POSITIONS - RCB AND RB ###############################################################################
-
-    elif (position == 'RB & RCB') | (position == 'RCB & RB'):
-        # RIGHT CENTER BACK
-        pitch.scatter(x=17, y=63.2, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
-        
-        # RIGHT FULLBACK
-        pitch.scatter(x=17, y=15, ax=ax2, c=color[0], edgecolor='#1b1b1b', s=500, zorder=3)
-
-######################################################## MUTIPLE POSITIONS - DM AND CML ###############################################################################
-
-    elif (position == 'DMF & LDMF') | (position == 'LDMF & DMF'):
-        # DEFENSIVE MIDFIELDER
-        pitch.scatter(x=40, y=50, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
-        
-        # CENTER MIDFIELDER LEFT
-        pitch.scatter(x=55, y=36.8, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
-
-######################################################## MUTIPLE POSITIONS - DM AND CMR ###############################################################################
-
-    elif (position == 'RDMF & DMF') | (position == 'DMF, RDMF'):
-        # DEFENSIVE MIDFIELDER
-        pitch.scatter(x=40, y=50, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
-        
-        # CENTER MIDFIELDER RIGHT
-        pitch.scatter(x=55, y=36.8, ax=ax2, c=color[0], edgecolor='#1b1b1b', s=500, zorder=3)
-
-######################################################## MUTIPLE POSITIONS - CML AND CMR ###############################################################################
-
-    elif (position == 'LCMF, RCMF') | (position == 'RCMF, LCMF'):
-        # CENTER MIDFIELDER RIGHT
-        pitch.scatter(x=55, y=36.8, ax=ax2, c=color[0], edgecolor='#1b1b1b', s=500, zorder=3)
-        
-        # CENTER MIDFIELDER LEFT
-        pitch.scatter(x=55, y=63.2, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
-
-#######################################################################################################################################
-
-    cols_Offensive = ['Finishing Ability', 'Heading Ability', 'Concentration Ability', 'Sight play', 'Aerial Ability', 'Create Chances Ability', 'Dribbling Ability', 'SetPieces Ability', 'KeyPass Ability', 'Pass Ability']
-    cols_Defensive = ['Heading Ability', 'Concentration Ability', 'Pass Ability', 'SetPieces Ability', 'Aerial Ability', 'Tackle Ability', 'Interception Ability']
-
-    if (isDefensive == True) & (setPieces == False):
-        params = cols_Defensive
-
-        cols_Defensive.remove('SetPieces Ability')
-    
-        player = df.loc[(df['Player'] == playerName) & (df['Comp'] == league)][cols_Defensive].reset_index()
-        player = list(player.loc[0])
-        player = player[1:]
-
-    elif (isDefensive == True) & (setPieces == True):
-
-        params = cols_Defensive
-
-        player = df.loc[(df['Player'] == playerName) & (df['Comp'] == league)][cols_Defensive].reset_index()
-        player = list(player.loc[0])
-        player = player[1:]
-
-    elif (isDefensive == False) & (setPieces == True):
-
-        params = cols_Offensive
-
-        player = df.loc[(df['Player'] == playerName) & (df['Comp'] == league)][cols_Offensive].reset_index()
-        player = list(player.loc[0])
-        player = player[1:]
-
-    elif (isDefensive == False) & (setPieces == False):
-
-        params = cols_Offensive
-
-        cols_Offensive.remove('SetPieces Ability')
-    
-        player = df.loc[(df['Player'] == playerName) & (df['Comp'] == league)][cols_Offensive].reset_index()
-        player = list(player.loc[0])
-        player = player[1:]
-
-    #######################################################################################################################################
-
-    df2 = df.loc[(df['Tier'] == tier) & (df['Minutes played'] >= Minutes) | (df.Player == playerName)].reset_index(drop=True)
-
-    values = []
-    for x in range(len(params)):   
-        values.append(math.floor(stats.percentileofscore(df2[params[x]], player[x])))
-
-    for n,i in enumerate(values):
-        if i == 100:
-            values[n] = 99
-    
-    elite = []
-    veryStrong = []
-    strong = []
-    improve = []
-    weak = []
-    veryWeak = []
-    for i in range(len(values)):
-        if values[i] >= 95:
-            elite.append(params[i])
-
-        elif values[i] >= 80 | values[i] < 95:
-            veryStrong.append(params[i])
-
-        elif values[i] >= 70 | values[i] < 80:
-            strong.append(params[i])
-
-        elif values[i] >= 50 | values[i] < 70:
-            improve.append(params[i])
-
-        elif values[i] < 50:
-            weak.append(params[i])
-
-        elif values[i] <= 30:
-            veryWeak.append(params[i])
-        
-
-    #######################################################################################################################################
-    highlight_textpropsStrong =\
-    [{"color": '#2ae102', "fontweight": 'bold'}]
-
-    fig_text(x = 0.53, y = 0.9,
-            s='Strengths',
-            size=28,
-            color='#2ae102')
-
-    h=0.94
-    for i in elite:
-        ax_text(x=1.5, y=h - 0.1, s='<Elite:>' + ' ' + i, va='center', ha='center',
-                highlight_textprops = highlight_textpropsStrong, size=18, color='#1b1b1b', ax=ax1)
-        h=h-0.1
-
-    h=h
-    for i in veryStrong:
-        ax_text(x=1.5, y=h - 0.1, s='<Very Strong:>' + ' ' + i, va='center', ha='center',
-                highlight_textprops = highlight_textpropsStrong, size=18, color='#1b1b1b', ax=ax1)
-        h=h-0.1
-
-    h=h
-    for i in strong:
-        ax_text(x=1.5, y=h - 0.1, s='<Strong:>' + ' ' + i, va='center', ha='center',
-                highlight_textprops = highlight_textpropsStrong, size=18, color='#1b1b1b', ax=ax1)
-        h=h-0.1
-
-    highlight_textprops =\
-    [{"color": '#ff0000', "fontweight": 'bold'},
-     {"color": '#f48515', "fontweight": 'bold'}]
-
-    fig_text(x = 0.75, y = 0.9,
-             s='<Weaknesses>/<To improve>',
-             highlight_textprops = highlight_textprops,
-             size=28)
-
-    highlight_textpropsImprove =\
-    [{"color": '#f48515', "fontweight": 'bold'}]
-
-    highlight_textpropsWeak =\
-    [{"color": '#ff0000', "fontweight": 'bold'}]
-
-    h=0.94
-    for i in improve:
-        ax_text(x=2.5, y=h - 0.1, s='<Improve:>' + ' ' + i, va='center', ha='center',
-                highlight_textprops = highlight_textpropsImprove, size=18, color='#1b1b1b', ax=ax1)
-        h=h-0.1
-
-    h=h
-    for i in weak:
-        ax_text(x=2.5, y=h - 0.1, s='<Weak:>' + ' ' + i, va='center', ha='center',
-                highlight_textprops = highlight_textpropsWeak, size=18, color='#1b1b1b', ax=ax1)
-        h=h-0.1
-
-    h=h
-    for i in veryWeak:
-        ax_text(x=2.5, y=h - 0.1, s='<Very Weak:>' + ' ' + i, va='center', ha='center',
-                highlight_textprops = highlight_textpropsWeak, size=18, color='#1b1b1b', ax=ax1)
-        h=h-0.1
-        
-    #######################################################################################################################################
-
-    fig_text(x = 0.23, y = 0.91,
-            s=playerName,
-            size=30,
-            color='#1b1b1b')
-
-    fig_text(x = 0.23, y = 0.75,
-            s='Club: ',
-            size=20,
-            color='#1b1b1b')
-
-    fig_text(x = 0.21, y = 0.71,
-            s='League: ',
-            size=20,
-            color='#1b1b1b')
-
-    fig_text(x = 0.16, y = 0.67,
-            s='Market Value: ',
-            size=20,
-            color='#1b1b1b')
-
-    fig_text(x = 0.15, y = 0.63,
-            s='Contract until: ',
-            size=20,
-            color='#1b1b1b')
-
-    fig_text(x = 0.15, y = 0.59,
-            s='Minutes played: ',
-            size=20,
-            color='#1b1b1b')
-
-    fig_text(x = 0.223, y = 0.55,
-            s='Age: ',
-            size=20,
-            color='#1b1b1b')
-
-    fig_text(x = 0.223, y = 0.51,
-            s='Height: ',
-            size=20,
-            color='#1b1b1b')
-
-    fig_text(x = 0.233, y = 0.47,
-            s='Foot: ',
-            size=20,
-            color='#1b1b1b')
-
-#######################################################################################################################################
-
-    highlight_textprops =\
-    [{"color": color[0], "fontweight": 'bold'}]
-
-    fig_text(x = 0.3, y = 0.75,
-            s=f'<{club}>',
-            highlight_textprops = highlight_textprops,
-            size=18,
-            color='#1b1b1b')
-
-    fig_text(x = 0.301, y = 0.71,
-            s=league,
-            size=18,
-            color='#1b1b1b')
-
-    fig_text(x = 0.301, y = 0.67,
-            s=valor,
-            size=18,
-            color='#1b1b1b')
-
-    #if 'M' not in Market:
-    #    fig_text(x = 0.33, y = 0.667,
-    #            s='Thousand',
-    #            size=11,
-    #            color='#1b1b1b')
-
-    fig_text(x = 0.301, y = 0.63,
-            s=contrato,
-            size=18,
-            color='#1b1b1b')
-
-    fig_text(x = 0.301, y = 0.59,
-            s=str(Minutes),
-            size=18,
-            color='#1b1b1b')
-
-    fig_text(x = 0.301, y = 0.55,
-            s=str(age),
-            size=18,
-            color='#1b1b1b')
-
-    fig_text(x = 0.301, y = 0.51,
-            s=altura,
-            size=18,
-            color='#1b1b1b')
-
-    fig_text(x = 0.301, y = 0.47,
-            s=pé,
-            size=18,
-            color='#1b1b1b')
-
-#######################################################################################################################################
-
-    fig_text(x = 0.47, y = 0.41,
-            s='<Main Position>',
-            highlight_textprops = highlight_textprops,
-            size=18,
-            color='#1b1b1b')
-
-    if (position.split(', ')[0] == 'RAMF') | (position == 'RAMF'):
-        fig_text(x = 0.423, y = 0.38,
-                s='RIGHT MIDFIELDER',
-                size=18,
-                color='#1b1b1b')
-
-    elif (position.split(', ')[0] == 'LAMF') | (position == 'LAMF'):
-        fig_text(x = 0.423, y = 0.38,
-                s='LEFT MIDFIELDER',
-                size=18,
-                color='#1b1b1b')
-    
-    elif (position.split(', ')[0] == 'CF') | (position == 'CF'):
-        fig_text(x = 0.423, y = 0.38,
-                s='FORWARD',
-                size=18,
-                color='#1b1b1b')
-    
-    elif (position.split(', ')[0] == 'RW') | (position == 'RW'):
-        fig_text(x = 0.423, y = 0.38,
-                s='RIGHT WINGER',
-                size=18,
-                color='#1b1b1b')
-
-    elif (position.split(', ')[0] == 'LW') | (position == 'LW') | (position.split(', ')[0] == 'LWB') :
-        fig_text(x = 0.423, y = 0.38,
-                s='LEFT WINGER',
-                size=18,
-                color='#1b1b1b')
-
-    elif (position.split(', ')[0] == 'LB') | (position == 'LB'):
-        fig_text(x = 0.423, y = 0.38,
-                s='LEFT BACK',
-                size=18,
-                color='#1b1b1b')
-    
-    elif (position.split(', ')[0] == 'RB') | (position == 'RB'):
-        fig_text(x = 0.423, y = 0.38,
-                s='RIGHT BACK',
-                size=18,
-                color='#1b1b1b')
-    
-    elif (position.split(', ')[0] == 'LCB') | (position == 'LCB'):
-        fig_text(x = 0.423, y = 0.38,
-                s='LEFT CENTER BACK',
-                size=18,
-                color='#1b1b1b')
-    
-    elif (position.split(', ')[0] == 'RCB') | (position == 'RCB'):
-        fig_text(x = 0.423, y = 0.38,
-                s='RIGHT CENTER BACK',
-                size=18,
-                color='#1b1b1b')
-
-    elif (position.split(', ')[0] == 'DMF') | (position == 'DMF'):
-        fig_text(x = 0.423, y = 0.38,
-                s='DEFENSIVE MIDFIELDER',
-                size=18,
-                color='#1b1b1b')
-
-    elif (position.split(', ')[0] == 'RCMF') | (position == 'RCMF'):
-        fig_text(x = 0.423, y = 0.38,
-                s='CENTER MIDFIELDER RIGHT',
-                size=18,
-                color='#1b1b1b')
-
-
-    elif (position.split(', ')[0] == 'LCMF') | (position == 'LCMF'):
-        fig_text(x = 0.423, y = 0.38,
-                s='CENTER MIDFIELDER LEFT',
-                size=18,
-                color='#1b1b1b')
-
-    elif (position.split(', ')[0] == 'AMF') | (position == 'AMF'):
-        fig_text(x = 0.423, y = 0.38,
-                s='OFFENSIVE MIDFIELDER',
-                size=18,
-                color='#1b1b1b')
-
-    elif (position.split(' &')[0] == 'GK') | (position == 'GK'):
-        fig_text(x = 0.423, y = 0.38,
-                s='GOALKEEPER',
-                size=18,
-                color='#1b1b1b')
-
-
-    #######################################################################################################################################
-        
-    if (position.__contains__('CB')):
-
-        cols = ['Stopper', 'Aerial CB', 'Ball Playing CB', 'Ball Carrying CB']
-
-        dfLeague = df.loc[df['Comp'] == league].reset_index(drop=True)
-
-        center_Back(dfLeague)
-
-        player = dfLeague.loc[(dfLeague['Position'].str.contains(position))].reset_index(drop=True)
-
-        player = player.loc[(player['Player'] == playerName)][cols].reset_index()
-        player = list(player.loc[0])
-        player = player[1:]
-
-        params = cols
-
-        values = []
-        for x in range(len(params)):   
-            values.append(math.floor(stats.percentileofscore(dfLeague[params[x]], player[x])))
-
-        for n,i in enumerate(values):
-            if i == 100:
-                values[n] = 99
-
-    elif ((position.__contains__('RB')) | (position.__contains__('RWB')) | (position.__contains__('LWB')) | (position.__contains__('LB'))):
-
-        cols = ['Inverted Wing Back', 'Wing Back', 'Attacking FB', 'Defensive FB', 'Full Back CB']
-
-        dfLeague = df.loc[df['Comp'] == league].reset_index(drop=True)
-
-        center_Back(dfLeague)
-
-        player = dfLeague.loc[(dfLeague['Position'].str.contains(position))].reset_index(drop=True)
-
-        player = player.loc[(player['Player'] == playerName)][cols].reset_index()
-        player = list(player.loc[0])
-        player = player[1:]
-
-        params = cols
-
-        values = []
-        for x in range(len(params)):   
-            values.append(math.floor(stats.percentileofscore(dfLeague[params[x]], player[x])))
-
-        for n,i in enumerate(values):
-            if i == 100:
-                values[n] = 99
-
-
-    elif ((position.__contains__('RCMF')) | (position.__contains__('LCMF')) | (position.__contains__('LDMF')) | (position.__contains__('RDMF')) | (position.__contains__('AMF')) | (position.__contains__('DMF'))):
-
-        cols = ['Ball Winner', 'Deep Lying Playmaker', 'Box-to-box', 'Attacking Playmaker', 'Media Punta llegador']
-
-        dfLeague = df.loc[df['Comp'] == league].reset_index(drop=True)
-
-        center_Back(dfLeague)
-
-        player = dfLeague.loc[(dfLeague['Position'].str.contains(position))].reset_index(drop=True)
-
-        player = player.loc[(player['Player'] == playerName)][cols].reset_index()
-        player = list(player.loc[0])
-        player = player[1:]
-
-        params = cols
-
-        values = []
-        for x in range(len(params)):   
-            values.append(math.floor(stats.percentileofscore(dfLeague[params[x]], player[x])))
-
-        for n,i in enumerate(values):
-            if i == 100:
-                values[n] = 99
-
-
-    elif ((position.__contains__('LW')) | (position.__contains__('RW')) | (position.__contains__('LAMF')) | (position.__contains__('RAMF')) | (position.__contains__('LWF')) | (position.__contains__('RWF'))):
-
-        cols = ['Banda', 'Por dentro', 'Falso', 'Defensivo']
-
-        dfLeague = df.loc[df['Comp'] == league].reset_index(drop=True)
-
-        center_Back(dfLeague)
-
-        player = dfLeague.loc[(dfLeague['Position'].str.contains(position))].reset_index(drop=True)
-
-        player = player.loc[(player['Player'] == playerName)][cols].reset_index()
-        player = list(player.loc[0])
-        player = player[1:]
-
-        params = cols
-
-        values = []
-        for x in range(len(params)):   
-            values.append(math.floor(stats.percentileofscore(dfLeague[params[x]], player[x])))
-
-        for n,i in enumerate(values):
-            if i == 100:
-                values[n] = 99
-
-
-    elif (position.__contains__('CF')):
-
-        cols = ['Box Forward', 'Advanced Forward', 'Target Man', 'False 9']
-
-        dfLeague = df.loc[df['Comp'] == league].reset_index(drop=True)
-
-        center_Back(dfLeague)
-
-        player = dfLeague.loc[(dfLeague['Position'].str.contains(position))].reset_index(drop=True)
-
-        player = player.loc[(player['Player'] == playerName)][cols].reset_index()
-        player = list(player.loc[0])
-        player = player[1:]
-
-        params = cols
-
-        values = []
-        for x in range(len(params)):   
-            values.append(math.floor(stats.percentileofscore(dfLeague[params[x]], player[x])))
-
-        for n,i in enumerate(values):
-            if i == 100:
-                values[n] = 99
-
-    # PLAYER ROLE   
-    #playerRole.index[0]
-
-    fig_text(x = 0.17, y = 0.4,
-            s='Final Rating',
-            size=16,
-            color='#1b1b1b')
-
-    if max(values) >= 90:
-        fig_text(x = 0.25, y = 0.38,
-                s='A',
-                size=100,
-                color='#2ae102')
-
-    elif (max(values) >= 65) & (max(values) < 90):
-        fig_text(x = 0.25, y = 0.38,
-                s='B',
-                size=100,
-                color='#d7ee1a')
-
-    elif (max(values) >= 50) & (max(values) < 65):
-        fig_text(x = 0.25, y = 0.38,
-                s='C',
-                size=100,
-                color='#fdab16')
-
-    elif max(values) < 50:
-        fig_text(x = 0.25, y = 0.38,
-                s='D',
-                size=100,
-                color='#ff0000')
-
-    fig = add_image(image='C:/Users/menes/Documents/Data Hub/Images/Players/' + league + '/' + club + '/' + playerName + '.png', fig=fig, left=0.12, bottom=0.78, width=0.1, height=0.23)
-
-    fig = add_image(image='C:/Users/menes/Documents/Data Hub/Images/Country/' + country + '.png', fig=fig, left=0.23, bottom=0.775, width=0.1, height=0.07)
-
-################################################################################################################################################
 
 def role_Chart(df, playerName, pos, league):
     # parameter and value list
@@ -10016,6 +9248,786 @@ def RoleForward(df):
     df['Advanced Forward'] =  round(((df['ballPlaying'] * 10) + (df[ 'decisionMake'] * 20) +
                                     (df['touchQuality'] * 12.5) + (df[ 'dribbles'] * 10) +
                                     (df['Aerial'] * 15) + (df[ 'attackingThreat'] * 32.5)) / 10, 2)
+
+################################################################################################################################################
+
+def scoutReport(playerName, team, setPieces, isDefensive, tier):
+
+    playerAbility(df)
+
+    playerClub = df.loc[(df['Player'] == playerName) & (df['Team'] == team) & (df['Season'] == '2021/22')]
+
+    playerClub['Market value'] = playerClub['Market value'].astype(str)
+
+    age = playerClub['Age'].unique()
+    age = age.tolist()
+    age = age[0]
+
+    league = playerClub['Comp'].unique()
+    league = league.tolist()
+    league = league[0]
+
+    country = playerClub['Birth country'].unique()
+    country = country.tolist()
+    country = country[0]
+    if country == '0':
+        country = playerClub['Passport country'].unique()
+        country = country.tolist()
+        country = country[0]
+    if ',' in country:
+        country = country.split(', ')[0]
+
+    Market = playerClub['Market value'].unique()
+    Market = Market.tolist()
+    valor = Market[0]
+
+    if len(str(valor)) == 6:
+        valor = str(valor)[:3]
+                
+    elif len(str(valor)) == 7:
+        if str(valor)[:2][1] != 0:
+            valor = str(valor)[:2][0] + '.' + str(valor)[:2][1] + 'M'
+            
+    elif len(str(valor)) == 8:
+        valor = str(valor)[:2] + 'M'
+
+    elif len(str(valor)) == 9:
+        valor = str(valor)[:3] + 'M'
+
+    position = playerClub['Position'].unique()
+    position = position.tolist()
+    position = position[0]
+    if ', ' in position:
+        position = position.split(', ')[0]
+
+    Contract = playerClub['Contract expires'].unique()
+    Contract = Contract.tolist()
+    contrato = Contract[0]
+
+    Height = playerClub['Height'].unique()
+    Height = Height.tolist()
+    altura = str(Height[0])
+
+    Foot = playerClub['Foot'].unique()
+    Foot = Foot.tolist()
+    pé = Foot[0]
+
+    Minutes = playerClub['Minutes played'].unique()
+    Minutes = Minutes.tolist()
+    Minutes = str(Minutes[0])
+    Minutes = int(Minutes)
+
+    club = playerClub['Team'].unique()
+    club = club.tolist()
+    club = club[0]
+
+    color = ['#FF0000', '#181818']
+
+    #######################################################################################################################################
+
+    fig = plt.figure(figsize=(15, 10), dpi=1000, facecolor = '#E8E8E8')
+    gspec = gridspec.GridSpec(
+    ncols=2, nrows=2, wspace = 0.5
+    )
+
+    ########################################################################################################################################################
+
+    ax1 = plt.subplot(
+                    gspec[0, 0],
+            )
+
+
+    ax1.axis('off')
+
+    ax2 = plt.subplot(
+                    gspec[1, 1],
+            )
+
+    pitch = Pitch(pitch_type='opta',pad_top=-0.5, pad_bottom=0.5, pad_right=-0.5,
+                                pitch_color='#E8E8E8', line_color='#1b1b1b',line_zorder=1, linewidth=5, spot_scale=0.002)
+
+    pitch.draw(ax=ax2)
+
+    if 'GK' in position:
+        # GK
+        pitch.scatter(x=5.8, y=50, ax=ax2, c=color[0], edgecolor='#1b1b1b', s=500, zorder=3)
+
+#######################################################################################################################################
+
+    elif 'RB' in position:
+        # RIGHT FULLBACK
+        pitch.scatter(x=17, y=15, ax=ax2, c=color[0], edgecolor='#1b1b1b', s=500, zorder=3)
+
+    elif 'RCB' in position:
+        # RIGHT CENTER BACK
+        pitch.scatter(x=17, y=36.8, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
+
+    elif 'LCB' in position:
+        # LEFT CENTER BACK
+        pitch.scatter(x=17, y=63.2, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
+
+    elif 'LB' in position:
+        # LEFT FULLBACK
+        pitch.scatter(x=17, y=85, ax=ax2, c=color[0], edgecolor='#1b1b1b', s=500, zorder=3)
+
+#######################################################################################################################################
+
+    elif 'DM' in position:
+        # DEFENSIVE MIDFIELDER
+        pitch.scatter(x=40, y=50, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
+
+    elif 'RCMF' in position:
+        # CENTER MIDFIELDER RIGHT
+        pitch.scatter(x=55, y=36.8, ax=ax2, c=color[0], edgecolor='#1b1b1b', s=500, zorder=3)
+
+    elif 'LCMF' in position:
+        # CENTER MIDFIELDER LEFT
+        pitch.scatter(x=40, y=50, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
+
+#######################################################################################################################################
+    elif 'RAMF' in position:
+        # RIGHT MIDFIELDER
+        pitch.scatter(x=70, y=15, ax=ax2, c=color[0], edgecolor='#1b1b1b', s=500, zorder=3)
+
+    elif 'AMF' in position:
+        # OFFENSIVE MIDFIELDER
+        pitch.scatter(x=70, y=50, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
+
+    elif 'LAMF' in position:
+        # LEFT MIDFIELDER
+        pitch.scatter(x=70, y=85, ax=ax2, c=color[0], edgecolor='#1b1b1b', s=500, zorder=3)
+
+#######################################################################################################################################
+
+    elif 'LW' in position:
+        # WINGER LEFT
+        pitch.scatter(x=85, y=88, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
+
+    elif 'LWB' in position:
+        # WINGER LEFT
+        pitch.scatter(x=85, y=88, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
+
+    elif 'RW' in position:
+        # WINGER RIGHT
+        pitch.scatter(x=85, y=12, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
+
+#######################################################################################################################################
+
+    elif 'CF' in position:
+        # FORWARD
+        pitch.scatter(x=88.5, y=50, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
+
+######################################################## MUTIPLE POSITIONS - LW / RW AND OM ###############################################################################
+
+    elif (position == 'LCB & RCB') | (position == 'RCB & LCB'):
+        # LEFT CENTER BACK
+        pitch.scatter(x=17, y=63.2, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
+        
+        # RIGHT CENTER BACK
+        pitch.scatter(x=17, y=36.8, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
+
+    elif (position == 'LW & AMF') | (position == 'OM & LW'):
+        # WINGER LEFT
+        pitch.scatter(x=85, y=88, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
+
+        # OFFENSIVE MIDFIELDER
+        pitch.scatter(x=70, y=50, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
+
+    elif (position == 'RW & AMF') | (position == 'AMF & RW'):
+        # WINGER RIGHT
+        pitch.scatter(x=85, y=12, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
+
+        # OFFENSIVE MIDFIELDER
+        pitch.scatter(x=70, y=50, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
+
+######################################################## MUTIPLE POSITIONS - LM / RM AND OM ###############################################################################
+
+    elif (position == 'LAMF & AMF') | (position == 'AMF & LAMF'):
+        # LEFT MIDFIELDER
+        pitch.scatter(x=70, y=85, ax=ax2, c=color[0], edgecolor='#1b1b1b', s=500, zorder=3)
+
+        # OFFENSIVE MIDFIELDER
+        pitch.scatter(x=70, y=50, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
+
+    elif (position == 'RAMF & AMF') | (position == 'AMF & RAMF'):
+        # RIGHT MIDFIELDER
+        pitch.scatter(x=70, y=15, ax=ax2, c=color[0], edgecolor='#1b1b1b', s=500, zorder=3)
+
+        # OFFENSIVE MIDFIELDER
+        pitch.scatter(x=70, y=50, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
+
+######################################################## MUTIPLE POSITIONS - AMF, CF, RCMF ###############################################################################
+
+    elif (position == 'AMF, CF, RCMF'):
+        # FORWARD
+        pitch.scatter(x=88.5, y=50, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
+
+        # OFFENSIVE MIDFIELDER
+        pitch.scatter(x=70, y=50, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
+
+        # RIGHT MIDFIELDER
+        pitch.scatter(x=70, y=15, ax=ax2, c=color[0], edgecolor='#1b1b1b', s=500, zorder=3)
+######################################################## MUTIPLE POSITIONS - FW AND OM ###############################################################################
+
+    elif (position == 'FW & AMF') | (position == 'AMF & FW'):
+        # FORWARD
+        pitch.scatter(x=88.5, y=50, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
+
+        # OFFENSIVE MIDFIELDER
+        pitch.scatter(x=70, y=50, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
+
+######################################################## MUTIPLE POSITIONS - RB AND LB ###############################################################################
+
+    elif (position == 'LB & RB') | (position == 'RB & LB'):
+        # RIGHT FULLBACK
+        pitch.scatter(x=17, y=15, ax=ax2, c=color[0], edgecolor='#1b1b1b', s=500, zorder=3)
+
+        # LEFT FULLBACK
+        pitch.scatter(x=17, y=85, ax=ax2, c=color[0], edgecolor='#1b1b1b', s=500, zorder=3)
+
+######################################################## MUTIPLE POSITIONS - LCB AND LB ###############################################################################
+
+    elif (position == 'LB & LCB') | (position == 'LCB & LB'):
+        # LEFT CENTER BACK
+        pitch.scatter(x=17, y=36.8, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
+        
+        # LEFT FULLBACK
+        pitch.scatter(x=17, y=15, ax=ax2, c=color[0], edgecolor='#1b1b1b', s=500, zorder=3)
+
+######################################################## MUTIPLE POSITIONS - RCB AND RB ###############################################################################
+
+    elif (position == 'RB & RCB') | (position == 'RCB & RB'):
+        # RIGHT CENTER BACK
+        pitch.scatter(x=17, y=63.2, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
+        
+        # RIGHT FULLBACK
+        pitch.scatter(x=17, y=15, ax=ax2, c=color[0], edgecolor='#1b1b1b', s=500, zorder=3)
+
+######################################################## MUTIPLE POSITIONS - DM AND CML ###############################################################################
+
+    elif (position == 'DMF & LDMF') | (position == 'LDMF & DMF'):
+        # DEFENSIVE MIDFIELDER
+        pitch.scatter(x=40, y=50, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
+        
+        # CENTER MIDFIELDER LEFT
+        pitch.scatter(x=55, y=36.8, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
+
+######################################################## MUTIPLE POSITIONS - DM AND CMR ###############################################################################
+
+    elif (position == 'RDMF & DMF') | (position == 'DMF, RDMF'):
+        # DEFENSIVE MIDFIELDER
+        pitch.scatter(x=40, y=50, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
+        
+        # CENTER MIDFIELDER RIGHT
+        pitch.scatter(x=55, y=36.8, ax=ax2, c=color[0], edgecolor='#1b1b1b', s=500, zorder=3)
+
+######################################################## MUTIPLE POSITIONS - CML AND CMR ###############################################################################
+
+    elif (position == 'LCMF, RCMF') | (position == 'RCMF, LCMF'):
+        # CENTER MIDFIELDER RIGHT
+        pitch.scatter(x=55, y=36.8, ax=ax2, c=color[0], edgecolor='#1b1b1b', s=500, zorder=3)
+        
+        # CENTER MIDFIELDER LEFT
+        pitch.scatter(x=55, y=63.2, ax=ax2, c=color[0], edgecolor="#1b1b1b", s=500, zorder=3)
+
+#######################################################################################################################################
+
+    cols_Offensive = ['Finishing Ability', 'Heading Ability', 'Concentration Ability', 'Sight play', 'Aerial Ability', 'Create Chances Ability', 'Dribbling Ability', 'SetPieces Ability', 'KeyPass Ability', 'Pass Ability']
+    cols_Defensive = ['Heading Ability', 'Concentration Ability', 'Pass Ability', 'SetPieces Ability', 'Aerial Ability', 'Tackle Ability', 'Interception Ability']
+
+    if (isDefensive == True) & (setPieces == False):
+        params = cols_Defensive
+
+        cols_Defensive.remove('SetPieces Ability')
+    
+        player = df.loc[(df['Player'] == playerName) & (df['Comp'] == league)][cols_Defensive].reset_index()
+        player = list(player.loc[0])
+        player = player[1:]
+
+    elif (isDefensive == True) & (setPieces == True):
+
+        params = cols_Defensive
+
+        player = df.loc[(df['Player'] == playerName) & (df['Comp'] == league)][cols_Defensive].reset_index()
+        player = list(player.loc[0])
+        player = player[1:]
+
+    elif (isDefensive == False) & (setPieces == True):
+
+        params = cols_Offensive
+
+        player = df.loc[(df['Player'] == playerName) & (df['Comp'] == league)][cols_Offensive].reset_index()
+        player = list(player.loc[0])
+        player = player[1:]
+
+    elif (isDefensive == False) & (setPieces == False):
+
+        params = cols_Offensive
+
+        cols_Offensive.remove('SetPieces Ability')
+    
+        player = df.loc[(df['Player'] == playerName) & (df['Comp'] == league)][cols_Offensive].reset_index()
+        player = list(player.loc[0])
+        player = player[1:]
+
+    #######################################################################################################################################
+
+    df2 = df.loc[(df['Tier'] == tier) & (df['Minutes played'] >= Minutes) | (df.Player == playerName)].reset_index(drop=True)
+
+    values = []
+    for x in range(len(params)):   
+        values.append(math.floor(stats.percentileofscore(df2[params[x]], player[x])))
+
+    for n,i in enumerate(values):
+        if i == 100:
+            values[n] = 99
+    
+    elite = []
+    veryStrong = []
+    strong = []
+    improve = []
+    weak = []
+    veryWeak = []
+    for i in range(len(values)):
+        if values[i] >= 95:
+            elite.append(params[i])
+
+        elif values[i] >= 80 | values[i] < 95:
+            veryStrong.append(params[i])
+
+        elif values[i] >= 70 | values[i] < 80:
+            strong.append(params[i])
+
+        elif values[i] >= 50 | values[i] < 70:
+            improve.append(params[i])
+
+        elif values[i] < 50:
+            weak.append(params[i])
+
+        elif values[i] <= 30:
+            veryWeak.append(params[i])
+        
+
+    #######################################################################################################################################
+    highlight_textpropsStrong =\
+    [{"color": '#2ae102', "fontweight": 'bold'}]
+
+    fig_text(x = 0.53, y = 0.9,
+            s='Strengths',
+            size=28,
+            color='#2ae102')
+
+    h=0.94
+    for i in elite:
+        ax_text(x=1.5, y=h - 0.1, s='<Elite:>' + ' ' + i, va='center', ha='center',
+                highlight_textprops = highlight_textpropsStrong, size=18, color='#1b1b1b', ax=ax1)
+        h=h-0.1
+
+    h=h
+    for i in veryStrong:
+        ax_text(x=1.5, y=h - 0.1, s='<Very Strong:>' + ' ' + i, va='center', ha='center',
+                highlight_textprops = highlight_textpropsStrong, size=18, color='#1b1b1b', ax=ax1)
+        h=h-0.1
+
+    h=h
+    for i in strong:
+        ax_text(x=1.5, y=h - 0.1, s='<Strong:>' + ' ' + i, va='center', ha='center',
+                highlight_textprops = highlight_textpropsStrong, size=18, color='#1b1b1b', ax=ax1)
+        h=h-0.1
+
+    highlight_textprops =\
+    [{"color": '#ff0000', "fontweight": 'bold'},
+     {"color": '#f48515', "fontweight": 'bold'}]
+
+    fig_text(x = 0.75, y = 0.9,
+             s='<Weaknesses>/<To improve>',
+             highlight_textprops = highlight_textprops,
+             size=28)
+
+    highlight_textpropsImprove =\
+    [{"color": '#f48515', "fontweight": 'bold'}]
+
+    highlight_textpropsWeak =\
+    [{"color": '#ff0000', "fontweight": 'bold'}]
+
+    h=0.94
+    for i in improve:
+        ax_text(x=2.5, y=h - 0.1, s='<Improve:>' + ' ' + i, va='center', ha='center',
+                highlight_textprops = highlight_textpropsImprove, size=18, color='#1b1b1b', ax=ax1)
+        h=h-0.1
+
+    h=h
+    for i in weak:
+        ax_text(x=2.5, y=h - 0.1, s='<Weak:>' + ' ' + i, va='center', ha='center',
+                highlight_textprops = highlight_textpropsWeak, size=18, color='#1b1b1b', ax=ax1)
+        h=h-0.1
+
+    h=h
+    for i in veryWeak:
+        ax_text(x=2.5, y=h - 0.1, s='<Very Weak:>' + ' ' + i, va='center', ha='center',
+                highlight_textprops = highlight_textpropsWeak, size=18, color='#1b1b1b', ax=ax1)
+        h=h-0.1
+        
+    #######################################################################################################################################
+
+    fig_text(x = 0.23, y = 0.91,
+            s=playerName,
+            size=30,
+            color='#1b1b1b')
+
+    fig_text(x = 0.23, y = 0.75,
+            s='Club: ',
+            size=20,
+            color='#1b1b1b')
+
+    fig_text(x = 0.21, y = 0.71,
+            s='League: ',
+            size=20,
+            color='#1b1b1b')
+
+    fig_text(x = 0.16, y = 0.67,
+            s='Market Value: ',
+            size=20,
+            color='#1b1b1b')
+
+    fig_text(x = 0.15, y = 0.63,
+            s='Contract until: ',
+            size=20,
+            color='#1b1b1b')
+
+    fig_text(x = 0.15, y = 0.59,
+            s='Minutes played: ',
+            size=20,
+            color='#1b1b1b')
+
+    fig_text(x = 0.223, y = 0.55,
+            s='Age: ',
+            size=20,
+            color='#1b1b1b')
+
+    fig_text(x = 0.223, y = 0.51,
+            s='Height: ',
+            size=20,
+            color='#1b1b1b')
+
+    fig_text(x = 0.233, y = 0.47,
+            s='Foot: ',
+            size=20,
+            color='#1b1b1b')
+
+#######################################################################################################################################
+
+    highlight_textprops =\
+    [{"color": color[0], "fontweight": 'bold'}]
+
+    fig_text(x = 0.3, y = 0.75,
+            s=f'<{club}>',
+            highlight_textprops = highlight_textprops,
+            size=18,
+            color='#1b1b1b')
+
+    fig_text(x = 0.301, y = 0.71,
+            s=league,
+            size=18,
+            color='#1b1b1b')
+
+    fig_text(x = 0.301, y = 0.67,
+            s=valor,
+            size=18,
+            color='#1b1b1b')
+
+    #if 'M' not in Market:
+    #    fig_text(x = 0.33, y = 0.667,
+    #            s='Thousand',
+    #            size=11,
+    #            color='#1b1b1b')
+
+    fig_text(x = 0.301, y = 0.63,
+            s=contrato,
+            size=18,
+            color='#1b1b1b')
+
+    fig_text(x = 0.301, y = 0.59,
+            s=str(Minutes),
+            size=18,
+            color='#1b1b1b')
+
+    fig_text(x = 0.301, y = 0.55,
+            s=str(age),
+            size=18,
+            color='#1b1b1b')
+
+    fig_text(x = 0.301, y = 0.51,
+            s=altura,
+            size=18,
+            color='#1b1b1b')
+
+    fig_text(x = 0.301, y = 0.47,
+            s=pé,
+            size=18,
+            color='#1b1b1b')
+
+#######################################################################################################################################
+
+    fig_text(x = 0.47, y = 0.41,
+            s='<Main Position>',
+            highlight_textprops = highlight_textprops,
+            size=18,
+            color='#1b1b1b')
+
+    if (position.split(', ')[0] == 'RAMF') | (position == 'RAMF'):
+        fig_text(x = 0.423, y = 0.38,
+                s='RIGHT MIDFIELDER',
+                size=18,
+                color='#1b1b1b')
+
+    elif (position.split(', ')[0] == 'LAMF') | (position == 'LAMF'):
+        fig_text(x = 0.423, y = 0.38,
+                s='LEFT MIDFIELDER',
+                size=18,
+                color='#1b1b1b')
+    
+    elif (position.split(', ')[0] == 'CF') | (position == 'CF'):
+        fig_text(x = 0.423, y = 0.38,
+                s='FORWARD',
+                size=18,
+                color='#1b1b1b')
+    
+    elif (position.split(', ')[0] == 'RW') | (position == 'RW'):
+        fig_text(x = 0.423, y = 0.38,
+                s='RIGHT WINGER',
+                size=18,
+                color='#1b1b1b')
+
+    elif (position.split(', ')[0] == 'LW') | (position == 'LW') | (position.split(', ')[0] == 'LWB') :
+        fig_text(x = 0.423, y = 0.38,
+                s='LEFT WINGER',
+                size=18,
+                color='#1b1b1b')
+
+    elif (position.split(', ')[0] == 'LB') | (position == 'LB'):
+        fig_text(x = 0.423, y = 0.38,
+                s='LEFT BACK',
+                size=18,
+                color='#1b1b1b')
+    
+    elif (position.split(', ')[0] == 'RB') | (position == 'RB'):
+        fig_text(x = 0.423, y = 0.38,
+                s='RIGHT BACK',
+                size=18,
+                color='#1b1b1b')
+    
+    elif (position.split(', ')[0] == 'LCB') | (position == 'LCB'):
+        fig_text(x = 0.423, y = 0.38,
+                s='LEFT CENTER BACK',
+                size=18,
+                color='#1b1b1b')
+    
+    elif (position.split(', ')[0] == 'RCB') | (position == 'RCB'):
+        fig_text(x = 0.423, y = 0.38,
+                s='RIGHT CENTER BACK',
+                size=18,
+                color='#1b1b1b')
+
+    elif (position.split(', ')[0] == 'DMF') | (position == 'DMF'):
+        fig_text(x = 0.423, y = 0.38,
+                s='DEFENSIVE MIDFIELDER',
+                size=18,
+                color='#1b1b1b')
+
+    elif (position.split(', ')[0] == 'RCMF') | (position == 'RCMF'):
+        fig_text(x = 0.423, y = 0.38,
+                s='CENTER MIDFIELDER RIGHT',
+                size=18,
+                color='#1b1b1b')
+
+
+    elif (position.split(', ')[0] == 'LCMF') | (position == 'LCMF'):
+        fig_text(x = 0.423, y = 0.38,
+                s='CENTER MIDFIELDER LEFT',
+                size=18,
+                color='#1b1b1b')
+
+    elif (position.split(', ')[0] == 'AMF') | (position == 'AMF'):
+        fig_text(x = 0.423, y = 0.38,
+                s='OFFENSIVE MIDFIELDER',
+                size=18,
+                color='#1b1b1b')
+
+    elif (position.split(' &')[0] == 'GK') | (position == 'GK'):
+        fig_text(x = 0.423, y = 0.38,
+                s='GOALKEEPER',
+                size=18,
+                color='#1b1b1b')
+
+
+    #######################################################################################################################################
+        
+    if (position.__contains__('CB')):
+
+        cols = ['Stopper', 'Aerial CB', 'Ball Playing CB', 'Ball Carrying CB']
+
+        dfLeague = df.loc[df['Comp'] == league].reset_index(drop=True)
+
+        RoleCenterBack(dfLeague)
+
+        player = dfLeague.loc[(dfLeague['Position'].str.contains(position))].reset_index(drop=True)
+
+        player = player.loc[(player['Player'] == playerName)][cols].reset_index()
+        player = list(player.loc[0])
+        player = player[1:]
+
+        params = cols
+
+        values = []
+        for x in range(len(params)):   
+            values.append(math.floor(stats.percentileofscore(dfLeague[params[x]], player[x])))
+
+        for n,i in enumerate(values):
+            if i == 100:
+                values[n] = 99
+
+    elif ((position.__contains__('RB')) | (position.__contains__('RWB')) | (position.__contains__('LWB')) | (position.__contains__('LB'))):
+
+        cols = ['Inverted Wing Back', 'Wing Back', 'Attacking FB', 'Defensive FB', 'Full Back CB']
+
+        dfLeague = df.loc[df['Comp'] == league].reset_index(drop=True)
+
+        roleFullBack(dfLeague)
+
+        player = dfLeague.loc[(dfLeague['Position'].str.contains(position))].reset_index(drop=True)
+
+        player = player.loc[(player['Player'] == playerName)][cols].reset_index()
+        player = list(player.loc[0])
+        player = player[1:]
+
+        params = cols
+
+        values = []
+        for x in range(len(params)):   
+            values.append(math.floor(stats.percentileofscore(dfLeague[params[x]], player[x])))
+
+        for n,i in enumerate(values):
+            if i == 100:
+                values[n] = 99
+
+
+    elif ((position.__contains__('RCMF')) | (position.__contains__('LCMF')) | (position.__contains__('LDMF')) | (position.__contains__('RDMF')) | (position.__contains__('AMF')) | (position.__contains__('DMF'))):
+
+        cols = ['Ball Winner', 'Deep Lying Playmaker', 'Box-to-box', 'Attacking Playmaker', 'Media Punta llegador']
+
+        dfLeague = df.loc[df['Comp'] == league].reset_index(drop=True)
+
+        RoleMidfield(dfLeague)
+
+        player = dfLeague.loc[(dfLeague['Position'].str.contains(position))].reset_index(drop=True)
+
+        player = player.loc[(player['Player'] == playerName)][cols].reset_index()
+        player = list(player.loc[0])
+        player = player[1:]
+
+        params = cols
+
+        values = []
+        for x in range(len(params)):   
+            values.append(math.floor(stats.percentileofscore(dfLeague[params[x]], player[x])))
+
+        for n,i in enumerate(values):
+            if i == 100:
+                values[n] = 99
+
+
+    elif ((position.__contains__('LW')) | (position.__contains__('RW')) | (position.__contains__('LAMF')) | (position.__contains__('RAMF')) | (position.__contains__('LWF')) | (position.__contains__('RWF'))):
+
+        cols = ['Banda', 'Por dentro', 'Falso', 'Defensivo']
+
+        dfLeague = df.loc[df['Comp'] == league].reset_index(drop=True)
+
+        RoleExtremo(dfLeague)
+
+        player = dfLeague.loc[(dfLeague['Position'].str.contains(position))].reset_index(drop=True)
+
+        player = player.loc[(player['Player'] == playerName)][cols].reset_index()
+        player = list(player.loc[0])
+        player = player[1:]
+
+        params = cols
+
+        values = []
+        for x in range(len(params)):   
+            values.append(math.floor(stats.percentileofscore(dfLeague[params[x]], player[x])))
+
+        for n,i in enumerate(values):
+            if i == 100:
+                values[n] = 99
+
+
+    elif (position.__contains__('CF')):
+
+        cols = ['Box Forward', 'Advanced Forward', 'Target Man', 'False 9']
+
+        dfLeague = df.loc[df['Comp'] == league].reset_index(drop=True)
+
+        RoleForward(dfLeague)
+
+        player = dfLeague.loc[(dfLeague['Position'].str.contains(position))].reset_index(drop=True)
+
+        player = player.loc[(player['Player'] == playerName)][cols].reset_index()
+        player = list(player.loc[0])
+        player = player[1:]
+
+        params = cols
+
+        values = []
+        for x in range(len(params)):   
+            values.append(math.floor(stats.percentileofscore(dfLeague[params[x]], player[x])))
+
+        for n,i in enumerate(values):
+            if i == 100:
+                values[n] = 99
+
+    # PLAYER ROLE   
+    #playerRole.index[0]
+
+    fig_text(x = 0.17, y = 0.4,
+            s='Final Rating',
+            size=16,
+            color='#1b1b1b')
+
+    if max(values) >= 90:
+        fig_text(x = 0.25, y = 0.38,
+                s='A',
+                size=100,
+                color='#2ae102')
+
+    elif (max(values) >= 65) & (max(values) < 90):
+        fig_text(x = 0.25, y = 0.38,
+                s='B',
+                size=100,
+                color='#d7ee1a')
+
+    elif (max(values) >= 50) & (max(values) < 65):
+        fig_text(x = 0.25, y = 0.38,
+                s='C',
+                size=100,
+                color='#fdab16')
+
+    elif max(values) < 50:
+        fig_text(x = 0.25, y = 0.38,
+                s='D',
+                size=100,
+                color='#ff0000')
+
+    #fig = add_image(image='C:/Users/menes/Documents/Data Hub/Images/Players/' + league + '/' + club + '/' + playerName + '.png', fig=fig, left=0.12, bottom=0.78, width=0.1, height=0.23)
+
+    #fig = add_image(image='C:/Users/menes/Documents/Data Hub/Images/Country/' + country + '.png', fig=fig, left=0.23, bottom=0.775, width=0.1, height=0.07)
+
+
+    plt.savefig('assets/scoutReport' + playerName + '.png', dpi=300)
+
+    return app.get_asset_url('scoutReport' + playerName + '.png')
+################################################################################################################################################
+
 
 ################################################################################################################################################
 #--------------------------------------------------- ROLES --------------------------------------------------------------------------------
