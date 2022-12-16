@@ -97,21 +97,20 @@ layout = dbc.Row([
 
 @app.callback(
     Output('dp-playersWyScout', 'options'),
-    Input('dp-league', 'value'),
-    State('rd-competition', 'value'))
+    Input('dp-leagues', 'value'))
 
 def dropdown_players(league):
 
         players = df.loc[df.Comp == league].reset_index(drop=True)
                 
-        players = players.name.unique()
+        players = players.Player.unique()
         options=[{'label':name, 'value':name} for name in players]
         
         return  options
 
 @app.callback(
     Output('dp-playersWyScout', 'value'),
-    Input('dp-league', 'value'))
+    Input('dp-leagues', 'value'))
 
 def dropdown_playerValue(league):
 
@@ -128,9 +127,14 @@ def dropdown_playerValue(league):
     [State('rd-viz', 'value'),
      State('rd-tiers', 'value'),
      State('dp-leagues', 'value'),
-     State('dp-position', 'value')])
+     State('dp-position', 'value'),
+     State('rd-roles', 'value')])
 
-def visualization(Player, rdViz, rdTiers, league, pos):
+def visualization(Player, rdViz, rdTiers, league, pos, role):
+        
+        teamValue = df.loc[(df.Player == Player) & (df.Season == '2021/22')].reset_index(drop=True)
+        teamValue = teamValue.Team.unique()
+        teamValue = teamValue[0]
         
         if Player == '':
                 players = df.loc[df.Comp == league].reset_index(drop=True)
@@ -138,4 +142,9 @@ def visualization(Player, rdViz, rdTiers, league, pos):
                 Player = players[0]
         
         if rdViz == 'Player Report':
-                return fc.scoutReport('N. De La Cruz', 'River Plate', False, False, rdTiers)
+                return fc.scoutReport(Player, teamValue, False, False, rdTiers)
+
+        elif rdViz == 'Styles of Play':
+                dfTable = fc.dataFrameForward('No', rdTiers, role, league)
+                return fc.table(dfTable, role)        
+        

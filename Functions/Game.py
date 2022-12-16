@@ -5580,7 +5580,9 @@ def possessionGained(team, eventType):
 #--------------------------------------------------- SCOUTING --------------------------------------------------------------------------------
 ################################################################################################################################################
 
+"""
 df = pd.read_csv('WyScout.csv')
+"""
 
 def playerAbility(df):
 
@@ -6949,7 +6951,25 @@ def createTier(league):
     elif league in tier4:
         return 4
 
+"""
 df['Tier'] = df.apply(lambda x: createTier(x.Comp), axis=1)
+
+df['Status'] = pd.qcut(df['Minutes played'], np.linspace(0,1,11), labels=np.linspace(0.1,1,10))
+
+df['Status'] = df['Status'].astype(float)
+
+def gameTime(col):
+    if col >= 0.8:
+        return 'Titular'
+
+    elif (col >= 0.5) & (col < 0.8):
+        return 'Suplente'
+
+    elif col < 0.5:
+        return 'Reserva'
+
+df['Status'] = df.apply(lambda x: gameTime(x['Status']), axis=1)
+"""
 
 ################################################################################################################################################
 
@@ -7463,7 +7483,6 @@ def PizzaChart(df, cols, playerName, league):
     add_image('C:/Users/menes/Documents/Data Hub/Images/SWL LOGO.png', fig, left=0.462, bottom=0.436, width=0.10, height=0.132)
 
 ################################################################################################################################################
-
 
 def role_Chart(df, playerName, pos, league):
     # parameter and value list
@@ -10033,88 +10052,88 @@ def scoutReport(playerName, team, setPieces, isDefensive, tier):
 #--------------------------------------------------- ROLES --------------------------------------------------------------------------------
 ################################################################################################################################################
 
-def szcore_df(df):
+def szcore_df(data):
 
     cols_cat = []
-    for col in df.columns:
-        if col not in df.select_dtypes([np.number]).columns:
+    for col in data.columns:
+        if col not in data.select_dtypes([np.number]).columns:
             cols_cat.append(col)
 
     for i in ['Age', 'Market value', 'Matches played', 'Minutes played', 'Height', 'Weight']:
         cols_cat.append(i)
 
     cols_num = [] 
-    for col in df.select_dtypes([np.number]).columns:
+    for col in data.select_dtypes([np.number]).columns:
             cols_num.append(col)
     
     for i in ['Age', 'Market value', 'Matches played', 'Minutes played', 'Height', 'Weight']:
         cols_num.remove(i)
         
-    data = df[cols_cat]
+    data2 = data[cols_cat]
 
-    test = stats.zscore(df[cols_num])
+    test = stats.zscore(data[cols_num])
 
-    data = pd.concat([data, test], axis=1)
+    data3 = pd.concat([data2, test], axis=1)
 
-    if 'Team within selected timeframe' not in data.columns:
+    if 'Team within selected timeframe' not in data3.columns:
         pass
     else:
-        data.drop(['Team within selected timeframe', 'On loan'], axis=1, inplace=True)
+        data3.drop(['Team within selected timeframe', 'On loan'], axis=1, inplace=True)
+
+    return data3
+
+
+def bestRoleCB(data):
+    
+    data['Role'] = data[['Stopper', 'Aerial CB', 'Ball Playing CB', 'Ball Carrying CB']].T.apply(lambda x: x.nlargest(1).idxmin())
+
+    data['Role2'] = data[['Stopper', 'Aerial CB', 'Ball Playing CB', 'Ball Carrying CB']].T.apply(lambda x: x.nlargest(2).idxmin())
 
     return data
 
+################################################################################################################################################
 
-def bestRoleCB(df):
+def bestRoleFB(data):
     
-    df['Role'] = df[['Stopper', 'Aerial CB', 'Ball Playing CB', 'Ball Carrying CB']].T.apply(lambda x: x.nlargest(1).idxmin())
+    data['Role'] = data[['Inverted Wing Back', 'Wing Back', 'Attacking FB', 'Defensive FB', 'Full Back CB']].T.apply(lambda x: x.nlargest(1).idxmin())
 
-    df['Role2'] = df[['Stopper', 'Aerial CB', 'Ball Playing CB', 'Ball Carrying CB']].T.apply(lambda x: x.nlargest(2).idxmin())
+    data['Role2'] = data[['Inverted Wing Back', 'Wing Back', 'Attacking FB', 'Defensive FB', 'Full Back CB']].T.apply(lambda x: x.nlargest(2).idxmin())
 
-    return df
+    return data
 
 ################################################################################################################################################
 
-def bestRoleFB(df):
+def bestRoleMidfield(data):
     
-    df['Role'] = df[['Inverted Wing Back', 'Wing Back', 'Attacking FB', 'Defensive FB', 'Full Back CB']].T.apply(lambda x: x.nlargest(1).idxmin())
+    data['Role'] = data[['Ball Winner', 'Deep Lying Playmaker', 'Box-to-box', 'Attacking Playmaker', 'Media Punta llegador']].T.apply(lambda x: x.nlargest(1).idxmin())
 
-    df['Role2'] = df[['Inverted Wing Back', 'Wing Back', 'Attacking FB', 'Defensive FB', 'Full Back CB']].T.apply(lambda x: x.nlargest(2).idxmin())
+    data['Role2'] = data[['Ball Winner', 'Deep Lying Playmaker', 'Box-to-box', 'Attacking Playmaker', 'Media Punta llegador']].T.apply(lambda x: x.nlargest(2).idxmin())
 
-    return df
+    return data
 
 ################################################################################################################################################
 
-def bestRoleMidfield(df):
+def bestRoleExtremo(data):
     
-    df['Role'] = df[['Ball Winner', 'Deep Lying Playmaker', 'Box-to-box', 'Attacking Playmaker', 'Media Punta llegador']].T.apply(lambda x: x.nlargest(1).idxmin())
+    data['Role'] = data[['Banda', 'Por dentro', 'Falso', 'Defensivo']].T.apply(lambda x: x.nlargest(1).idxmin())
 
-    df['Role2'] = df[['Ball Winner', 'Deep Lying Playmaker', 'Box-to-box', 'Attacking Playmaker', 'Media Punta llegador']].T.apply(lambda x: x.nlargest(2).idxmin())
+    data['Role2'] = data[['Banda', 'Por dentro', 'Falso', 'Defensivo']].T.apply(lambda x: x.nlargest(2).idxmin())
 
-    return df
+    return data
 
 ################################################################################################################################################
 
-def bestRoleExtremo(df):
+def bestRoleForward(data):
     
-    df['Role'] = df[['Banda', 'Por dentro', 'Falso', 'Defensivo']].T.apply(lambda x: x.nlargest(1).idxmin())
+    data['Role'] = data[['Box Forward', 'Advanced Forward', 'Target Man', 'False 9']].T.apply(lambda x: x.nlargest(1).idxmin())
 
-    df['Role2'] = df[['Banda', 'Por dentro', 'Falso', 'Defensivo']].T.apply(lambda x: x.nlargest(2).idxmin())
+    data['Role2'] = data[['Box Forward', 'Advanced Forward', 'Target Man', 'False 9']].T.apply(lambda x: x.nlargest(2).idxmin())
 
-    return df
+    return data
 
 ################################################################################################################################################
 
-def bestRoleForward(df):
-    
-    df['Role'] = df[['Box Forward', 'Advanced Forward', 'Target Man', 'False 9']].T.apply(lambda x: x.nlargest(1).idxmin())
-
-    df['Role2'] = df[['Box Forward', 'Advanced Forward', 'Target Man', 'False 9']].T.apply(lambda x: x.nlargest(2).idxmin())
-
-    return df
-
-################################################################################################################################################
-
-def rangoCB(df, league, Role):
+def rangoCB(league, Role):
     
     dfCB = df.loc[df.Position.str.contains('CB')].reset_index(drop=True)
 
@@ -10136,7 +10155,7 @@ def rangoCB(df, league, Role):
 
 ################################################################################################################################################
 
-def rangoFB(df, league, Role):
+def rangoFB(league, Role):
     
     dfFB = df.loc[(df.Position.str.contains('RB')) | (df.Position.str.contains('LB'))| (df.Position.str.contains('LWB'))| (df.Position.str.contains('RWB'))].reset_index(drop=True)
 
@@ -10158,7 +10177,7 @@ def rangoFB(df, league, Role):
 
 ################################################################################################################################################
 
-def rangoMF(df, league, Role):
+def rangoMF(league, Role):
     
     dfMF = df.loc[(df.Position.str.contains('RCMF')) | (df.Position.str.contains('LCMF')) | (df.Position.str.contains('LDMF')) | (df.Position.str.contains('RDMF')) |
                     (df.Position.str.contains('AMF')) | (df.Position.str.contains('DMF'))].reset_index(drop=True)
@@ -10181,7 +10200,7 @@ def rangoMF(df, league, Role):
 
 ################################################################################################################################################
 
-def rangoExtremo(df, league, Role):
+def rangoExtremo(league, Role):
     
     dfExtremo = df.loc[(df.Position.str.contains('LW')) | (df.Position.str.contains('RW')) | (df.Position.str.contains('LAMF')) |
                        (df.Position.str.contains('RAMF')) | (df.Position.str.contains('LWF')) | (df.Position.str.contains('RWF'))].reset_index(drop=True)
@@ -10202,7 +10221,7 @@ def rangoExtremo(df, league, Role):
 
 ################################################################################################################################################
 
-def rangoFW(df, league, Role):
+def rangoFW(league, role):
     
     dfFW = df.loc[(df.Position.str.contains('CF')) & (df['Season'] == '2021/22')].reset_index(drop=True)
 
@@ -10214,17 +10233,15 @@ def rangoFW(df, league, Role):
 
     dfRole = dfFW.loc[(dfFW['Comp'] == league) & (dfFW['Minutes played'] >= 1000)]
 
-    role = Role
+    dataRole = dfRole.loc[((dfRole['Role'] == role) | (dfRole['Role2'] == role)) & ((dfRole[role] >= dfRole[role].quantile(.25)) | (dfRole[role] <= dfRole[role].quantile(.75)))].sort_values(role, ascending=False)
 
-    dfRole = dfRole.loc[((dfRole['Role'] == role) | (dfRole['Role2'] == role)) & ((dfRole[role] >= dfRole[role].quantile(.25)) | (dfRole[role] <= dfRole[role].quantile(.75)))].sort_values(role, ascending=False)
-
-    return dfRole[['Player', 'Team', 'Comp', 'Role', 'Role2']]
+    return dataRole[['Player', 'Team', 'Comp', 'Role', 'Role2']]
 
 ################################################################################################################################################
 
-def dataFrameCenterBack(df, contract, tier, role, league, tier2=None):
+def dataFrameCenterBack(contract, tier, role, league, tier2=None):
 
-    rango = rangoCB(df, league, role)
+    rango = rangoCB(league, role)
 
     rango = rango.tail(1)
 
@@ -10286,9 +10303,9 @@ def dataFrameCenterBack(df, contract, tier, role, league, tier2=None):
 
 ################################################################################################################################################
 
-def dataFrameFullBack(df, contract, tier, role, league, tier2=None):
+def dataFrameFullBack(contract, tier, role, league, tier2=None):
 
-    rango = rangoFB(df, league, role)
+    rango = rangoFB(league, role)
 
     rango = rango.tail(1)
 
@@ -10351,9 +10368,9 @@ def dataFrameFullBack(df, contract, tier, role, league, tier2=None):
 
 ################################################################################################################################################
 
-def dataFrameMidfield(df, contract, tier, role, league, tier2=None):
+def dataFrameMidfield(contract, tier, role, league, tier2=None):
 
-    rango = rangoMF(df, league, role)
+    rango = rangoMF(league, role)
 
     rango = rango.tail(1)
 
@@ -10416,9 +10433,9 @@ def dataFrameMidfield(df, contract, tier, role, league, tier2=None):
 
 ################################################################################################################################################
 
-def dataFrameExtremo(df, contract, tier, role, league, tier2=None):
+def dataFrameExtremo(contract, tier, role, league, tier2=None):
 
-    rango = rangoExtremo(df, league, role)
+    rango = rangoExtremo(league, role)
 
     rango = rango.tail(1)
 
@@ -10481,9 +10498,11 @@ def dataFrameExtremo(df, contract, tier, role, league, tier2=None):
 
 ################################################################################################################################################
 
-def dataFrameForward(df, contract, tier, role, league, tier2=None):
+def dataFrameForward(contract, tier, Role, League, tier2=None):
 
-    rango = rangoFW(df, league, role)
+    playerAbility(df)
+
+    rango = rangoFW(League, Role)
 
     rango = rango.tail(1)
 
@@ -10491,19 +10510,19 @@ def dataFrameForward(df, contract, tier, role, league, tier2=None):
     playeRange = playeRange.tolist()
     playeRange = playeRange[0]
 
-    df = df.loc[(df.Position.str.contains('CF')) & (df['Season'] == '2021/22')]
+    dfFW = df.loc[(df.Position.str.contains('CF')) & (df['Season'] == '2021/22')]
 
-    playerAbility(df)
+    #playerAbility(dfFW)
 
-    RoleForward(df)
+    RoleForward(dfFW)
 
-    szcore_df(df)
+    szcore_df(dfFW)
 
-    bestRoleForward(df)
+    bestRoleForward(dfFW)
+    
+    dfPlayer = dfFW.loc[dfFW.Player == playeRange].reset_index(drop=True)
 
-    dfPlayer = df.loc[df.Player == playeRange].reset_index(drop=True)
-
-    rangoValue = dfPlayer[role].values
+    rangoValue = dfPlayer[Role].values
     rangoValue = rangoValue.tolist()
     rangoValue = rangoValue[0]
     rangoValue
@@ -10524,42 +10543,47 @@ def dataFrameForward(df, contract, tier, role, league, tier2=None):
 
        elif tier == 4:
           return role * 0.65
-
-    df[role] = df.apply(lambda x: tierValue(x[role], x['Tier']), axis=1)
+  
+    dfFW[Role] = dfFW.apply(lambda x: tierValue(x[Role], x['Tier']), axis=1)
 
     if tier != 'All Data':
         if contract == 'Yes':
-            df = df.loc[ ((df.Tier == tier) | (df.Tier == tier2)) & (df['Minutes played'] >= 1500) & (df['Contract expires'] == str(date.today().year) + '-06' + '-30') & (df[role] >= rangoValue) & ((df['Role'] == role) | (df['Role2'] == role))][['Player', 'Team', 'Position', 'Status', 'Age', 'Comp', 'Contract expires', 'Market value', 'Role', 'Role2', role, 'Tier']].sort_values(role, ascending=False)
+            dfFW = dfFW.loc[ ((dfFW.Tier == tier) | (dfFW.Tier == tier2)) & (dfFW['Minutes played'] >= 1500) & (dfFW['Contract expires'] == str(date.today().year) + '-06' + '-30') & (dfFW[Role] >= rangoValue) & ((dfFW['Role'] == Role) | (dfFW['Role2'] == Role))][['Player', 'Team', 'Position', 'Status', 'Age', 'Comp', 'Contract expires', 'Market value', 'Role', 'Role2', Role, 'Tier']].sort_values(Role, ascending=False)
         
         elif contract == 'No':
-            df = df.loc[((df.Tier == tier) | (df.Tier == tier2)) & (df['Minutes played'] >= 1500) & (df[role] >= rangoValue) & ((df['Role'] == role) | (df['Role2'] == role))][['Player', 'Team', 'Passport country', 'Position', 'Status', 'Age', 'Comp', 'Contract expires', 'Market value', 'Role', 'Role2', role, 'Tier']].sort_values(role, ascending=False)
+            dfFW = dfFW.loc[((dfFW.Tier == tier) | (dfFW.Tier == tier2)) & (dfFW['Minutes played'] >= 1500) & (dfFW[Role] >= rangoValue) & ((dfFW['Role'] == Role) | (dfFW['Role2'] == Role))][['Player', 'Team', 'Passport country', 'Position', 'Status', 'Age', 'Comp', 'Contract expires', 'Market value', 'Role', 'Role2', Role, 'Tier']].sort_values(Role, ascending=False)
             
     elif tier == 'All Data':
         if contract == 'Yes':
-            df = df.loc[(df['Contract expires'] == str(date.today().year) + '-06' + '-30') & (df['Minutes played'] >= 1500) & (df[role] >= rangoValue) & ((df['Role'] == role) | (df['Role2'] == role))][['Player', 'Team', 'Position', 'Status', 'Age', 'Comp', 'Contract expires', 'Market value', 'Role', 'Role2', role, 'Tier']].sort_values(role, ascending=False)
+            dfFW = dfFW.loc[(dfFW['Contract expires'] == str(date.today().year) + '-06' + '-30') & (dfFW['Minutes played'] >= 1500) & (dfFW[Role] >= rangoValue) & ((dfFW['Role'] == Role) | (dfFW['Role2'] == Role))][['Player', 'Team', 'Position', 'Status', 'Age', 'Comp', 'Contract expires', 'Market value', 'Role', 'Role2', Role, 'Tier']].sort_values(Role, ascending=False)
         
         elif contract == 'No':
-            df = df.loc[(df[role] >= rangoValue) & (df['Minutes played'] >= 1500) & ((df['Role'] == role) | (df['Role2'] == role))][['Player', 'Team', 'Position', 'Status', 'Age', 'Comp', 'Contract expires', 'Market value', 'Role', 'Role2', role, 'Tier']].sort_values(role, ascending=False)
+            dfFW = dfFW.loc[(dfFW[Role] >= rangoValue) & (dfFW['Minutes played'] >= 1500) & ((dfFW['Role'] == Role) | (dfFW['Role2'] == Role))][['Player', 'Team', 'Position', 'Status', 'Age', 'Comp', 'Contract expires', 'Market value', 'Role', 'Role2', Role, 'Tier']].sort_values(Role, ascending=False)
             
-    return df
+    return dfFW
 
 ################################################################################################################################################
 #------------------------------------------------ TABLES ----------------------------------------------------------------------
 ################################################################################################################################################
 
-def pathColumn(df):
+def pathColumn(tableData):
         flag = []
-        for idx, row in df.iterrows():
-                if ', ' in df.loc[idx, 'Passport country']:
-                        df.loc[idx, 'Passport country'] = df.loc[idx, 'Passport country'].split(', ')[0]
-                        flag.append('C:/Users/menes/Documents/Data Hub/Country/' + df.loc[idx, 'Passport country'] + '.png')
+        for idx, row in tableData.iterrows():
+                if ', ' in tableData.loc[idx, 'Passport country']:
+                        tableData.loc[idx, 'Passport country'] = tableData.loc[idx, 'Passport country'].split(', ')[0]
+                        flag.append('C:/Users/menes/Documents/Data Hub/Country/' + tableData.loc[idx, 'Passport country'] + '.png')
                 else:
-                        flag.append('C:/Users/menes/Documents/Data Hub/Country/' + df.loc[idx, 'Passport country'] + '.png')
+                        flag.append('C:/Users/menes/Documents/Data Hub/Country/' + tableData.loc[idx, 'Passport country'] + '.png')
+        
+        return flag
 
 ################################################################################################################################################
 
-def table(boxForward):
-    boxForward = boxForward[['Player', 'Flag', 'Team', 'Position', 'Age', 'Comp', 'Contract expires', 'Market value', 'Role', 'Role2', 'Box Forward']].reset_index(drop=True)
+def table(boxForward, role):
+    
+    boxForward['Flag'] = pathColumn(boxForward)
+    
+    boxForward = boxForward[['Player', 'Flag', 'Team', 'Position', 'Age', 'Comp', 'Contract expires', 'Market value', 'Role', 'Role2', role]].reset_index(drop=True)
 
     pearl_earring_cmap = LinearSegmentedColormap.from_list("Pearl Earring - 10 colors",
                                                             ['#E8E8E8', '#3d0000', '#FF0000'], N=10)
@@ -10628,10 +10652,10 @@ def table(boxForward):
                 border='right'
             ),
             ColumnDefinition(
-                name="Box Forward",
+                name=role,
                 textprops={"ha": "center"},
                 width=0.75,
-                cmap=normed_cmap(boxForward["Box Forward"], cmap=pearl_earring_cmap, num_stds=2.5),
+                cmap=normed_cmap(boxForward[role], cmap=pearl_earring_cmap, num_stds=2.5),
                 group="Role data",
             )
         ]
@@ -10652,7 +10676,7 @@ def table(boxForward):
         row_divider_kw={"linewidth": 1, "linestyle": (0, (1, 5))},
         col_label_divider_kw={"linewidth": 3, "linestyle": "-"},
         column_border_kw={"linewidth": 3, "linestyle": "-"},
-    ).autoset_fontcolors(colnames=["Box Forward"])
+    ).autoset_fontcolors(colnames=[role])
 
     #table.col_label_row.set_facecolor("#E8E8E8")
 
@@ -10664,6 +10688,10 @@ def table(boxForward):
     fig_text(s = 'Only players at the big 5 league | Season 2021-22',
                     x = 0.5, y = 0.87, fontweight='bold',
                     ha='center',fontsize=16, color='#181818', alpha=0.8);
+
+    plt.savefig('assets/table' + role + '.png', dpi=300)
+
+    return app.get_asset_url('table' + role + '.png')
 
 ################################################################################################################################################
 
