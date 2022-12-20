@@ -7623,6 +7623,335 @@ def role_Chart(df, playerName, pos, league):
                 fontsize=12)
 
 ################################################################################################################################################
+
+def radar_chartPhysical(physical, player, cols):
+
+  color = ['#890e3e', '#f9f1e7']
+
+  from soccerplots.radar_chart import Radar
+
+  #Atribuição do jogador a colocar no gráfico
+  players = physical.loc[(physical['player'] == player)].reset_index(drop=True)
+
+    #####################################################################################################################
+    #####################################################################################################################
+
+  #Valores que pretendemos visualizar no radar chart, acedemos ao index 0 para obtermos os valores dentro da lista correta
+  values = players[cols].values[0]
+  #Obtenção do alcance minimo e máximo dos valores
+
+  ranges = [(physical[col].min(), physical[col].max()) for col in cols]
+  
+  #Atribuição dos valores aos titulos e respetivos tamanhos e cores
+  title = dict(
+  title_name = player,
+  title_color = color[0],
+  title_fontsize = 40,
+  subtitle_fontsize = 30,
+  subtitle_name='Physical data',
+  subtitle_color='#181818',
+  )
+
+    #team_player = df[col_name_team].to_list()
+
+    #dict_team ={'Dortmund':['#ffe011', '#000000'],
+              #'Nice':['#cc0000', '#000000'],}
+
+    #color = dict_team.get(team_player[0])
+
+    ## endnote 
+  endnote = "Visualization made by: Pedro Meneses(@menesesp20)"
+
+  #Criação do radar chart
+  fig, ax = plt.subplots(figsize=(18,15))
+  radar = Radar(background_color="#E8E8E8", patch_color="#181818", range_color="#181818", label_color="#181818", label_fontsize=20, range_fontsize=12)
+  fig, ax = radar.plot_radar(ranges=ranges, 
+                               params=cols, 
+                               values=values, 
+                               radar_color=color,
+                               figax=(fig, ax),
+                               image_coord=[0.464, 0.81, 0.1, 0.075],
+                               title=title,
+                               endnote=endnote)
+
+  # add image
+  add_image('Images/WorldCup_Qatar.png', fig, left=0.68, bottom=0.83, width=0.1, height=0.12)
+
+  fig.set_facecolor('#E8E8E8')
+
+  plt.savefig('assets/radarPhysical' + player + '.png', dpi=300)
+
+  return app.get_asset_url('radarPhysical' + player + '.png')
+
+################################################################################################################################################
+
+def PizzaChartPhysical(physical, playerName, cols):
+    # parameter list
+    params = cols
+
+    player = physical.loc[(physical['player'] == playerName)][cols].reset_index()
+    player = list(player.loc[0])
+    player = player[1:]
+
+    values = []
+    for x in range(len(params)):   
+        values.append(math.floor(stats.percentileofscore(physical[params[x]], player[x])))
+
+    for n,i in enumerate(values):
+        if i == 100:
+            values[n] = 99
+
+    # color for the slices and text
+    slice_colors = ["#2d92df"] * 2 + ["#fb8c04"] * 6 + ["#eb04e3"] * 2
+    text_colors = ["#F2F2F2"] * 10
+
+    # instantiate PyPizza class
+    baker = PyPizza(
+        params=params,                  # list of parameters
+        background_color="#E8E8E8",     # background color
+        straight_line_color="#000000",  # color for straight lines
+        straight_line_lw=1,             # linewidth for straight lines
+        last_circle_color="#000000",    # color for last line
+        last_circle_lw=1,               # linewidth of last circle
+        other_circle_lw=0,              # linewidth for other circles
+        inner_circle_size=20            # size of inner circle
+    )
+
+    # plot pizza
+    fig, ax = baker.make_pizza(
+        values,                          # list of values
+        figsize=(15, 10),                # adjust the figsize according to your need
+        color_blank_space="same",        # use the same color to fill blank space
+        slice_colors=slice_colors,       # color for individual slices
+        value_colors=text_colors,        # color for the value-text
+        value_bck_colors=slice_colors,   # color for the blank spaces
+        blank_alpha=0.4,                 # alpha for blank-space colors
+        kwargs_slices=dict(
+            edgecolor="#000000", zorder=2, linewidth=1
+        ),                               # values to be used when plotting slices
+        kwargs_params=dict(
+            color="#181818", fontsize=10,
+            va="center"
+        ),                               # values to be used when adding parameter labels
+        kwargs_values=dict(
+            color="#181818", fontsize=11,
+            zorder=3,
+            bbox=dict(
+                edgecolor="#000000", facecolor="cornflowerblue",
+                boxstyle="round,pad=0.2", lw=1
+            )
+        )                                # values to be used when adding parameter-values labels
+    )
+
+    fig_text(s =  'Physical Template',
+            x = 0.253, y = 0.035,
+            color='#181818',
+            fontweight='bold', ha='center',
+            fontsize=5)
+
+    ###########################################################################################################
+
+    fig_text(s =  playerName,
+             x = 0.5, y = 1.12,
+             color='#181818',
+             fontweight='bold', ha='center',
+             fontsize=14);
+
+    # add credits
+    CREDIT_1 = "data: FIFA"
+    CREDIT_2 = "made by: @menesesp20"
+    CREDIT_3 = "inspired by: @Worville, @FootballSlices, @somazerofc & @Soumyaj15209314"
+
+
+    # CREDITS
+    fig_text(s =  f"{CREDIT_1}\n{CREDIT_2}\n{CREDIT_3}",
+             x = 0.35, y = 0.02,
+             color='#181818',
+             fontweight='bold', ha='center',
+             fontsize=5);
+
+    # Attacking
+    fig_text(s =  'Speed',
+             x = 0.41, y = 0.988,
+             color='#181818',
+             fontweight='bold', ha='center',
+             fontsize=8);
+
+    # Possession
+    fig_text(s =  'Distance',
+             x = 0.535, y = 0.988,
+             color='#181818',
+             fontweight='bold', ha='center',
+             fontsize=8);
+
+    # Defending
+    fig_text(s =  'Sprint',
+             x = 0.665, y = 0.988,
+             color='#181818',
+             fontweight='bold', ha='center',
+             fontsize=8);
+
+    # add rectangles
+    fig.patches.extend([
+        plt.Rectangle(
+            (0.34, 0.97), 0.025, 0.021, fill=True, color="#2d92df",
+            transform=fig.transFigure, figure=fig
+        ),
+        plt.Rectangle(
+            (0.47, 0.97), 0.025, 0.021, fill=True, color="#fb8c04",
+            transform=fig.transFigure, figure=fig
+        ),
+        plt.Rectangle(
+            (0.60, 0.97), 0.025, 0.021, fill=True, color="#eb04e3",
+            transform=fig.transFigure, figure=fig
+        ),
+    ])
+
+    # add image
+    add_image('Images/WorldCup_Qatar.png', fig, left=0.475, bottom=0.452, width=0.075, height=0.105)
+
+    plt.savefig('assets/pizzaPhysical' + playerName + '.png', dpi=300)
+
+    return app.get_asset_url('pizzaPhysical' + playerName + '.png')
+
+################################################################################################################################################
+
+def pizza_ComparePhysical(physical, playerName, playerName2, cols):
+    
+    params = cols
+    
+    color = ['#890e3e', '#f9f1e7']
+    
+    player = physical.loc[physical['player'] == playerName][cols].reset_index()
+    player = list(player.loc[0])
+    player = player[1:]
+
+    values = []
+    for x in range(len(params)):   
+        values.append(math.floor(stats.percentileofscore(physical[params[x]], player[x])))
+
+    for n,i in enumerate(values):
+        if i == 100:
+            values[n] = 99
+
+    ###########################################################################################
+
+    player2 = physical.loc[physical['player'] == playerName2][cols].reset_index()
+    player2 = list(player2.loc[0])
+    player2 = player2[1:]
+
+    values_2 = []
+    for x in range(len(params)):   
+        values_2.append(math.floor(stats.percentileofscore(physical[params[x]], player2[x])))
+
+    for n,i in enumerate(values_2):
+        if i == 100:
+            values_2[n] = 99
+
+    # instantiate PyPizza class
+    baker = PyPizza(
+        params=params,                  # list of parameters
+        background_color="#E8E8E8",     # background color
+        straight_line_color="#000000",  # color for straight lines
+        straight_line_lw=1,             # linewidth for straight lines
+        last_circle_lw=1,               # linewidth of last circle
+        last_circle_color="#000000",    # color of last circle
+        other_circle_ls="-.",           # linestyle for other circles
+        other_circle_lw=1,              # linewidth for other circles
+        inner_circle_size=20            
+    )
+
+    # plot pizza
+    fig, ax = baker.make_pizza(
+        values,                     # list of values
+        compare_values=values_2,    # comparison values
+        figsize=(15, 10),             # adjust figsize according to your need
+        kwargs_slices=dict(
+            facecolor=color[0], edgecolor="#000000",
+            zorder=2, linewidth=1
+        ),                          # values to be used when plotting slices
+        kwargs_compare=dict(
+            facecolor=color[1], edgecolor="#000000",
+            zorder=2, linewidth=1,
+        ),
+        kwargs_params=dict(
+            color="#181818",
+            fontsize=12,
+            va="center"
+        ),                          # values to be used when adding parameter
+        kwargs_values=dict(
+            color="#181818",
+            fontsize=12,
+            zorder=3,
+            bbox=dict(
+                edgecolor="#000000", facecolor=color[0],
+                boxstyle="round,pad=0.2", lw=1
+            )
+        ),                          # values to be used when adding parameter-values labels
+        kwargs_compare_values=dict(
+            color="#181818",
+            fontsize=12,
+            zorder=3,
+            bbox=dict(edgecolor="#000000", facecolor=color[1], boxstyle="round,pad=0.2", lw=1)
+        ),                          # values to be used when adding parameter-values labels
+    )
+
+
+    fig_text(s = 'Physical Template | World Cup Catar 2022',
+            x = 0.515, y = 1.12,
+            color='#181818',
+            fontweight='bold', ha='center',
+            fontsize=14)
+
+    ###########################################################################################################
+
+    # add credits
+    CREDIT_1 = "data: WyScout"
+    CREDIT_2 = "made by: @menesesp20"
+    CREDIT_3 = "inspired by: @Worville, @FootballSlices, @somazerofc & @Soumyaj15209314"
+
+
+    # CREDITS
+    fig_text(s =  f"{CREDIT_1}\n{CREDIT_2}\n{CREDIT_3}",
+             x = 0.35, y = 0.02,
+             color='#181818',
+             fontweight='bold', ha='center',
+             fontsize=5);
+
+    # Attacking
+    fig_text(s =  playerName,
+             x = 0.47, y = 0.988,
+             color='#181818',
+             fontweight='bold', ha='center',
+             fontsize=12);
+
+    # Possession
+    fig_text(s =  playerName2,
+             x = 0.605, y = 0.988,
+             color='#181818',
+             fontweight='bold', ha='center',
+             fontsize=12);
+
+    # add rectangles
+    fig.patches.extend([
+        plt.Rectangle(
+            (0.40, 0.97), 0.025, 0.021, fill=True, color=color[0],
+            transform=fig.transFigure, figure=fig
+        ),
+        plt.Rectangle(
+            (0.52, 0.97), 0.025, 0.021, fill=True, color=color[1],
+            transform=fig.transFigure, figure=fig
+        )
+        ])
+
+    # add image
+    add_image('Images/WorldCup_Qatar.png', fig, left=0.475, bottom=0.452, width=0.075, height=0.105)
+
+    plt.savefig('assets/pizzaComparePhysical' + playerName + '.png', dpi=300)
+
+    return app.get_asset_url('pizzaComparePhysical' + playerName + '.png')
+
+################################################################################################################################################
 #--------------------------------------------------- DEFENSIVE --------------------------------------------------------------------------------
 ################################################################################################################################################
 

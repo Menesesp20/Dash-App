@@ -33,6 +33,7 @@ layout = dbc.Card(
             dbc.NavLink("Players", href="/", active="exact"),
             dbc.NavLink("Teams", href="/page2", active="exact"),
             dbc.NavLink("Scouting", href="/page3", active="exact"),
+            dbc.NavLink("Physical", href="/page4", active="exact"),
             ])
         
         ],style=style_card)

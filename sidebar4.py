@@ -8,9 +8,7 @@ style_card = style={"box-shadow": "2px 2px 10px 0px rgba(10, 9, 7, 0.10)",
                     "padding": "10px",
                     "height": "95vh"}
 
-competition = ['Mundial', 'Premier League', 'La Liga', 'Ligue 1', 'Bundesliga', 'Serie A']
-
-graphs = ['Chances Created', 'xT Map', 'Passing Network', 'Field Tilt', 'High TurnOvers', 'xT Flow', 'BuildUp', 'GoalKick', 'Corners', 'Possession Gained']
+graphs = ['Radar', 'Percentil', 'Compare']
 
 # =========  Layout  =========== #
 layout = dbc.Card(
@@ -18,11 +16,6 @@ layout = dbc.Card(
         html.H2("DATA HUB", style={'font-size': '30px', 'color': '#e8e8e8'}),
         html.Hr(), 
         html.P("Data driven approach", style={'color': '#e8e8e8'}, className="lead"),
-        html.H5("Competitions:", style={"margin-top": "20px", 'color': '#e8e8e8'}),
-        dcc.RadioItems(competition,
-                       "Mundial", id="rd-competition",
-                        inputStyle={"margin-right": "30px", "margin-left": "5px", 'color': '#e8e8e8'}),
-        
         html.H5("Visualizations:", style={"margin-top": "20px", 'color': '#e8e8e8'}),
         dcc.RadioItems(graphs,
                        graphs[0], id="rd-viz",

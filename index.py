@@ -5,10 +5,11 @@ import matplotlib.pyplot as plt
 
 from app import *
 import Functions.Game as fc
-from pages import page1, page2, page3
+from pages import page1, page2, page3, page4
 import sidebar1
 import sidebar2
 import sidebar3
+import sidebar4
 
 from matplotlib import font_manager
 
@@ -90,6 +91,9 @@ def render_sidebar_content(pathname):
     if pathname == "/page3":
         return sidebar3.layout
 
+    if pathname == "/page4":
+        return sidebar4.layout
+
 @app.callback(
         Output("page-content", "children"),
         [Input("url", "pathname")])
@@ -103,6 +107,9 @@ def render_page_content(pathname):
 
     if pathname == "/page3":
         return page3.layout
+
+    if pathname == "/page4":
+        return page4.layout
     
 # RUN APP
 if __name__ == '__main__':
