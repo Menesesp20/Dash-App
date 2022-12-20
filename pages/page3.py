@@ -146,5 +146,5 @@ def visualization(Player, rdViz, rdTiers, league, pos, role):
 
         elif rdViz == 'Styles of Play':
                 dfTable = fc.dataFrameForward('No', rdTiers, role, league)
-                return fc.table(dfTable, role)        
+                return fc.table(dfTable, role)
         
