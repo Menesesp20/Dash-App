@@ -10,7 +10,7 @@ style_card = style={"box-shadow": "2px 2px 10px 0px rgba(10, 9, 7, 0.10)",
 
 tiers = [0, 1, 2, 3, 4]
 
-graphs = ['Scouting List', 'Styles of Play', 'Player Report', 'Player Stats']
+graphs = ['Scouting List', 'Styles of Play', 'Player Report', 'Player Stats', 'Player Radar']
 
 roles = ['Box Forward', 'False 9', 'Advanced Forward', 'Target Man']
 

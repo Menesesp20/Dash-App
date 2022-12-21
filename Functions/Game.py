@@ -5580,9 +5580,8 @@ def possessionGained(team, eventType):
 #--------------------------------------------------- SCOUTING --------------------------------------------------------------------------------
 ################################################################################################################################################
 
-"""
-df = pd.read_csv('WyScout.csv')
-"""
+
+wyscout = pd.read_csv('WyScout.csv')
 
 def playerAbility(df):
 
@@ -7674,6 +7673,10 @@ def radar_chartPhysical(physical, player, cols):
                                title=title,
                                endnote=endnote)
 
+  for col in cols:
+        if col == 'Aerial duels/90':
+                ax.invert_yaxis()
+
   # add image
   add_image('Images/WorldCup_Qatar.png', fig, left=0.68, bottom=0.83, width=0.1, height=0.12)
 
@@ -7682,6 +7685,86 @@ def radar_chartPhysical(physical, player, cols):
   plt.savefig('assets/radarPhysical' + player + '.png', dpi=300)
 
   return app.get_asset_url('radarPhysical' + player + '.png')
+
+################################################################################################################################################
+
+def radar_chart(player, cols):
+
+  color = ['#890e3e', '#f9f1e7']
+
+  from soccerplots.radar_chart import Radar
+
+  #Atribuição do jogador a colocar no gráfico
+  players = wyscout.loc[(wyscout['Player'] == player) & (wyscout.Season == '2021/22')].reset_index(drop=True)
+
+  club = players.Team.unique()
+  club = club.tolist()
+  club = club[0]
+
+  position = players['Position'].unique()
+  position = position.tolist()
+  position = position[0]
+  if ', ' in position:
+          position = position.split(', ')[0]
+
+    #####################################################################################################################
+    #####################################################################################################################
+
+  #Valores que pretendemos visualizar no radar chart, acedemos ao index 0 para obtermos os valores dentro da lista correta
+  values = players[cols].values[0]
+  #Obtenção do alcance minimo e máximo dos valores
+
+  rango = wyscout.loc[(wyscout.Position.str.contains(position)) | (wyscout.Player == player)].reset_index(drop=True)
+
+  ranges = [(rango[col].min(), rango[col].max()) for col in cols]
+  
+  #Atribuição dos valores aos titulos e respetivos tamanhos e cores
+  title = dict(
+  title_name = player,
+  title_color = color[0],
+  title_fontsize = 40,
+  subtitle_fontsize = 30,
+  subtitle_name=club,
+  subtitle_color='#181818',
+  )
+
+    #team_player = df[col_name_team].to_list()
+
+    #dict_team ={'Dortmund':['#ffe011', '#000000'],
+              #'Nice':['#cc0000', '#000000'],}
+
+    #color = dict_team.get(team_player[0])
+
+    ## endnote 
+  endnote = "Visualization made by: Pedro Meneses(@menesesp20)"
+
+  #Get the index of the 'Aerial Duels' axis in the cols list
+  idx = cols.index('Aerial duels/90')
+
+  # INVERT THE AXIS FOR ONE COLUMN
+  if cols[idx] == 'Aerial duels/90':
+          ranges[idx] = (ranges[idx][1], ranges[idx][0])
+
+
+  #Criação do radar chart
+  fig, ax = plt.subplots(figsize=(18,15))
+  radar = Radar(background_color="#E8E8E8", patch_color="#181818", range_color="#181818", label_color="#181818", label_fontsize=20, range_fontsize=12)
+  fig, ax = radar.plot_radar(ranges=ranges, 
+                               params=cols, 
+                               values=values, 
+                               radar_color=color,
+                               figax=(fig, ax),
+                               image_coord=[0.464, 0.81, 0.1, 0.075],
+                               title=title,
+                               endnote=endnote)          
+  # add image
+  add_image('Images/WorldCup_Qatar.png', fig, left=0.68, bottom=0.83, width=0.1, height=0.12)
+
+  fig.set_facecolor('#E8E8E8')
+
+  plt.savefig('assets/radarChart' + player + '.png', dpi=300)
+
+  return app.get_asset_url('radarChart' + player + '.png')
 
 ################################################################################################################################################
 

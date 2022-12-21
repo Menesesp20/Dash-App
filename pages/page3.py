@@ -48,9 +48,9 @@ leagues = df.Comp.unique()
 
 players = df.Player.unique()
 
-position = df.Position.unique()
+position = ['Center Back', 'Full Back', 'Midfield', 'Winger', 'Forward']
 
-events = ['Scouting List', 'Styles of Play', 'Player Report', 'Player Stats']
+events = ['Scouting List', 'Styles of Play', 'Player Report', 'Player Stats', 'Player Radar']
 
 layout = dbc.Row([
             dbc.Col([
@@ -80,7 +80,7 @@ layout = dbc.Row([
                                 dcc.Dropdown(
                                         id='dp-position',
                                         options=position,
-                                        value='CF')
+                                        value='Forward')
                                 ])],
                         md=2),
                 ], style={"margin-top": "10px"}),
@@ -147,4 +147,11 @@ def visualization(Player, rdViz, rdTiers, league, pos, role):
         elif rdViz == 'Styles of Play':
                 dfTable = fc.dataFrameForward('No', rdTiers, role, league)
                 return fc.table(dfTable, role)
+
+        elif rdViz == 'Player Radar':
+                if pos == 'Forward':
+                        cols = ['Non-penalty goals', 'xG', 'Shots on target, %', 'Goal conversion, %',
+                                'Dribbles/90', 'Deep completions/90', 'Passes penalty area %',
+                                'Aerial duels %', 'Aerial duels/90', 'Touches in box/90']
+                return fc.radar_chart(Player, cols)
         
