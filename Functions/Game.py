@@ -1307,26 +1307,23 @@ def passing_networkWhoScored(team, gameDay, afterSub=None):
         SubTimes = Subs["newsecond"]
         SubOne = SubTimes.min()
 
-        passes = network.loc[(network['typedisplayName'] == "Pass") &
-                             (network['outcomeTypedisplayName'] == 'Successful')].reset_index(drop=True)
-
-
         ###########################################################################################################################
         if afterSub == None:
-          passes = passes.loc[passes['newsecond'] < SubOne].reset_index(drop=True)
+          network = network.loc[network['newsecond'] < SubOne].reset_index(drop=True)
 
         elif afterSub != None:
-          passes = passes.loc[passes['newsecond'] > SubOne].reset_index(drop=True)
+          network = network.loc[network['newsecond'] > SubOne].reset_index(drop=True)
 
         ###########################################################################################################################
 
-        passes['passer'] = passes['name']
-        passes['recipient'] = passes['passer'].shift(-1)
-        passes['passer'] = passes['passer'].astype(str)
-        passes['recipient'] = passes['recipient'].astype(str)
+        network['passer'] = network['name']
+        network['recipient'] = network['passer'].shift(-1)
+        network['passer'] = network['passer'].astype(str)
+        network['recipient'] = network['recipient'].astype(str)
 
-        passes = passes.loc[passes['recipient'] != 'nan']
-
+        passes = network.loc[(network['typedisplayName'] == "Pass") &
+                             (network['outcomeTypedisplayName'] == 'Successful')].reset_index(drop=True)
+        
         ###########################################################################################################################
 
         avg = passes.groupby('passer').agg({'x':['mean'], 'y':['mean', 'count']})
@@ -1469,24 +1466,22 @@ def passing_networkWhoScored(team, gameDay, afterSub=None):
         SubTimes = Subs["newsecond"]
         SubOne = SubTimes.min()
 
-        passes = network.loc[(network['typedisplayName'] == "Pass") &
-                             (network['outcomeTypedisplayName'] == 'Successful')].reset_index(drop=True)
-
         ###########################################################################################################################
         if afterSub == None:
-          passes = passes.loc[passes['newsecond'] < SubOne].reset_index(drop=True)
+          network = network.loc[network['newsecond'] < SubOne].reset_index(drop=True)
 
         elif afterSub != None:
-          passes = passes.loc[passes['newsecond'] > SubOne].reset_index(drop=True)
+          network = network.loc[network['newsecond'] > SubOne].reset_index(drop=True)
 
         ###########################################################################################################################
 
-        passes['passer'] = passes['name']
-        passes['recipient'] = passes['passer'].shift(-1)
-        passes['passer'] = passes['passer'].astype(str)
-        passes['recipient'] = passes['recipient'].astype(str)
-        
-        passes = passes.loc[passes['recipient'] != 'nan']
+        network['passer'] = network['name']
+        network['recipient'] = network['passer'].shift(-1)
+        network['passer'] = network['passer'].astype(str)
+        network['recipient'] = network['recipient'].astype(str)
+
+        passes = network.loc[(network['typedisplayName'] == "Pass") &
+                             (network['outcomeTypedisplayName'] == 'Successful')].reset_index(drop=True)
 
         ###########################################################################################################################
 
@@ -1507,7 +1502,8 @@ def passing_networkWhoScored(team, gameDay, afterSub=None):
 
         avg.to_excel('avgWhoScoredmundial.xlsx')
 
-        avg = pd.read_excel('avgWhoScoredmundial.xlsx')
+        # opnepyxl - xlsx / xlrd - xls
+        avg = pd.read_excel('avgWhoScoredmundial.xlsx', engine='openpyxl')
 
         avg.drop(avg.index[0:2], inplace=True)
 

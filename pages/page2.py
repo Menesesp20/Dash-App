@@ -71,7 +71,7 @@ layout = dbc.Row([
                                 id='dp-teams',
                                 options=teams,
                                 value='Portugal')
-                            ])],
+                            ], className='d-grid d-md-flex')],
                             md=4),
 
                 dbc.Col([
@@ -81,7 +81,7 @@ layout = dbc.Row([
                                         id='dp-event',
                                         options=events,
                                         value='Pass')
-                                ])],
+                                ], className='d-grid d-md-flex')],
                         md=2),
 
                 dbc.Col([
@@ -91,19 +91,19 @@ layout = dbc.Row([
                                         id='dp-matchID',
                                         options=matchID,
                                         value='All Season')
-                                ])],
+                                ], className='d-grid d-md-flex')],
                         md=4),
 
-                ], style={"margin-top": "10px"}),
+                ], style={"margin-top": "10px", 'margin-right' : '0px'}),
                 
                 dbc.Row([
                     dbc.Col([
                         html.Div([
                             html.Img(id='visualizationTeams', src='', style={'width' : '80%'})
-                            ]),
+                            ], className='d-grid d-md-flex'),
                         ], width={"size": 12, "offset": 1}, style={'margin-top' : '50px'}, md=10)
-                    ])
-                ])
+                    ], style={'margin-right' : '0px'})
+                ], md=10)
             ])
 
 @app.callback(
