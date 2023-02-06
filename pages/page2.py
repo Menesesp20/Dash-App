@@ -145,3 +145,6 @@ def visualization(club, rdCompetition, rdViz, rdMatchID, dpEvent):
         
         elif (rdCompetition == 'Mundial') & (rdViz == 'Possession Gained'):
                 return fc.possessionGained(club, dpEvent)
+
+        elif (rdCompetition == 'Mundial') & (rdViz == 'Territory Dominance'):
+                return fc.territory_dominance(rdMatchID, club)

@@ -6,11 +6,11 @@ from app import app
 style_card = style={"box-shadow": "2px 2px 10px 0px rgba(10, 9, 7, 0.10)",
                     "margin": "10px",
                     "padding": "0px",
-                    "height": "95vh"}
+                    "height": "100vh"}
 
 competition = ['Mundial', 'Premier League', 'La Liga', 'Ligue 1', 'Bundesliga', 'Serie A']
 
-graphs = ['Chances Created', 'xT Map', 'Passing Network', 'Field Tilt', 'High TurnOvers', 'xT Flow', 'BuildUp', 'GoalKick', 'Corners', 'Possession Gained']
+graphs = ['Chances Created', 'xT Map', 'Passing Network', 'Field Tilt', 'Territory Dominance', 'High TurnOvers', 'xT Flow', 'BuildUp', 'GoalKick', 'Corners', 'Possession Gained']
 
 # =========  Layout  =========== #
 layout = dbc.Card(

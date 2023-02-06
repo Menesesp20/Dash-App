@@ -2859,8 +2859,6 @@ def defensiveLine(team, data):
 
 def xT_Flow(club, gameDay, data):
 
-    color = clubColors.get(club)
-
     df_XT = df.loc[(df['outcomeTypedisplayName'] == 'Successful') & (df['Match_ID'] == gameDay)].reset_index(drop=True)
 
     xTDF = xT(df_XT, data)
@@ -2878,7 +2876,7 @@ def xT_Flow(club, gameDay, data):
     #Drop rows with NaN values
     dfxT = dfxT.dropna(axis=0, subset=['xTH', 'xTA'])
 
-    fig, ax = plt.subplots(figsize=(20,12))
+    fig, ax = plt.subplots(figsize=(25, 18))
 
     #Set color background outside the graph
     fig.set_facecolor('#e8e8e8')
@@ -2894,19 +2892,16 @@ def xT_Flow(club, gameDay, data):
     awayName = away[0]
     color2 = clubColors.get(awayName)
 
-    dfxT['xTH'] = dfxT['home_xT'].rolling(window = 5, min_periods = 0).mean()
+    # Set the number of shots taken by the home team and the opposing team
+    home_shots_taken = [abs(i) if i <= 0 else i for i in list(dfxT['xTH'])]
+    away_shots_taken = [-abs(i) if i >= 0 else i for i in list(dfxT['xTA'])]
 
-    dfxT['xTA'] = dfxT['away_xT'].rolling(window = 5, min_periods = 0).mean()
+    # Set the position of the bars on the y-axis
+    x_pos = list(range(len(home_shots_taken)))
 
-    ax.fill_between(dfxT.Minutes, dfxT['xTH'], 0,
-                    where=(dfxT['xTH'] > dfxT['xTA']),
-                    interpolate=True, color=color[0], edgecolor='white', lw=3)
-
-    #ax.fill(df.Minutes, df['xTH'], "r", df.Minutes, df['xTA'], "b")
-
-    ax.fill_between(dfxT.Minutes, -abs(dfxT['xTA']), 0,
-                    where=(dfxT['xTA'] > dfxT['xTH']),
-                    interpolate=True, color=color2[0], edgecolor='white', lw=3)
+    # Create the bar graph
+    ax.bar(x_pos, home_shots_taken, width=0.7, color=color[0], label='Home Team xT')
+    ax.bar(x_pos, away_shots_taken, width=0.7, color=color2[0], label='Away Team xT')
 
     #Params for the text inside the <> this is a function to highlight text
     highlight_textprops =\
@@ -2919,7 +2914,7 @@ def xT_Flow(club, gameDay, data):
 
     fig_text(s = 'World Cup Catar 2022 | xT values based on Karun Singhs model | @menesesp20',
              x = 0.5, y = 0.92, fontweight='bold',
-             ha='center',fontsize=16, color='#181818', alpha=0.4);
+             ha='center', fontsize=16, color='#181818', alpha=0.4);
 
     # Half Time Line
     halfTime = 45
@@ -2930,7 +2925,7 @@ def xT_Flow(club, gameDay, data):
     ax.axhline(diferencialLine, color='#181818', ls='-', lw=1.5)
 
     fig_text(s = 'HALF TIME',
-             x = 0.525, y = 0.85, fontweight='bold',
+             x = (halfTime + 6) / 100, y = 0.85, fontweight='bold',
              ha='center',fontsize=5, color='#181818');
 
 
@@ -2949,7 +2944,7 @@ def xT_Flow(club, gameDay, data):
     mpl.rcParams["axes.labelweight"] = "bold"
 
     # Club Logo
-    fig = add_image(image='Images/Clubs/' + 'Mundial' + '/' + club + '.png', fig=fig, left=0.1, bottom=0.855, width=0.1, height=0.15)
+    fig = add_image(image='Images/Clubs/' + 'Mundial' + '/' + club + '.png', fig=fig, left=0.12, bottom=0.905, width=0.08, height=0.09)
     
     plt.savefig('assets/xTFlow' + club + '.png', dpi=300)
     
@@ -3052,6 +3047,116 @@ def touch_Flow(club):
     plt.savefig('assets/TouchFlow' + club + '.png', dpi=300)
     
     return app.get_asset_url('TouchFlow' + club + '.png')
+
+################################################################################################################################################
+
+def compute_contested_zones(match_id, team_name, data=df):
+    pitch = VerticalPitch(
+        pitch_type='opta',
+        goal_type='box',
+        pitch_color='#E8E8E8',
+        linewidth=1.1,
+        line_color='black',
+        pad_top=10,
+        corner_arcs=True
+    )
+    # Here we can get the positional dimensions
+    pos_x = pitch.dim.positional_x
+    pos_y = pitch.dim.positional_y
+    df = data.copy()
+    df_match = df[df['Match_ID'] == match_id]
+    # -- Adjust opposition figures
+    df_match.loc[:,'x'] = [100 - x if y != team_name else x for x,y in zip(df_match['x'], df_match['team'])]
+    df_match.loc[:,'y'] = [100 - x if y != team_name else x for x,y in zip(df_match['y'], df_match['team'])]
+    df_match = df_match.assign(bins_x = lambda x: pd.cut(x.x, bins=pos_x))
+    df_match = df_match.assign(bins_y = lambda x: pd.cut(x.y, bins=list(pos_y) + [105]))
+    df_match_groupped = df_match.groupby(['bins_x', 'bins_y', 'team', 'Match_ID'])['isTouch'].sum().reset_index(name='touches')
+    df_team = df_match_groupped[df_match_groupped['team'] == team_name]
+    df_oppo = df_match_groupped[df_match_groupped['team'] != team_name].rename(columns={'team':'opp_name', 'touches':'opp_touches'})
+    df_plot = pd.merge(df_team, df_oppo, on=['bins_x', 'bins_y'])
+    df_plot = df_plot.assign(ratio = lambda x: x.touches/(x.touches + x.opp_touches))
+    df_plot['left_x'] = df_plot['bins_x'].apply(lambda x: x.left).astype(float)
+    df_plot['right_x'] = df_plot['bins_x'].apply(lambda x: x.right).astype(float)
+    df_plot['left_y'] = df_plot['bins_y'].apply(lambda x: x.left).astype(float)
+    df_plot['right_y'] = df_plot['bins_y'].apply(lambda x: x.right).astype(float)
+    return df_plot
+
+################################################################################################################################################
+
+def plot_zone_dominance(ax, match_id, team_name, df):
+    data_plot = df.copy()
+    data_plot = compute_contested_zones(match_id, team_name, data=data_plot)
+    pitch = VerticalPitch(
+        pitch_type='opta',
+        goal_type='box',
+        pitch_color='#E8E8E8',
+        linewidth=1.1,
+        line_color='black',
+        pad_top=10,
+        corner_arcs=True
+    )
+    pitch.draw(ax = ax)
+
+    # Here we can get the positional dimensions
+    pos_x = pitch.dim.positional_x
+    pos_y = pitch.dim.positional_y
+
+    for index_y, y in enumerate(pos_y):
+        for index_x, x in enumerate(pos_x):
+            try:
+                lower_y = pos_y[index_y]
+                lower_x = pos_x[index_x]
+                upper_y = pos_y[index_y + 1]
+                upper_x = pos_x[index_x + 1]
+                condition_bounds = (data_plot['left_x'] >= lower_x) & (data_plot['right_x'] <= upper_x) & (data_plot['left_y'] >= lower_y) & (data_plot['right_y'] <= upper_y)
+                data_point = data_plot[condition_bounds]['ratio'].iloc[0]
+                if data_point > .55:
+                    home = data_plot.team.unique()
+                    home = home[0]
+                    color = clubColors.get(home)
+                elif data_point < .45:
+                    away = data_plot.opp_name.unique()
+                    away = away[0]
+                    color = clubColors.get(away)
+                else:
+                    color = '#5b5b5b'
+                ax.fill_between(
+                    x=[lower_y, upper_y],
+                    y1=lower_x,
+                    y2=upper_x,
+                    color=color,
+                    zorder=0,
+                    alpha=0.75,
+                    ec='None'
+                )
+            except:
+                continue
+
+    ax_text(
+        x=100,y=115,
+        s=f"{data_plot['team'].iloc[0].upper()} vs. {data_plot['opp_name'].iloc[0].upper()}",
+        color='black',
+        ha='left',
+        va='center',
+        weight='bold',
+        size=10,
+        ax=ax
+    )
+
+    # Remember that we need to invert the axis!!
+    for x in pos_x[1:-1]:
+        ax.plot([pos_y[0], pos_y[-1]], [x,x], color='black', ls='dashed', zorder=0, lw=0.3, alpha=0.85)
+    for y in pos_y[1:-1]:
+        ax.plot([y,y], [pos_x[0], pos_x[-1]], color='black', ls='dashed', zorder=0, lw=0.3, alpha=0.85)
+
+    return ax
+
+################################################################################################################################################
+
+def territory_dominance(gameDay, teamName):
+    fig, ax = plt.subplots(figsize=(8, 5), dpi=300)
+    fig.set_facecolor('#E8E8E8')
+    return plot_zone_dominance(ax, gameDay, teamName)
 
 ################################################################################################################################################
 
@@ -5575,7 +5680,6 @@ def possessionGained(team, eventType):
 ################################################################################################################################################
 #--------------------------------------------------- SCOUTING --------------------------------------------------------------------------------
 ################################################################################################################################################
-
 
 wyscout = pd.read_csv('WyScout.csv')
 
