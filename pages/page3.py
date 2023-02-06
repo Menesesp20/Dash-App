@@ -8,7 +8,7 @@ import Functions.Game as fc
 
 from matplotlib import font_manager
 
-font_path = 'C:/Users/menes/Documents/Data Hub/Fonts/Gagalin-Regular.otf'
+font_path = 'Fonts/Gagalin-Regular.otf'
 font_manager.fontManager.addfont(font_path)
 prop = font_manager.FontProperties(fname=font_path)
 

@@ -8,7 +8,7 @@ import Functions.Game as fc
 
 from matplotlib import font_manager
 
-font_path = 'C:/Users/menes/Documents/Data Hub/Fonts/Gagalin-Regular.otf'
+font_path = 'Fonts/Gagalin-Regular.otf'
 font_manager.fontManager.addfont(font_path)
 prop = font_manager.FontProperties(fname=font_path)
 
@@ -42,7 +42,7 @@ clubColors = {'Brazil' : ['#fadb04', '#1c3474'],
               'Canada' : ['#ff0000', '#ff0000'],
               'Costa Rica' : ['#ff0000', '#202960']}
 
-df = pd.read_csv('C:/Users/menes/Documents/Data Hub/Database/optaMundial.csv')
+df = pd.read_csv('optaMundial.csv')
 df["matchTimestamp"] = 60 * df["minute"] + df["second"]
 df["matchTimestamp"] = pd.to_timedelta(df["matchTimestamp"], unit='s')
 df.drop_duplicates(subset=['name', 'matchTimestamp', 'team', 'typedisplayName', 'x', 'y'], keep='first', inplace=True)
